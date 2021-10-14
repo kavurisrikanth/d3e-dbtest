@@ -1,3 +1,23 @@
+(QueryUsage StartPage_properties_creatables_computation_Query_getCreatables {
+    query [
+        'Query'
+        'getCreatables'
+        'StartPage'
+        'properties_creatables_computation'
+    ]
+    struct #Creatables
+})
+
+(QueryUsage StartPage_creatables_synchronise_Subscription_onCreatablesChange {
+    query [
+        'Subscription'
+        'onCreatablesChange'
+        'StartPage'
+        'creatables_synchronise'
+    ]
+    struct #Creatables
+})
+
 (QueryUsage StartPage_eventHandlers_createBasic_block_Query_loadCreatable {
     query [
         'Query'

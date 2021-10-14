@@ -72,6 +72,7 @@ type Query
 	getCreatableById ( id: Long ) : Creatable
 	getOneTimePasswordById ( id: Long ) : OneTimePassword
 	checkTokenUniqueInOneTimePassword ( oneTimePasswordId: Long token: String ) : Boolean
+	getCreatables : Creatables
 	loginWithOTP ( token: String code: String ) : LoginResult
 }
 
@@ -196,6 +197,18 @@ input CreatableEntityInput
 	childColl : [NonCreatableEntityInput]
 	file : DFileEntityInput
 	emb : EmbeddedEntityInput
+}
+
+type CreatablesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+}
+
+input CreatablesRequestEntityInput
+{
+	id : Long
 }
 
 type D3EImage
@@ -416,6 +429,11 @@ input UserSessionEntityInput
 {
 	id : Long
 	userSessionId : String
+}
+
+type Creatables
+{
+	items : [Creatable]
 }
 
 enum MutateResultStatus {

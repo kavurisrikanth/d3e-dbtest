@@ -1,5 +1,6 @@
 package rest;
 
+import classes.Creatables;
 import classes.LoginResult;
 import classes.ReportOutAttribute;
 import classes.ReportOutCell;
@@ -28,6 +29,7 @@ public class StructSchema1 {
     addReportOutRowFields();
     addReportOutCellFields();
     addLoginResultFields();
+    addCreatablesFields();
   }
 
   public DModel<?> getType(String type) {
@@ -250,5 +252,34 @@ public class StructSchema1 {
         FieldPrimitiveType.String,
         (s) -> s.getFailureMessage(),
         (s, v) -> s.setFailureMessage(v));
+  }
+
+  private void addCreatablesFields() {
+    DModel<Creatables> m = getType2("Creatables");
+    m.addEnum(
+        "status",
+        Creatables._STATUS,
+        null,
+        SchemaConstants.DBResultStatus,
+        (s) -> s.getStatus(),
+        (s, v) -> s.setStatus(v));
+    m.addPrimitiveCollection(
+        "errors",
+        Creatables._ERRORS,
+        null,
+        null,
+        FieldPrimitiveType.String,
+        (s) -> s.getErrors(),
+        (s, v) -> s.setErrors(v));
+    m.addReferenceCollection(
+        "items",
+        Creatables._ITEMS,
+        null,
+        null,
+        false,
+        getType("Creatable"),
+        (s) -> s.getItems(),
+        (s, v) -> s.setItems(v),
+        (s) -> s.getItemsRef());
   }
 }

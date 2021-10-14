@@ -57,6 +57,7 @@ public class Creatable extends CreatableObject {
   private DFile file;
 
   @Field @ChildDocument @javax.persistence.Embedded private Embedded emb = new Embedded();
+  private transient Creatable old;
 
   @Override
   public int _typeIdx() {
@@ -220,6 +221,22 @@ public class Creatable extends CreatableObject {
     this.emb._setChildIdx(_EMB);
   }
 
+  public Creatable getOld() {
+    return this.old;
+  }
+
+  public void setOld(DatabaseObject old) {
+    this.old = ((Creatable) old);
+  }
+
+  public void recordOld(CloneContext ctx) {
+    super.recordOld(ctx);
+    if (this.getChild() != null) {
+      this.getChild().recordOld(ctx);
+    }
+    this.getChildColl().forEach((one) -> one.recordOld(ctx));
+  }
+
   public String displayName() {
     return "Creatable";
   }
@@ -273,6 +290,10 @@ public class Creatable extends CreatableObject {
 
   public Creatable createNewInstance() {
     return new Creatable();
+  }
+
+  public boolean needOldObject() {
+    return true;
   }
 
   public void collectCreatableReferences(List<Object> _refs) {

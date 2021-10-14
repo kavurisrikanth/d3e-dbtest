@@ -336,6 +336,11 @@
 				},
 				{
 					"kind": "OBJECT",
+					"name": "CreatablesRequest",
+					"ofType": null
+				},
+				{
+					"kind": "OBJECT",
 					"name": "EmailMessage",
 					"ofType": null
 				},
@@ -735,6 +740,20 @@
 					"type": {
 						"kind": "SCALAR",
 						"name": "Boolean",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "getCreatables",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "Creatables",
 						"ofType": null
 					},
 					"isDeprecated": false,
@@ -1928,6 +1947,76 @@
 					"type": {
 						"kind": "INPUT_OBJECT",
 						"name": "EmbeddedEntityInput",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"interfaces": null,
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
+			"name": "CreatablesRequest",
+			"description": "",
+			"fields": [
+				{
+					"name": "id",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "SCALAR",
+						"name": "Long",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "localId",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "SCALAR",
+						"name": "Long",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+				{
+					"kind": "INTERFACE",
+					"name": "DBObject",
+					"ofType": null
+				}
+			],
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "INPUT_OBJECT",
+			"name": "CreatablesRequestEntityInput",
+			"description": "",
+			"fields": null,
+			"inputFields": [
+				{
+					"name": "id",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "SCALAR",
+						"name": "Long",
 						"ofType": null
 					},
 					"isDeprecated": false,
@@ -3898,6 +3987,37 @@
 				}
 			],
 			"interfaces": null,
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
+			"name": "Creatables",
+			"description": "",
+			"fields": [
+				{
+					"name": "items",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "LIST",
+						"name": null,
+						"ofType": {
+							"kind": "OBJECT",
+							"name": "Creatable",
+							"ofType": null
+						}
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+
+			],
 			"enumValues": null,
 			"possibleTypes": null
 		}

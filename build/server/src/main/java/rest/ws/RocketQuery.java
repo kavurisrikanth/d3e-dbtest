@@ -1,5 +1,6 @@
 package rest.ws;
 
+import classes.Creatables;
 import classes.LoginResult;
 import classes.MutateResultStatus;
 import d3e.core.CurrentUser;
@@ -8,7 +9,11 @@ import d3e.core.ListExt;
 import gqltosql2.Field;
 import gqltosql2.GqlToSql;
 import gqltosql2.OutObject;
+import java.util.List;
 import java.util.UUID;
+import lists.CreatablesChangeTracker;
+import lists.CreatablesImpl;
+import lists.NativeObj;
 import models.AnonymousUser;
 import models.OneTimePassword;
 import models.User;
@@ -31,6 +36,7 @@ public class RocketQuery extends AbstractRocketQuery {
   @Autowired private JwtTokenUtil jwtTokenUtil;
   @Autowired private AnonymousUserRepository anonymousUserRepository;
   @Autowired private OneTimePasswordRepository oneTimePasswordRepository;
+  @Autowired private CreatablesImpl creatablesImpl;
   @Autowired private DataChangeTracker dataChangeTracker;
 
   protected LoginResult login(
@@ -104,6 +110,25 @@ public class RocketQuery extends AbstractRocketQuery {
             return singleResult("OneTimePassword", false, one, tracker);
           }
           return singleResult("OneTimePassword", false, one);
+        }
+      case "getCreatables":
+        {
+          if (!(currentUser instanceof AnonymousUser)) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList(
+                    "Current user type does not have read permissions for this DataQuery."));
+          }
+          List<NativeObj> rows = creatablesImpl.getNativeResult();
+          OutObject res = creatablesImpl.getAsJson(inspect2(field, "items"), rows);
+          if (subscribed) {
+            Creatables resObj = creatablesImpl.getAsStruct(rows);
+            CreatablesChangeTracker tracker =
+                new CreatablesChangeTracker(dataChangeTracker, session, field);
+            tracker.init(res, resObj);
+            return singleResult("Creatables", false, res, tracker);
+          }
+          return singleResult("Creatables", false, res);
         }
       case "currentAnonymousUser":
         {

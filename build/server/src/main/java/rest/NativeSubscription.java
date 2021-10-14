@@ -12,6 +12,8 @@ import graphql.language.Field;
 import io.reactivex.rxjava3.core.Flowable;
 import java.util.HashMap;
 import java.util.List;
+import lists.CreatablesSubscriptionHelper;
+import lists.DataQueryChange;
 import org.json.JSONObject;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +29,28 @@ public class NativeSubscription extends AbstractQueryService {
   @Autowired private D3ESubscription subscription;
   @Autowired private IModelSchema schema;
   @Autowired private GqlToSql gqltosql;
+  @Autowired private ObjectFactory<CreatablesSubscriptionHelper> creatables;
 
   public Flowable<JSONObject> subscribe(JSONObject req) throws Exception {
     List<Field> fields = parseFields(req);
     Field field = fields.get(0);
     JSONObject variables = req.getJSONObject("variables");
     return executeOperation(field, variables);
+  }
+
+  private JSONObject fromDataQueryDataChange(DataQueryChange<?> event, Field field) {
+    JSONObject data = new JSONObject();
+    JSONObject opData = new JSONObject();
+    try {
+      opData.put("changeType", event.changeType.name());
+      opData.put("path", event.path);
+      opData.put("data", event.data);
+      opData.put("position", event.index);
+      data.put(field.getName(), opData);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return data;
   }
 
   private <T> JSONObject fromD3ESubscriptionEventExternal(
@@ -151,6 +169,13 @@ public class NativeSubscription extends AbstractQueryService {
               .onUserSessionChangeEvent()
               .filter((e) -> ids.contains(e.model.getId()))
               .map((e) -> fromD3ESubscriptionEvent(e, field, "UserSession"));
+        }
+      case "onCreatablesChange":
+        {
+          return creatables
+              .getObject()
+              .subscribe(inspect(field, "data.items"))
+              .map((e) -> fromDataQueryDataChange(e, field));
         }
     }
     D3ELogger.info("Subscription Not found");

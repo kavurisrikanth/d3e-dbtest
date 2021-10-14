@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import lists.CreatablesImpl;
 import models.AnonymousUser;
 import models.OneTimePassword;
 import models.User;
@@ -57,6 +58,7 @@ public class NativeQuery extends AbstractQueryService {
   @Autowired private UserSessionRepository userSessionRepository;
   @Autowired private PasswordEncoder passwordEncoder;
   @Autowired private ObjectFactory<AppSessionProvider> provider;
+  @Autowired private CreatablesImpl creatablesImpl;
 
   @PostMapping(path = "/query", produces = MediaType.APPLICATION_JSON_VALUE)
   public String run(@RequestBody String query) throws Exception {
@@ -136,6 +138,16 @@ public class NativeQuery extends AbstractQueryService {
                 ListExt.asList("Current user does not have read permissions for this model."));
           }
           return gqlToSql.execute("OneTimePassword", field, ctx.readLong("id"));
+        }
+      case "getCreatables":
+        {
+          if (!(currentUser instanceof AnonymousUser)) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList(
+                    "Current user type does not have read permissions for this DataQuery."));
+          }
+          return creatablesImpl.getAsJson(inspect(field, "items"));
         }
       case "loginWithOTP":
         {

@@ -10,6 +10,7 @@ import '../rocket/Template.dart';
 import '../utils/GraphQLClientInit.dart';
 import '../utils/LocalDataStore.dart';
 import '../utils/ReferenceCatch.dart';
+import 'Creatables.dart';
 
 class Query {
   GraphQLClient _client;
@@ -39,5 +40,11 @@ class Query {
 
   Future<Creatable> getCreatableById(int usage, int id) async {
     return MessageDispatch.get().query(CREATABLE, id, usage);
+  }
+
+  Future<Creatables> getCreatables(int usage,
+      {bool optimized = false, bool synchronize = false}) async {
+    return MessageDispatch.get()
+        .dataQuery('Creatables', usage, false, null, synchronize: synchronize);
   }
 }

@@ -2,6 +2,7 @@ package rest;
 
 import classes.ChangeEventType;
 import classes.ConnectionStatus;
+import classes.Creatables;
 import classes.DBResultStatus;
 import classes.IconType;
 import classes.ImageFrom;
@@ -22,6 +23,7 @@ import gqltosql.schema.FieldPrimitiveType;
 import models.AnonymousUser;
 import models.Avatar;
 import models.Creatable;
+import models.CreatablesRequest;
 import models.D3EImage;
 import models.D3EMessage;
 import models.EmailMessage;
@@ -78,6 +80,16 @@ public class ModelSchema extends AbstractModelSchema {
             "_creatable",
             DModelType.MODEL,
             () -> new Creatable()));
+    addTable(
+        new DModel<CreatablesRequest>(
+                "CreatablesRequest",
+                SchemaConstants.CreatablesRequest,
+                0,
+                0,
+                "_creatables_request",
+                DModelType.MODEL,
+                () -> new CreatablesRequest())
+            .trans());
     addTable(
         new DModel<D3EImage>(
                 "D3EImage",
@@ -235,6 +247,15 @@ public class ModelSchema extends AbstractModelSchema {
             null,
             DModelType.STRUCT,
             () -> new LoginResult()));
+    addTable(
+        new DModel<Creatables>(
+            "Creatables",
+            SchemaConstants.Creatables,
+            3,
+            0,
+            null,
+            DModelType.STRUCT,
+            () -> new Creatables()));
     addDFileFields();
   }
 

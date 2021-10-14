@@ -8,6 +8,7 @@ import java.util.Map;
 import models.AnonymousUser;
 import models.Avatar;
 import models.Creatable;
+import models.CreatablesRequest;
 import models.D3EImage;
 import models.D3EMessage;
 import models.EmailMessage;
@@ -32,6 +33,7 @@ public class ModelSchema1 {
     addAnonymousUserFields();
     addAvatarFields();
     addCreatableFields();
+    addCreatablesRequestFields();
     addD3EImageFields();
     addD3EMessageFields();
     addEmailMessageFields();
@@ -137,6 +139,10 @@ public class ModelSchema1 {
         getType("Embedded"),
         (s) -> s.getEmb(),
         (s, v) -> s.setEmb(v));
+  }
+
+  private void addCreatablesRequestFields() {
+    DModel<CreatablesRequest> m = getType2("CreatablesRequest");
   }
 
   private void addD3EImageFields() {

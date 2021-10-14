@@ -6,7 +6,7 @@ class DisplayUtil {
   DisplayUtil();
   static String displayCreatable(Creatable c) {
     if (c == null) {
-      return 'Unnamed';
+      return 'Null Creatable';
     }
 
     StringBuffer sb = StringBuffer();
@@ -52,7 +52,7 @@ class DisplayUtil {
 
   static String displayNonCreatable(NonCreatable nc) {
     if (nc == null) {
-      return 'Unnamed NonCreatable';
+      return 'Null NonCreatable';
     }
 
     StringBuffer sb = StringBuffer();
@@ -68,7 +68,7 @@ class DisplayUtil {
 
   static String displayEmbedded(Embedded e) {
     if (e == null) {
-      return 'Unnamed Embedded';
+      return 'Null Embedded';
     }
 
     return e.embName;

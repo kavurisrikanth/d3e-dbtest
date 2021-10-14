@@ -11,6 +11,8 @@
     loginSettings ({
     })
     queries [
-        
+        ({
+            query #Creatables
+        })
     ]
 })

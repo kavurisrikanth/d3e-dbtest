@@ -1,5 +1,6 @@
 import 'TemplateTypes.dart';
 import '../classes/ConnectionStatus.dart';
+import '../classes/Creatables.dart';
 import '../classes/DBResultStatus.dart';
 import '../classes/LoginResult.dart';
 import '../models/Creatable.dart';
@@ -12,41 +13,47 @@ const int CONNECTIONSTATUS = 1;
 
 const int CREATABLE = 2;
 
-const int DBRESULTSTATUS = 3;
+const int CREATABLES = 3;
 
-const int DFILE = 4;
+const int DBRESULTSTATUS = 4;
 
-const int DATE = 5;
+const int DFILE = 5;
 
-const int DATETIME = 6;
+const int DATE = 6;
 
-const int DOUBLE = 7;
+const int DATETIME = 7;
 
-const int DURATION = 8;
+const int DOUBLE = 8;
 
-const int EMBEDDED = 9;
+const int DURATION = 9;
 
-const int INTEGER = 10;
+const int EMBEDDED = 10;
 
-const int LOGINRESULT = 11;
+const int INTEGER = 11;
 
-const int NONCREATABLE = 12;
+const int LOGINRESULT = 12;
 
-const int STRING = 13;
+const int NONCREATABLE = 13;
 
-const int TIME = 14;
+const int STRING = 14;
 
-const int TYPE = 15;
+const int TIME = 15;
 
-const int USER = 16;
+const int TYPE = 16;
+
+const int USER = 17;
 
 class UsageConstants {
   static final int
-      STARTPAGE_EVENTHANDLERS_CREATEBASIC_BLOCK_QUERY_LOADCREATABLE = 0;
+      STARTPAGE_CREATABLES_SYNCHRONISE_SUBSCRIPTION_ONCREATABLESCHANGE = 0;
   static final int
-      STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE = 1;
+      STARTPAGE_EVENTHANDLERS_CREATEBASIC_BLOCK_QUERY_LOADCREATABLE = 1;
+  static final int
+      STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE = 2;
   static final int STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE =
-      2;
+      3;
+  static final int
+      STARTPAGE_PROPERTIES_CREATABLES_COMPUTATION_QUERY_GETCREATABLES = 4;
 }
 
 class ChannelConstants {
@@ -55,8 +62,16 @@ class ChannelConstants {
 }
 
 class Template {
-  static String HASH = '43421fc3fd27c9d95255adb287d22e5d';
+  static String HASH = 'd8aed84f220ccf8db07c92d279e3ed40';
   static List<Usage> _usages = [
+    Usage(
+        'StartPage_creatables_synchronise_Subscription_onCreatablesChange',
+        [
+          TypeUsage(CREATABLES, [
+            FieldUsage(1, [TypeUsage(CREATABLE, [])])
+          ])
+        ],
+        'ce3faeb2c73f4133a2ace22f5fe1c97d'),
     Usage(
         'StartPage_eventHandlers_createBasic_block_Query_loadCreatable',
         [
@@ -167,7 +182,15 @@ class Template {
             FieldUsage(6, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '94190277ec30aa16483467018a7ea4f9')
+        '94190277ec30aa16483467018a7ea4f9'),
+    Usage(
+        'StartPage_properties_creatables_computation_Query_getCreatables',
+        [
+          TypeUsage(CREATABLES, [
+            FieldUsage(1, [TypeUsage(CREATABLE, [])])
+          ])
+        ],
+        'ce3faeb2c73f4133a2ace22f5fe1c97d')
   ];
   static List<TemplateType> _types = [
     TemplateType('Boolean', '27226c864bac7454a8504f8edb15d95b', []),
@@ -197,6 +220,16 @@ class Template {
         ],
         refType: RefType.Model,
         creator: () => Creatable()),
+    TemplateType(
+        'Creatables',
+        'ea47dcd50be8f52cedcc136ae32aff4a',
+        [
+          TemplateField('errors', STRING, FieldType.String, collection: true),
+          TemplateField('items', CREATABLE, FieldType.Ref, collection: true),
+          TemplateField('status', DBRESULTSTATUS, FieldType.Enum)
+        ],
+        refType: RefType.Struct,
+        creator: () => Creatables()),
     TemplateType(
         'DBResultStatus',
         'b7ade0f723488459cca2566a1b4959b5',

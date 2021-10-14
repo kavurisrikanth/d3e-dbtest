@@ -1,8 +1,10 @@
 package d3e.core;
 
+import classes.Creatables;
 import classes.LoginResult;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
+import lists.CreatablesImpl;
 import models.AnonymousUser;
 import models.Creatable;
 import models.OneTimePassword;
@@ -35,6 +37,7 @@ public class QueryProvider {
   @Autowired private ReportConfigOptionRepository reportConfigOptionRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private UserSessionRepository userSessionRepository;
+  @Autowired private CreatablesImpl creatablesImpl;
   @Autowired private ObjectFactory<AppSessionProvider> provider;
 
   @PostConstruct
@@ -63,6 +66,10 @@ public class QueryProvider {
 
   public boolean checkTokenUniqueInOneTimePassword(long oneTimePasswordId, String token) {
     return oneTimePasswordRepository.checkTokenUnique(oneTimePasswordId, token);
+  }
+
+  public Creatables getCreatables() {
+    return creatablesImpl.get();
   }
 
   public LoginResult loginWithOTP(String token, String code, String deviceToken) {

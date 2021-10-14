@@ -1,0 +1,4 @@
+(DataQuery Creatables {
+    query `Creatable.all`
+    enableSync true
+})
