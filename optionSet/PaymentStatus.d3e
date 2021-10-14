@@ -1,7 +1,0 @@
-(OptionSet PaymentStatus {
-    options [
-        (Pending {})
-        (Completed {})
-        (Failed {})
-    ]
-})
