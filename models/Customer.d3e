@@ -54,5 +54,10 @@
             collection true
             child true
         })
+        (avatar {
+            type ({
+                model #D3EImage
+            })
+        })
     ]
 })
