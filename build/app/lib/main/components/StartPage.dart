@@ -205,18 +205,30 @@ class _StartPageState extends ObservableState<StartPage> {
   Widget build(BuildContext context) {
     return ScrollView2(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Row(children: [
-            for (var item in this.allCreatables)
-              Text(DisplayUtil.displayCreatable(item))
-          ]),
-          Row(children: [
-            Text('Creatable'),
-            Text(DisplayUtil.displayCreatable(this.creatable))
-          ]),
-          Row(children: [
-            Text('NonCreatable'),
-            Text(DisplayUtil.displayNonCreatable(this.nonCreatable))
-          ]),
+          ScrollView2(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var item in this.allCreatables)
+                      Text(DisplayUtil.displayCreatable(item))
+                  ]),
+              scrollDirection: Axis.horizontal),
+          ScrollView2(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Creatable'),
+                    Text(DisplayUtil.displayCreatable(this.creatable))
+                  ]),
+              scrollDirection: Axis.horizontal),
+          ScrollView2(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('NonCreatable'),
+                    Text(DisplayUtil.displayNonCreatable(this.nonCreatable))
+                  ]),
+              scrollDirection: Axis.horizontal),
           Button(
               onPressed: () {
                 createBasic();
