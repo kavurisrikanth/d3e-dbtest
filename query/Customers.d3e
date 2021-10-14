@@ -1,0 +1,4 @@
+(DataQuery Customers {
+    query `Customer.all`
+    enableSync true
+})

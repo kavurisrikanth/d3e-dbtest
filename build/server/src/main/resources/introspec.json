@@ -886,6 +886,34 @@
 					"deprecationReason": null
 				},
 				{
+					"name": "getCustomers",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "Customers",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "getInventory",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "Inventory",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
 					"name": "loginWithOTP",
 					"description": "",
 					"args": [
@@ -928,6 +956,344 @@
 		},
 		{
 			"kind": "OBJECT",
+			"name": "Mutation",
+			"description": "",
+			"fields": [
+				{
+					"name": "createCustomer",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "INPUT_OBJECT",
+								"name": "CustomerEntityInput",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateCustomerResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "updateCustomer",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "INPUT_OBJECT",
+								"name": "CustomerEntityInput",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateCustomerResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "deleteCustomer",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "SCALAR",
+								"name": "Long",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateCustomerResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "createInventoryItem",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "INPUT_OBJECT",
+								"name": "InventoryItemEntityInput",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateInventoryItemResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "updateInventoryItem",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "INPUT_OBJECT",
+								"name": "InventoryItemEntityInput",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateInventoryItemResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "deleteInventoryItem",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "SCALAR",
+								"name": "Long",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateInventoryItemResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "createOrder",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "INPUT_OBJECT",
+								"name": "OrderEntityInput",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateOrderResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "updateOrder",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "INPUT_OBJECT",
+								"name": "OrderEntityInput",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateOrderResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "deleteOrder",
+					"description": "",
+					"args": [
+						{
+							"name": "input",
+							"description": "",
+							"type": {
+								"kind": "SCALAR",
+								"name": "Long",
+								"ofType": null
+							},
+							"defaultValue": null
+						}
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "MutateOrderResult",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+
+			],
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
+			"name": "MutateCustomerResult",
+			"description": "",
+			"fields": [
+				{
+					"name": "status",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "ENUM",
+						"name": "MutateResultStatus",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "value",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "Customer",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "errors",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "LIST",
+						"name": null,
+						"ofType": {
+							"kind": "SCALAR",
+							"name": "String",
+							"ofType": null
+						}
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+
+			],
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
+			"name": "MutateInventoryItemResult",
+			"description": "",
+			"fields": [
+				{
+					"name": "status",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "ENUM",
+						"name": "MutateResultStatus",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "value",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "InventoryItem",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "errors",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "LIST",
+						"name": null,
+						"ofType": {
+							"kind": "SCALAR",
+							"name": "String",
+							"ofType": null
+						}
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+
+			],
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
 			"name": "MutateOneTimePasswordResult",
 			"description": "",
 			"fields": [
@@ -954,6 +1320,65 @@
 					"type": {
 						"kind": "OBJECT",
 						"name": "OneTimePassword",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "errors",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "LIST",
+						"name": null,
+						"ofType": {
+							"kind": "SCALAR",
+							"name": "String",
+							"ofType": null
+						}
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+
+			],
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
+			"name": "MutateOrderResult",
+			"description": "",
+			"fields": [
+				{
+					"name": "status",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "ENUM",
+						"name": "MutateResultStatus",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "value",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "OBJECT",
+						"name": "Order",
 						"ofType": null
 					},
 					"isDeprecated": false,
@@ -4749,6 +5174,68 @@
 				}
 			],
 			"interfaces": null,
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
+			"name": "Customers",
+			"description": "",
+			"fields": [
+				{
+					"name": "items",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "LIST",
+						"name": null,
+						"ofType": {
+							"kind": "OBJECT",
+							"name": "Customer",
+							"ofType": null
+						}
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+
+			],
+			"enumValues": null,
+			"possibleTypes": null
+		},
+		{
+			"kind": "OBJECT",
+			"name": "Inventory",
+			"description": "",
+			"fields": [
+				{
+					"name": "items",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "LIST",
+						"name": null,
+						"ofType": {
+							"kind": "OBJECT",
+							"name": "InventoryItem",
+							"ofType": null
+						}
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				}
+			],
+			"inputFields": null,
+			"interfaces": [
+
+			],
 			"enumValues": null,
 			"possibleTypes": null
 		}

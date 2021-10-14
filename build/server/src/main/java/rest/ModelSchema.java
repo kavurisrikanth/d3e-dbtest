@@ -2,9 +2,11 @@ package rest;
 
 import classes.ChangeEventType;
 import classes.ConnectionStatus;
+import classes.Customers;
 import classes.Gender;
 import classes.IconType;
 import classes.ImageFrom;
+import classes.Inventory;
 import classes.LoginResult;
 import classes.MutateResultStatus;
 import classes.PaymentStatus;
@@ -269,6 +271,24 @@ public class ModelSchema extends AbstractModelSchema {
             null,
             DModelType.STRUCT,
             () -> new LoginResult()));
+    addTable(
+        new DModel<Customers>(
+            "Customers",
+            SchemaConstants.Customers,
+            1,
+            0,
+            null,
+            DModelType.STRUCT,
+            () -> new Customers()));
+    addTable(
+        new DModel<Inventory>(
+            "Inventory",
+            SchemaConstants.Inventory,
+            1,
+            0,
+            null,
+            DModelType.STRUCT,
+            () -> new Inventory()));
     addDFileFields();
   }
 

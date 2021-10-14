@@ -36,13 +36,17 @@ public class SchemaConstants {
   public static final int ReportOutRow = 32;
   public static final int ReportOutCell = 33;
   public static final int LoginResult = 34;
-  public static final int ConnectionStatus = 35;
-  public static final int MutateResultStatus = 36;
-  public static final int ChangeEventType = 37;
-  public static final int TrackSizeType = 38;
-  public static final int IconType = 39;
-  public static final int ImageFrom = 40;
-  public static final int Gender = 41;
-  public static final int PaymentStatus = 42;
-  public static final int _TOTAL_COUNT = 43;
+  public static final int Customers = 35;
+  public static final int Inventory = 36;
+  public static final int CustomersBase = 37;
+  public static final int InventoryBase = 38;
+  public static final int ConnectionStatus = 39;
+  public static final int MutateResultStatus = 40;
+  public static final int ChangeEventType = 41;
+  public static final int TrackSizeType = 42;
+  public static final int IconType = 43;
+  public static final int ImageFrom = 44;
+  public static final int Gender = 45;
+  public static final int PaymentStatus = 46;
+  public static final int _TOTAL_COUNT = 47;
 }

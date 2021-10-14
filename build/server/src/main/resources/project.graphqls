@@ -76,17 +76,49 @@ type Query
 	getOneTimePasswordById ( id: Long ) : OneTimePassword
 	checkTokenUniqueInOneTimePassword ( oneTimePasswordId: Long token: String ) : Boolean
 	getOrderById ( id: Long ) : Order
+	getCustomers : Customers
+	getInventory : Inventory
 	loginWithOTP ( token: String code: String ) : LoginResult
 }
 
 type Mutation
 {
+	createCustomer ( input: CustomerEntityInput ) : MutateCustomerResult
+	updateCustomer ( input: CustomerEntityInput ) : MutateCustomerResult
+	deleteCustomer ( input: Long ) : MutateCustomerResult
+	createInventoryItem ( input: InventoryItemEntityInput ) : MutateInventoryItemResult
+	updateInventoryItem ( input: InventoryItemEntityInput ) : MutateInventoryItemResult
+	deleteInventoryItem ( input: Long ) : MutateInventoryItemResult
+	createOrder ( input: OrderEntityInput ) : MutateOrderResult
+	updateOrder ( input: OrderEntityInput ) : MutateOrderResult
+	deleteOrder ( input: Long ) : MutateOrderResult
+}
+
+type MutateCustomerResult
+{
+	status : MutateResultStatus
+	value : Customer
+	errors : [String]
+}
+
+type MutateInventoryItemResult
+{
+	status : MutateResultStatus
+	value : InventoryItem
+	errors : [String]
 }
 
 type MutateOneTimePasswordResult
 {
 	status : MutateResultStatus
 	value : OneTimePassword
+	errors : [String]
+}
+
+type MutateOrderResult
+{
+	status : MutateResultStatus
+	value : Order
 	errors : [String]
 }
 
@@ -502,6 +534,16 @@ input UserSessionEntityInput
 {
 	id : Long
 	userSessionId : String
+}
+
+type Customers
+{
+	items : [Customer]
+}
+
+type Inventory
+{
+	items : [InventoryItem]
 }
 
 enum MutateResultStatus {

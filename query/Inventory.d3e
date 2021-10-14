@@ -1,0 +1,4 @@
+(DataQuery Inventory {
+    query `InventoryItem.all`
+    enableSync true
+})

@@ -1,22 +1,35 @@
 package rest.ws;
 
+import classes.Customers;
+import classes.Inventory;
 import classes.LoginResult;
+import classes.MutateResultStatus;
 import d3e.core.CurrentUser;
 import d3e.core.D3ELogger;
+import d3e.core.ListExt;
 import gqltosql2.Field;
 import gqltosql2.GqlToSql;
 import gqltosql2.OutObject;
+import java.util.List;
 import java.util.UUID;
+import lists.CustomersChangeTracker;
+import lists.CustomersImpl;
+import lists.InventoryChangeTracker;
+import lists.InventoryImpl;
+import lists.NativeObj;
+import models.AnonymousUser;
 import models.OneTimePassword;
 import models.User;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import repository.jpa.AnonymousUserRepository;
 import repository.jpa.OneTimePasswordRepository;
 import security.AppSessionProvider;
 import security.JwtTokenUtil;
 import security.UserProxy;
+import store.ValidationFailedException;
 
 @Service
 public class RocketQuery extends AbstractRocketQuery {
@@ -24,7 +37,10 @@ public class RocketQuery extends AbstractRocketQuery {
   @Autowired private PasswordEncoder passwordEncoder;
   @Autowired private ObjectFactory<AppSessionProvider> provider;
   @Autowired private JwtTokenUtil jwtTokenUtil;
+  @Autowired private AnonymousUserRepository anonymousUserRepository;
   @Autowired private OneTimePasswordRepository oneTimePasswordRepository;
+  @Autowired private CustomersImpl customersImpl;
+  @Autowired private InventoryImpl inventoryImpl;
   @Autowired private DataChangeTracker dataChangeTracker;
 
   protected LoginResult login(
@@ -56,6 +72,11 @@ public class RocketQuery extends AbstractRocketQuery {
     switch (query) {
       case "getAnonymousUserById":
         {
+          if (currentUser instanceof AnonymousUser) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList("Current user does not have read permissions for this model."));
+          }
           OutObject one = gqlToSql.execute("AnonymousUser", field, ctx.readLong());
           if (subscribed) {
             OutObjectTracker tracker = new OutObjectTracker(dataChangeTracker, session, field);
@@ -66,6 +87,11 @@ public class RocketQuery extends AbstractRocketQuery {
         }
       case "getCustomerById":
         {
+          if (currentUser instanceof AnonymousUser) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList("Current user does not have read permissions for this model."));
+          }
           OutObject one = gqlToSql.execute("Customer", field, ctx.readLong());
           if (subscribed) {
             OutObjectTracker tracker = new OutObjectTracker(dataChangeTracker, session, field);
@@ -76,6 +102,11 @@ public class RocketQuery extends AbstractRocketQuery {
         }
       case "getInventoryItemById":
         {
+          if (currentUser instanceof AnonymousUser) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList("Current user does not have read permissions for this model."));
+          }
           OutObject one = gqlToSql.execute("InventoryItem", field, ctx.readLong());
           if (subscribed) {
             OutObjectTracker tracker = new OutObjectTracker(dataChangeTracker, session, field);
@@ -86,6 +117,11 @@ public class RocketQuery extends AbstractRocketQuery {
         }
       case "getOneTimePasswordById":
         {
+          if (currentUser instanceof AnonymousUser) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList("Current user does not have read permissions for this model."));
+          }
           OutObject one = gqlToSql.execute("OneTimePassword", field, ctx.readLong());
           if (subscribed) {
             OutObjectTracker tracker = new OutObjectTracker(dataChangeTracker, session, field);
@@ -96,6 +132,11 @@ public class RocketQuery extends AbstractRocketQuery {
         }
       case "getOrderById":
         {
+          if (currentUser instanceof AnonymousUser) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList("Current user does not have read permissions for this model."));
+          }
           OutObject one = gqlToSql.execute("Order", field, ctx.readLong());
           if (subscribed) {
             OutObjectTracker tracker = new OutObjectTracker(dataChangeTracker, session, field);
@@ -103,6 +144,48 @@ public class RocketQuery extends AbstractRocketQuery {
             return singleResult("Order", false, one, tracker);
           }
           return singleResult("Order", false, one);
+        }
+      case "getCustomers":
+        {
+          if (!(currentUser instanceof AnonymousUser)) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList(
+                    "Current user type does not have read permissions for this DataQuery."));
+          }
+          List<NativeObj> rows = customersImpl.getNativeResult();
+          OutObject res = customersImpl.getAsJson(inspect2(field, "items"), rows);
+          if (subscribed) {
+            Customers resObj = customersImpl.getAsStruct(rows);
+            CustomersChangeTracker tracker =
+                new CustomersChangeTracker(dataChangeTracker, session, field);
+            tracker.init(res, resObj);
+            return singleResult("Customers", false, res, tracker);
+          }
+          return singleResult("Customers", false, res);
+        }
+      case "getInventory":
+        {
+          if (!(currentUser instanceof AnonymousUser)) {
+            throw new ValidationFailedException(
+                MutateResultStatus.AuthFail,
+                ListExt.asList(
+                    "Current user type does not have read permissions for this DataQuery."));
+          }
+          List<NativeObj> rows = inventoryImpl.getNativeResult();
+          OutObject res = inventoryImpl.getAsJson(inspect2(field, "items"), rows);
+          if (subscribed) {
+            Inventory resObj = inventoryImpl.getAsStruct(rows);
+            InventoryChangeTracker tracker =
+                new InventoryChangeTracker(dataChangeTracker, session, field);
+            tracker.init(res, resObj);
+            return singleResult("Inventory", false, res, tracker);
+          }
+          return singleResult("Inventory", false, res);
+        }
+      case "currentAnonymousUser":
+        {
+          return singleResult("AnonymousUser", false, provider.getObject().getAnonymousUser());
         }
     }
     D3ELogger.info("Query Not found");

@@ -67,6 +67,8 @@ public class Customer extends CreatableObject {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   private List<PaymentMethod> paymentMethods = new ArrayList<>();
 
+  private transient Customer old;
+
   @Override
   public int _typeIdx() {
     return SchemaConstants.Customer;
@@ -225,6 +227,19 @@ public class Customer extends CreatableObject {
         });
   }
 
+  public Customer getOld() {
+    return this.old;
+  }
+
+  public void setOld(DatabaseObject old) {
+    this.old = ((Customer) old);
+  }
+
+  public void recordOld(CloneContext ctx) {
+    super.recordOld(ctx);
+    this.getPaymentMethods().forEach((one) -> one.recordOld(ctx));
+  }
+
   public String displayName() {
     return "Customer";
   }
@@ -278,6 +293,10 @@ public class Customer extends CreatableObject {
 
   public Customer createNewInstance() {
     return new Customer();
+  }
+
+  public boolean needOldObject() {
+    return true;
   }
 
   public void collectCreatableReferences(List<Object> _refs) {

@@ -1,0 +1,39 @@
+(QueryUsage StartPage_properties_customers_computation_Query_getCustomers {
+    query [
+        'Query'
+        'getCustomers'
+        'StartPage'
+        'properties_customers_computation'
+    ]
+    struct #Customers
+})
+
+(QueryUsage StartPage_customers_synchronise_Subscription_onCustomersChange {
+    query [
+        'Subscription'
+        'onCustomersChange'
+        'StartPage'
+        'customers_synchronise'
+    ]
+    struct #Customers
+})
+
+(QueryUsage StartPage_properties_inventory_computation_Query_getInventory {
+    query [
+        'Query'
+        'getInventory'
+        'StartPage'
+        'properties_inventory_computation'
+    ]
+    struct #Inventory
+})
+
+(QueryUsage StartPage_inventory_synchronise_Subscription_onInventoryChange {
+    query [
+        'Subscription'
+        'onInventoryChange'
+        'StartPage'
+        'inventory_synchronise'
+    ]
+    struct #Inventory
+})

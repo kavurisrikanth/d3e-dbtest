@@ -1,0 +1,121 @@
+(D3EPage StartPage {
+    properties [
+        (customers {
+            type ({
+                struct #Customers
+            })
+            computed true
+            computation `Query.getCustomers().await`
+            synchronise true
+        })
+        (allCustomers {
+            type ({
+                model #Customer
+            })
+            collection true
+            computed true
+            computation `customers.items`
+        })
+        (inventory {
+            type ({
+                struct #Inventory
+            })
+            computed true
+            computation `Query.getInventory().await`
+            synchronise true
+        })
+        (allItems {
+            type ({
+                model #InventoryItem
+            })
+            collection true
+            computed true
+            computation `inventory.items`
+        })
+    ]
+    build (CRef col {
+        component #Column
+        children [
+            (CFor custs {
+                var 'item'
+                items `this.allCustomers`
+                type ({
+                    model #Customer
+                })
+                item (CRef oneCust {
+                    component #Row
+                    children [
+                        (CRef id {
+                            component #TextView
+                            data [
+                                ({
+                                    prop #data
+                                    bind true
+                                    bindTo `item.name`
+                                })
+                            ]
+                        })
+                        (CRef id {
+                            component #TextView
+                            data [
+                                ({
+                                    prop #data
+                                    bind true
+                                    bindTo `item.dob.toString()`
+                                })
+                            ]
+                        })
+                    ]
+                })
+            })
+            (CRef cust {
+                component #Button
+                child (CRef id {
+                    component #TextView
+                    data [
+                        ({
+                            prop #data
+                            value 'Create Customer'
+                        })
+                    ]
+                })
+            })
+            (CRef inv {
+                component #Button
+                child (CRef id {
+                    component #TextView
+                    data [
+                        ({
+                            prop #data
+                            value 'Create Inventory Item'
+                        })
+                    ]
+                })
+            })
+            (CRef ord {
+                component #Button
+                child (CRef id {
+                    component #TextView
+                    data [
+                        ({
+                            prop #data
+                            value 'Create Order'
+                        })
+                    ]
+                })
+            })
+        ]
+    })
+    eventHandlers [
+        (onInit {
+            block ```
+                if (this.allCustomers.isEmpty) {
+                    Util2.createCustomer();
+                }
+                if (this.allItems.isEmpty) {
+                    Util2.createInvoiceItem();
+                }
+            ```
+        })
+    ]
+})

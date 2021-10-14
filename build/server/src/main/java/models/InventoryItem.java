@@ -23,6 +23,8 @@ public class InventoryItem extends CreatableObject {
   @ColumnDefault("0.0")
   private double price = 0.0d;
 
+  private transient InventoryItem old;
+
   @Override
   public int _typeIdx() {
     return SchemaConstants.InventoryItem;
@@ -66,6 +68,14 @@ public class InventoryItem extends CreatableObject {
     this.price = price;
   }
 
+  public InventoryItem getOld() {
+    return this.old;
+  }
+
+  public void setOld(DatabaseObject old) {
+    this.old = ((InventoryItem) old);
+  }
+
   public String displayName() {
     return "InventoryItem";
   }
@@ -99,6 +109,10 @@ public class InventoryItem extends CreatableObject {
 
   public InventoryItem createNewInstance() {
     return new InventoryItem();
+  }
+
+  public boolean needOldObject() {
+    return true;
   }
 
   @Override

@@ -1,8 +1,12 @@
 package d3e.core;
 
+import classes.Customers;
+import classes.Inventory;
 import classes.LoginResult;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
+import lists.CustomersImpl;
+import lists.InventoryImpl;
 import models.AnonymousUser;
 import models.Customer;
 import models.InventoryItem;
@@ -47,6 +51,8 @@ public class QueryProvider {
   @Autowired private UPIPayMethodRepository uPIPayMethodRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private UserSessionRepository userSessionRepository;
+  @Autowired private CustomersImpl customersImpl;
+  @Autowired private InventoryImpl inventoryImpl;
   @Autowired private ObjectFactory<AppSessionProvider> provider;
 
   @PostConstruct
@@ -87,6 +93,14 @@ public class QueryProvider {
     return findById.orElse(null);
   }
 
+  public Customers getCustomers() {
+    return customersImpl.get();
+  }
+
+  public Inventory getInventory() {
+    return inventoryImpl.get();
+  }
+
   public LoginResult loginWithOTP(String token, String code, String deviceToken) {
     OneTimePassword otp = oneTimePasswordRepository.getByToken(token);
     User user = otp.getUser();
@@ -98,5 +112,9 @@ public class QueryProvider {
     loginResult.setUserObject(otp.getUser());
     loginResult.setToken(token);
     return loginResult;
+  }
+
+  public AnonymousUser currentAnonymousUser() {
+    return provider.getObject().getAnonymousUser();
   }
 }

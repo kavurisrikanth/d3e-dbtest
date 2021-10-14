@@ -1,5 +1,7 @@
 package rest;
 
+import classes.Customers;
+import classes.Inventory;
 import classes.LoginResult;
 import classes.ReportOutAttribute;
 import classes.ReportOutCell;
@@ -28,6 +30,8 @@ public class StructSchema1 {
     addReportOutRowFields();
     addReportOutCellFields();
     addLoginResultFields();
+    addCustomersFields();
+    addInventoryFields();
   }
 
   public DModel<?> getType(String type) {
@@ -221,12 +225,26 @@ public class StructSchema1 {
   private void addLoginResultFields() {
     DModel<LoginResult> m = getType2("LoginResult");
     m.addPrimitive(
+        "failureMessage",
+        LoginResult._FAILUREMESSAGE,
+        null,
+        FieldPrimitiveType.String,
+        (s) -> s.getFailureMessage(),
+        (s, v) -> s.setFailureMessage(v));
+    m.addPrimitive(
         "success",
         LoginResult._SUCCESS,
         null,
         FieldPrimitiveType.Boolean,
         (s) -> s.isSuccess(),
         (s, v) -> s.setSuccess(v));
+    m.addPrimitive(
+        "token",
+        LoginResult._TOKEN,
+        null,
+        FieldPrimitiveType.String,
+        (s) -> s.getToken(),
+        (s, v) -> s.setToken(v));
     m.addReference(
         "userObject",
         LoginResult._USEROBJECT,
@@ -236,19 +254,33 @@ public class StructSchema1 {
         (s) -> s.getUserObject(),
         (s, v) -> s.setUserObject(v),
         (s) -> s.getUserObjectRef());
-    m.addPrimitive(
-        "token",
-        LoginResult._TOKEN,
+  }
+
+  private void addCustomersFields() {
+    DModel<Customers> m = getType2("Customers");
+    m.addReferenceCollection(
+        "items",
+        Customers._ITEMS,
         null,
-        FieldPrimitiveType.String,
-        (s) -> s.getToken(),
-        (s, v) -> s.setToken(v));
-    m.addPrimitive(
-        "failureMessage",
-        LoginResult._FAILUREMESSAGE,
         null,
-        FieldPrimitiveType.String,
-        (s) -> s.getFailureMessage(),
-        (s, v) -> s.setFailureMessage(v));
+        false,
+        getType("Customer"),
+        (s) -> s.getItems(),
+        (s, v) -> s.setItems(v),
+        (s) -> s.getItemsRef());
+  }
+
+  private void addInventoryFields() {
+    DModel<Inventory> m = getType2("Inventory");
+    m.addReferenceCollection(
+        "items",
+        Inventory._ITEMS,
+        null,
+        null,
+        false,
+        getType("InventoryItem"),
+        (s) -> s.getItems(),
+        (s, v) -> s.setItems(v),
+        (s) -> s.getItemsRef());
   }
 }

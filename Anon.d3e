@@ -1,0 +1,33 @@
+(UserType AnonymousUserType {
+    userModel #AnonymousUser
+    modelAccess [
+        ({
+            model #Customer
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        })
+        ({
+            model #InventoryItem
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        })
+        ({
+            model #Order
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        })
+    ]
+    loginSettings ({
+    })
+    queries [
+        ({
+            query #Customers
+        })
+        ({
+            query #Inventory
+        })
+    ]
+})
