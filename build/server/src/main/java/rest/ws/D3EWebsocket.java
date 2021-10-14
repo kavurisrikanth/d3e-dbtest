@@ -38,7 +38,6 @@ import d3e.core.DFile;
 import d3e.core.ListExt;
 import d3e.core.MD5Util;
 import d3e.core.TransactionWrapper;
-import d3e.gen.ProjectRepo;
 import gqltosql.schema.DChannel;
 import gqltosql.schema.DField;
 import gqltosql.schema.DMessage;
@@ -140,7 +139,6 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 				double used = (((double) (total - free) / total) * 100);
 				D3ELogger.info(String.format("Memory: Total: %s, Free: %s, Used: %,.2f%%", readableFileSize(total),
 						readableFileSize(free), used));
-				D3ELogger.info("Total Open Projects: " + ProjectRepo.getCount());
 				new ArrayList<>(sessions.values()).forEach(s -> {
 					try {
 						if (s.isLocked()) {
