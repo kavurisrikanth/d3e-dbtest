@@ -1,0 +1,538 @@
+scalar Date
+
+scalar LocalDate
+
+scalar LocalDateTime
+
+scalar LocalTime
+
+scalar OffsetDateTime
+
+scalar ExpressionString
+
+scalar BlockString
+
+scalar Type
+
+scalar Duration
+
+schema
+{
+	query: Query
+	mutation: Mutation
+}
+
+union D3EMessageUnionX =  EmailMessage | SMSMessage
+
+union PaymentMethodUnionX =  CardPayMethod | UPIPayMethod
+
+union UserUnionX =  AnonymousUser
+
+interface DBObject
+{
+	id : Long
+	localId : Long
+}
+
+type DatabaseObject
+{
+	object : DBObject
+}
+
+type DFile
+{
+	name : String
+	id : String
+	size : Long
+}
+
+input DFileEntityInput
+{
+	name : String
+	id : String
+	size : Long
+}
+
+type LoginResult
+{
+	success : Boolean
+	token : String
+	failureMessage : String
+	userObject : UserUnionX
+}
+
+input ObjectRef
+{
+	id : Long
+	type : String
+}
+
+type Query
+{
+	getObject : DatabaseObject
+	getAnonymousUserById ( id: Long ) : AnonymousUser
+	getCustomerById ( id: Long ) : Customer
+	getInventoryItemById ( id: Long ) : InventoryItem
+	getOneTimePasswordById ( id: Long ) : OneTimePassword
+	checkTokenUniqueInOneTimePassword ( oneTimePasswordId: Long token: String ) : Boolean
+	getOrderById ( id: Long ) : Order
+	loginWithOTP ( token: String code: String ) : LoginResult
+}
+
+type Mutation
+{
+}
+
+type MutateOneTimePasswordResult
+{
+	status : MutateResultStatus
+	value : OneTimePassword
+	errors : [String]
+}
+
+type Subscription
+{
+	onAnonymousUserChangeEvent : AnonymousUserChangeEvent
+	onAnonymousUserChangeEventById ( ids: [Long] ) : AnonymousUserChangeEvent
+	onCustomerChangeEvent : CustomerChangeEvent
+	onCustomerChangeEventById ( ids: [Long] ) : CustomerChangeEvent
+	onCustomerOrdersChange ( id: Long ) : OrderChangeEvent
+	onInventoryItemChangeEvent : InventoryItemChangeEvent
+	onInventoryItemChangeEventById ( ids: [Long] ) : InventoryItemChangeEvent
+	onOneTimePasswordChangeEvent : OneTimePasswordChangeEvent
+	onOneTimePasswordChangeEventById ( ids: [Long] ) : OneTimePasswordChangeEvent
+	onOrderChangeEvent : OrderChangeEvent
+	onOrderChangeEventById ( ids: [Long] ) : OrderChangeEvent
+	onUserChangeEvent : UserChangeEvent
+	onUserChangeEventById ( ids: [Long] ) : UserChangeEvent
+	onUserSessionChangeEvent : UserSessionChangeEvent
+	onUserSessionChangeEventById ( ids: [Long] ) : UserSessionChangeEvent
+}
+
+type AnonymousUserChangeEvent
+{
+	model : AnonymousUser
+	changeType : ChangeEventType
+}
+
+type CustomerChangeEvent
+{
+	model : Customer
+	changeType : ChangeEventType
+}
+
+type InventoryItemChangeEvent
+{
+	model : InventoryItem
+	changeType : ChangeEventType
+}
+
+type OneTimePasswordChangeEvent
+{
+	model : OneTimePassword
+	changeType : ChangeEventType
+}
+
+type OrderChangeEvent
+{
+	model : Order
+	changeType : ChangeEventType
+}
+
+type UserChangeEvent
+{
+	model : UserUnionX
+	changeType : ChangeEventType
+}
+
+type UserSessionChangeEvent
+{
+	model : UserSession
+	changeType : ChangeEventType
+}
+
+type AnonymousUser
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	isActive : Boolean
+	deviceToken : String
+}
+
+input AnonymousUserEntityInput
+{
+	id : Long
+	isActive : Boolean
+	deviceToken : String
+}
+
+type Avatar
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	image : D3EImage
+	createFrom : String
+}
+
+input AvatarEntityInput
+{
+	id : Long
+	image : D3EImageEntityInput
+	createFrom : String
+}
+
+type CardPayMethod
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	cardNumber : String
+	validTill : LocalDateTime
+	cvv : String
+	nameOnCard : String
+}
+
+input CardPayMethodEntityInput
+{
+	id : Long
+	cardNumber : String
+	validTill : LocalDateTime
+	cvv : String
+	nameOnCard : String
+}
+
+type Customer
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	dob : LocalDateTime
+	underage : Boolean
+	gender : Gender
+	guardian : Customer
+	guardianAgreement : DFile
+	orders : [Order]
+	paymentMethods : [PaymentMethodUnionX]
+}
+
+input CustomerEntityInput
+{
+	id : Long
+	name : String
+	dob : LocalDateTime
+	gender : Gender
+	guardian : Long
+	guardianAgreement : DFileEntityInput
+	paymentMethods : [PaymentMethodEntityInputUnionX]
+}
+
+type D3EImage
+{
+	size : Long
+	width : Long
+	height : Long
+	file : DFile
+}
+
+input D3EImageEntityInput
+{
+	id : Long
+	size : Long
+	width : Long
+	height : Long
+	file : DFileEntityInput
+}
+
+input D3EMessageEntityInputUnionX
+{
+	type : String
+	valueEmailMessage : EmailMessageEntityInput
+	valueSMSMessage : SMSMessageEntityInput
+}
+
+input D3EMessageEntityInput
+{
+	id : Long
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+}
+
+type EmailMessage
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	bcc : [String]
+	cc : [String]
+	subject : String
+	html : Boolean
+	inlineAttachments : [DFile]
+	attachments : [DFile]
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+}
+
+input EmailMessageEntityInput
+{
+	id : Long
+	bcc : [String]
+	cc : [String]
+	subject : String
+	html : Boolean
+	inlineAttachments : [DFileEntityInput]
+	attachments : [DFileEntityInput]
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+}
+
+type InventoryItem
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	price : Float
+}
+
+input InventoryItemEntityInput
+{
+	id : Long
+	name : String
+	price : Float
+}
+
+type OneTimePassword
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	input : String
+	inputType : String
+	userType : String
+	success : Boolean
+	errorMsg : String
+	token : String
+	expiry : LocalDateTime
+}
+
+input OneTimePasswordEntityInput
+{
+	id : Long
+	input : String
+	inputType : String
+	userType : String
+}
+
+type Order
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	customer : Customer
+	items : [OrderItem]
+	totalAmount : Float
+	paymentMethod : PaymentMethodUnionX
+	paymentStatus : PaymentStatus
+	createdDate : LocalDateTime
+}
+
+input OrderEntityInput
+{
+	id : Long
+	customer : Long
+	items : [OrderItemEntityInput]
+	paymentMethod : ObjectRef
+	paymentStatus : PaymentStatus
+	createdDate : LocalDateTime
+}
+
+type OrderItem
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	item : InventoryItem
+	quantity : Long
+	amount : Float
+}
+
+input OrderItemEntityInput
+{
+	id : Long
+	item : Long
+	quantity : Long
+}
+
+input PaymentMethodEntityInputUnionX
+{
+	type : String
+	valueCardPayMethod : CardPayMethodEntityInput
+	valueUPIPayMethod : UPIPayMethodEntityInput
+}
+
+input PaymentMethodEntityInput
+{
+	id : Long
+}
+
+type PushNotification
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	deviceTokens : [String]
+	title : String
+	body : String
+	path : String
+}
+
+input PushNotificationEntityInput
+{
+	id : Long
+	deviceTokens : [String]
+	title : String
+	body : String
+	path : String
+}
+
+type ReportConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	identity : String
+	values : [ReportConfigOption]
+}
+
+input ReportConfigEntityInput
+{
+	id : Long
+	identity : String
+	values : [ReportConfigOptionEntityInput]
+}
+
+type ReportConfigOption
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	identity : String
+	value : String
+}
+
+input ReportConfigOptionEntityInput
+{
+	id : Long
+	identity : String
+	value : String
+}
+
+type SMSMessage
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	dltTemplateId : String
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+}
+
+input SMSMessageEntityInput
+{
+	id : Long
+	dltTemplateId : String
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+}
+
+type UPIPayMethod
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	upiId : String
+}
+
+input UPIPayMethodEntityInput
+{
+	id : Long
+	upiId : String
+}
+
+input UserEntityInputUnionX
+{
+	type : String
+	valueAnonymousUser : AnonymousUserEntityInput
+}
+
+input UserEntityInput
+{
+	id : Long
+	isActive : Boolean
+	deviceToken : String
+}
+
+type UserSession
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	userSessionId : String
+}
+
+input UserSessionEntityInputUnionX
+{
+	type : String
+}
+
+input UserSessionEntityInput
+{
+	id : Long
+	userSessionId : String
+}
+
+enum MutateResultStatus {
+	ServerError
+	Success
+	AuthFail
+	ValidationFail
+	BadRequest
+}
+
+enum Gender {
+	Unspecified
+	Male
+	Female
+}
+
+enum PaymentStatus {
+	Pending
+	Completed
+	Failed
+}
+
+enum ChangeEventType {
+	Insert
+	Update
+	Delete
+}
+
+enum SubscriptionChangeType {
+	All
+	Insert
+	Update
+	Delete
+}
