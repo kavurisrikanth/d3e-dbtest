@@ -120,6 +120,16 @@ class _StartPageState extends ObservableState<StartPage> {
           child: Text('Create basic Creatable')),
       Button(
           onPressed: () {
+            createRef();
+          },
+          child: Text('Create Creatable with Ref')),
+      Button(
+          onPressed: () {
+            createRefColl();
+          },
+          child: Text('Create Creatable with Ref Collection')),
+      Button(
+          onPressed: () {
             basicNC();
           },
           child: Text('Create basic NonCreatable'))
@@ -144,6 +154,76 @@ class _StartPageState extends ObservableState<StartPage> {
       this.setCreatable(c);
     } else {
       this.setMessage('Creatable creation failed.');
+    }
+  }
+
+  void createRef() async {
+    Creatable ref = Creatable(name: NameUtil.getName());
+
+    DBResult r = (await ref.save());
+
+    if (r.status == DBResultStatus.Success) {
+      this.setMessage('Reference creation success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+
+      Creatable c = Creatable(name: NameUtil.getName(), ref: ref);
+
+      r = (await c.save());
+
+      if (r.status == DBResultStatus.Success) {
+        this.setMessage('Creatable creation success.');
+
+        this.setCreatable((await Query.get().getCreatableById(
+            UsageConstants
+                .STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE,
+            c.id)));
+      } else {
+        this.setMessage('Creatable creation failed.');
+      }
+    } else {
+      this.setMessage('Reference creation failed.');
+    }
+  }
+
+  void createRefColl() async {
+    int i = 3;
+
+    List<Creatable> refs = [];
+
+    for (int x = 0; x < 3; x++) {
+      Creatable ref = Creatable(name: NameUtil.getName());
+
+      DBResult r = (await ref.save());
+
+      if (r.status == DBResultStatus.Success) {
+        this.setMessage('Reference creation success.');
+
+        this.setCreatable((await Query.get().getCreatableById(
+            UsageConstants
+                .STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
+            ref.id)));
+      } else {
+        this.setMessage('Reference creation failed.');
+      }
+    }
+
+    Creatable c = Creatable(name: NameUtil.getName(), refColl: refs);
+
+    DBResult r = (await c.save());
+
+    if (r.status == DBResultStatus.Success) {
+      this.setMessage('Reference creation success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
+          c.id)));
+    } else {
+      this.setMessage('Reference creation failed.');
     }
   }
 

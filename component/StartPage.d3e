@@ -82,6 +82,30 @@
                     ]
                 })
             })
+            (CRef cWithRef {
+                component #Button
+                child (CRef id {
+                    component #TextView
+                    data [
+                        ({
+                            prop #data
+                            value 'Create Creatable with Ref'
+                        })
+                    ]
+                })
+            })
+            (CRef cWithRefColl {
+                component #Button
+                child (CRef id {
+                    component #TextView
+                    data [
+                        ({
+                            prop #data
+                            value 'Create Creatable with Ref Collection'
+                        })
+                    ]
+                })
+            })
             (CRef basicNC {
                 component #Button
                 child (CRef id {
@@ -113,6 +137,66 @@
                     this.creatable = c;
                 } else {
                     this.message = 'Creatable creation failed.';
+                }
+            ```
+        })
+        (createRef {
+            type OnEvent
+            on #cWithRef
+            event #onPressed
+            block ```
+                Creatable ref = Creatable(
+                    name: NameUtil.getName()
+                );
+                DBResult r = ref.save().await;
+                if (r.status == Success) {
+                    this.message = 'Reference creation success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                    Creatable c = Creatable(
+                        name: NameUtil.getName(),
+                        ref: ref
+                    );
+                    r = c.save().await;
+                    if (r.status == Success) {
+                        this.message = 'Creatable creation success.';
+                        this.creatable = Query.loadCreatable(c).await;
+                    } else {
+                        this.message = 'Creatable creation failed.';
+                    }
+                } else {
+                    this.message = 'Reference creation failed.';
+                }
+            ```
+        })
+        (createRefColl {
+            type OnEvent
+            on #cWithRefColl
+            event #onPressed
+            block ```
+                Integer i = 3;
+                List<Creatable> refs = [];
+                for (Integer x = 0; x < 3; x++) {
+                    Creatable ref = Creatable(
+                        name: NameUtil.getName()
+                    );
+                    DBResult r = ref.save().await;
+                    if (r.status == Success) {
+                        this.message = 'Reference creation success.';
+                        this.creatable = Query.loadCreatable(ref).await;
+                    } else {
+                        this.message = 'Reference creation failed.';
+                    }
+                }
+                Creatable c = Creatable(
+                    name: NameUtil.getName(),
+                    refColl: refs
+                );
+                DBResult r = c.save().await;
+                if (r.status == Success) {
+                    this.message = 'Reference creation success.';
+                    this.creatable = Query.loadCreatable(c).await;
+                } else {
+                    this.message = 'Reference creation failed.';
                 }
             ```
         })

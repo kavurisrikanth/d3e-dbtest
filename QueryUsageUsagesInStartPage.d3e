@@ -7,3 +7,23 @@
     ]
     model #Creatable
 })
+
+(QueryUsage StartPage_eventHandlers_createRef_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createRef_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_createRefColl_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createRefColl_block'
+    ]
+    model #Creatable
+})
