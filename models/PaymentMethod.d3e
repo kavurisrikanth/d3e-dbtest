@@ -1,0 +1,4 @@
+(Model PaymentMethod {
+    abstract true
+    creatable false
+})

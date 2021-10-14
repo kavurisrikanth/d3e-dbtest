@@ -1,0 +1,9 @@
+(Project D3EDBTest {
+    name 'D3EDBTest'
+    domain 'd3e.DBTest'
+    package 'D3EDBTest'
+    targets [
+        JavaBackEnd
+        FlutterFrontEnd
+    ]
+})

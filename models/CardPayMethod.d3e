@@ -1,0 +1,36 @@
+(Model CardPayMethod {
+    creatable false
+    parent #PaymentMethod
+    properties [
+        (cardNumber {
+            type ({
+                primitive String
+            })
+            required true
+        })
+        (validTill {
+            type ({
+                primitive DateTime
+            })
+            required true
+            validations [
+                ({
+                    errorMsg 'Card must be valid'
+                    expression `Util.isValidCard(this)`
+                })
+            ]
+        })
+        (cvv {
+            type ({
+                primitive String
+            })
+            required true
+        })
+        (nameOnCard {
+            type ({
+                primitive String
+            })
+            required true
+        })
+    ]
+})
