@@ -1,0 +1,22 @@
+(Model NonCreatable {
+    creatable false
+    properties [
+        (name {
+            type ({
+                primitive String
+            })
+            generate true
+            generateSettings ({
+                type Sequence
+                startsFrom 0
+                step 1
+                prefix 'creatable'
+            })
+        })
+        (emb {
+            type ({
+                model #Embedded
+            })
+        })
+    ]
+})

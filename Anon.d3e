@@ -1,0 +1,16 @@
+(UserType AnonymousUserType {
+    userModel #AnonymousUser
+    modelAccess [
+        ({
+            model #Creatable
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        })
+    ]
+    loginSettings ({
+    })
+    queries [
+        
+    ]
+})

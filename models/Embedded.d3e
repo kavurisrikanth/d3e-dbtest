@@ -1,0 +1,10 @@
+(Model Embedded {
+    embedded true
+    properties [
+        (embName {
+            type ({
+                primitive String
+            })
+        })
+    ]
+})

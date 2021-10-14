@@ -1,0 +1,133 @@
+(D3EPage StartPage {
+    properties [
+        (message {
+            type ({
+                primitive String
+            })
+            internal true
+        })
+        (creatable {
+            type ({
+                model #Creatable
+            })
+            internal true
+        })
+        (nonCreatable {
+            type ({
+                model #NonCreatable
+            })
+            internal true
+        })
+    ]
+    build (CRef col {
+        component #Column
+        children [
+            (CRef row {
+                component #Row
+                children [
+                    (CRef id {
+                        component #TextView
+                        data [
+                            ({
+                                prop #data
+                                value 'Creatable'
+                            })
+                        ]
+                    })
+                    (CRef id {
+                        component #TextView
+                        data [
+                            ({
+                                prop #data
+                                bind true
+                                bindTo `DisplayUtil.displayCreatable(this.creatable)`
+                            })
+                        ]
+                    })
+                ]
+            })
+            (CRef row {
+                component #Row
+                children [
+                    (CRef id {
+                        component #TextView
+                        data [
+                            ({
+                                prop #data
+                                value 'NonCreatable'
+                            })
+                        ]
+                    })
+                    (CRef id {
+                        component #TextView
+                        data [
+                            ({
+                                prop #data
+                                bind true
+                                bindTo `this.creatable == null ? 'Unnamed NonCreatable' : this.nonCreatable.name`
+                            })
+                        ]
+                    })
+                ]
+            })
+            (CRef basicC {
+                component #Button
+                child (CRef id {
+                    component #TextView
+                    data [
+                        ({
+                            prop #data
+                            value 'Create basic Creatable'
+                        })
+                    ]
+                })
+            })
+            (CRef basicNC {
+                component #Button
+                child (CRef id {
+                    component #TextView
+                    data [
+                        ({
+                            prop #data
+                            value 'Create basic NonCreatable'
+                        })
+                    ]
+                })
+            })
+        ]
+    })
+    eventHandlers [
+        (createBasic {
+            type OnEvent
+            on #basicC
+            event #onPressed
+            block ```
+                Creatable c = Creatable();
+                DBResult r = c.save().await;
+                if (r.status == Success) {
+                    String message = 'Creatable creation success';
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    this.message = message;
+                    this.creatable = c;
+                } else {
+                    this.message = 'Creatable creation failed.';
+                }
+            ```
+        })
+        (basicNC {
+            type OnEvent
+            on #basicNC
+            event #onPressed
+            block ```
+                NonCreatable c = NonCreatable();
+                DBResult r = c.save().await;
+                if (r.status == Success) {
+                    String message = 'NonCreatable creation success';
+                    this.message = message;
+                } else {
+                    this.message = 'NonCreatable creation failed.';
+                }
+            ```
+        })
+    ]
+})

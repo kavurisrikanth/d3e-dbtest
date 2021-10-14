@@ -1,0 +1,51 @@
+(Model Creatable {
+    creatable true
+    properties [
+        (name {
+            type ({
+                primitive String
+            })
+            generate true
+            generateSettings ({
+                type Sequence
+                startsFrom 0
+                step 1
+                prefix 'creatable'
+            })
+        })
+        (ref {
+            type ({
+                model #Creatable
+            })
+        })
+        (refColl {
+            type ({
+                model #Creatable
+            })
+            collection true
+        })
+        (child {
+            type ({
+                model #NonCreatable
+            })
+            child true
+        })
+        (childColl {
+            type ({
+                model #NonCreatable
+            })
+            collection true
+            child true
+        })
+        (file {
+            type ({
+                primitive DFile
+            })
+        })
+        (emb {
+            type ({
+                model #Embedded
+            })
+        })
+    ]
+})

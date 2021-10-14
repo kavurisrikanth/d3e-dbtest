@@ -1,0 +1,9 @@
+(QueryUsage StartPage_eventHandlers_createBasic_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createBasic_block'
+    ]
+    model #Creatable
+})
