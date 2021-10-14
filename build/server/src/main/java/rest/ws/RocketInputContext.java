@@ -151,6 +151,7 @@ public class RocketInputContext {
 		msg.writeString(val.getId());
 		msg.writeString(val.getName());
 		msg.writeLong(val.getSize());
+		msg.writeString(val.getMimeType());
 	}
 
 	private void readEmbedded(Object obj) {

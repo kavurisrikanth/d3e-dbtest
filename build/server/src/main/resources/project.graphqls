@@ -70,8 +70,6 @@ type Query
 	getObject : DatabaseObject
 	getAnonymousUserById ( id: Long ) : AnonymousUser
 	getCreatableById ( id: Long ) : Creatable
-	getOldCreatableName : String
-	checkNameUniqueInCreatable ( creatableId: Long name: String ) : Boolean
 	getOneTimePasswordById ( id: Long ) : OneTimePassword
 	checkTokenUniqueInOneTimePassword ( oneTimePasswordId: Long token: String ) : Boolean
 	loginWithOTP ( token: String code: String ) : LoginResult
@@ -191,6 +189,7 @@ type Creatable
 input CreatableEntityInput
 {
 	id : Long
+	name : String
 	ref : Long
 	refColl : [Long]
 	child : NonCreatableEntityInput

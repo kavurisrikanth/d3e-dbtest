@@ -102,7 +102,9 @@
             on #basicC
             event #onPressed
             block ```
-                Creatable c = Creatable();
+                Creatable c = Creatable(
+                    name: NameUtil.getName()
+                );
                 DBResult r = c.save().await;
                 if (r.status == Success) {
                     String message = 'Creatable creation success';

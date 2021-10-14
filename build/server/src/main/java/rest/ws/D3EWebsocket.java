@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
+import classes.DBResultStatus;
 import classes.LoginResult;
 import d3e.core.CurrentUser;
 import d3e.core.D3ELogger;
@@ -38,7 +40,6 @@ import d3e.core.DFile;
 import d3e.core.ListExt;
 import d3e.core.MD5Util;
 import d3e.core.TransactionWrapper;
-import d3e.gen.ProjectRepo;
 import gqltosql.schema.DChannel;
 import gqltosql.schema.DField;
 import gqltosql.schema.DMessage;
@@ -140,7 +141,6 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 				double used = (((double) (total - free) / total) * 100);
 				D3ELogger.info(String.format("Memory: Total: %s, Free: %s, Used: %,.2f%%", readableFileSize(total),
 						readableFileSize(free), used));
-				D3ELogger.info("Total Open Projects: " + ProjectRepo.getCount());
 				new ArrayList<>(sessions.values()).forEach(s -> {
 					try {
 						if (s.isLocked()) {
@@ -178,6 +178,11 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 		D3ELogger.info("D3EWebsocket connection closed. " + status + ", " + sessionid);
 		ClientSession cs = sessions.remove(sessionid);
 		disconnectedSessions.put(cs.getId(), cs);
+		cs.setSession(null);
+		if (cs.getTimeout() == 0) {
+			cleanSession(sessionid);
+			return;
+		}
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -187,8 +192,7 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 					e.printStackTrace();
 				}
 			}
-		}, RECONNECT_TIMEOUT);
-		cs.setSession(null);
+		}, cs.getTimeout());
 	}
 
 	protected void cleanSession(String id) {
@@ -219,7 +223,6 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 		} catch (ServletException | IOException e) {
 			e.printStackTrace();
 		}
-		channels.disconnect(csession);
 	}
 
 	@Override
@@ -229,6 +232,8 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 			D3ELogger.info("Session was closed. Ignoring message. (It should not happen)");
 			return;
 		}
+		MDC.put("userId", String.valueOf(cs.userId));
+		MDC.put("http", session.getId());
 		ByteBuffer payload = message.getPayload();
 		cs.stream.writeBytes(payload.array());
 		if (!message.isLast()) {
@@ -465,14 +470,14 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 		msg.writeInt(count);
 		for (var entry : objects.entrySet()) {
 			DBObject key = entry.getKey();
-			D3ELogger.info("Send changes:  for " + key + ", id: " + key.getId());
+			// D3ELogger.info("Send changes: for " + key + ", id: " + key.getId());
 			writeObject(msg, template, entry.getKey(), entry.getValue());
 		}
 		msg.flush();
 	}
 
 	public void sendEmbeddedChanges(ClientSession session, Map<DBObject, Map<DField, BitSet>> objects) {
-		D3ELogger.info("Send embedded changes: ");
+		// D3ELogger.info("Send embedded changes: ");
 		RocketMessage msg = new RocketMessage(session);
 		msg.writeInt(OBJECTS);
 		msg.writeBoolean(true);
@@ -508,7 +513,7 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 		fields.stream().forEach(b -> {
 			int cidx = type.toClientIdx(b);
 			DField f = type.getField(cidx);
-			D3ELogger.info("w field: " + f.getName());
+			// D3ELogger.info("w field: " + f.getName());
 			if (f.getType() == FieldType.InverseCollection || f.getType() == FieldType.PrimitiveCollection
 					|| f.getType() == FieldType.ReferenceCollection) {
 				Object val = f.getValue(object);
@@ -535,7 +540,7 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 	}
 
 	private void writeCompleteList(RocketMessage msg, Template template, List newColl, DField field) {
-		D3ELogger.info("List Change all: " + newColl.size());
+		// D3ELogger.info("List Change all: " + newColl.size());
 		msg.writeInt(newColl.size());
 		for (Object val : newColl) {
 			if (field.getType() == FieldType.PrimitiveCollection) {
@@ -562,11 +567,11 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 	}
 
 	private void writeListChanges(RocketMessage msg, Template template, List<Change> changes, DField field) {
-		D3ELogger.info("List Changes: " + changes.size() + ", " + changes);
+		// D3ELogger.info("List Changes: " + changes.size() + ", " + changes);
 		msg.writeInt(-changes.size());
 		for (Change change : changes) {
 			if (change.type == ListChanges.ChangeType.Added) {
-				D3ELogger.info("Added At: " + change.index);
+				// D3ELogger.info("Added At: " + change.index);
 				msg.writeInt(change.index + 1);
 				if (field.getType() == FieldType.PrimitiveCollection) {
 					msg.writePrimitiveField(change.obj, field, template);
@@ -586,7 +591,7 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 					msg.writeInt(-1);
 				}
 			} else {
-				D3ELogger.info("Removed At: " + change.index);
+				// D3ELogger.info("Removed At: " + change.index);
 				msg.writeInt(-(change.index + 1));
 			}
 		}
@@ -746,13 +751,33 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 			}
 			writeQueryResult(res, tu, ses.template, msg);
 		} catch (ValidationFailedException e) {
-			msg.writeByte(1);
-			msg.writeStringList(e.getErrors());
+			msg.writeByte(0);
+			if (subscribed) {
+				msg.writeString(null);
+			}
+			writeDataQueryErrorResult(tu, ses.template, e.getErrors(), msg);
 		} catch (Exception e) {
-			msg.writeByte(1);
-			msg.writeStringList(ListExt.asList(e.getMessage()));
+			msg.writeByte(0);
+			if (subscribed) {
+				msg.writeString(null);
+			}
+			writeDataQueryErrorResult(tu, ses.template, ListExt.asList(e.getMessage()), msg);
 			e.printStackTrace();
 		}
+	}
+
+	private void writeDataQueryErrorResult(TemplateUsage tu, Template template, List<String> errors,
+			RocketMessage msg) {
+		QueryResult res = new QueryResult();
+		UsageType type = tu.getTypes()[0];
+		TemplateType tt = template.getType(type.getType());
+		DModel model = tt.getModel();
+		res.value = model.newInstance();
+		res.type = model.getType();
+		res.external = true;
+		model.getField("status").setValue(res.value, DBResultStatus.Errors);
+		model.getField("errors").setValue(res.value, errors);
+		writeQueryResult(res, tu, template, msg);
 	}
 
 	private String newSubId() {
@@ -781,10 +806,15 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 		TemplateType type = template.getType(ut.getType());
 		List<Field> fields = new ArrayList<>();
 		for (UsageField uf : ut.getFields()) {
-			Field f = new Field();
-			f.setField(type.getField(uf.getField()));
-			f.setSelections(createSelections(uf.getTypes(), template));
-			fields.add(f);
+			try {
+				Field f = new Field();
+				f.setField(type.getField(uf.getField()));
+				f.setSelections(createSelections(uf.getTypes(), template));
+				fields.add(f);
+			} catch (Exception e) {
+				D3ELogger.info("Unknown field: " + ut.getType() + ", " + uf.getField());
+				e.printStackTrace();
+			}
 		}
 		return new Selection(type.getModel(), fields);
 	}
@@ -793,24 +823,19 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 		msg.writeByte(RESTORE);
 		String sessionId = msg.readString();
 		D3ELogger.info("Restore: " + sessionId);
-		if (sessions.containsKey(sessionId)) {
-			msg.writeByte(0);
-			msg.writeString(ses.getId());
+		ClientSession disSes = disconnectedSessions.remove(sessionId);
+		if (disSes == null) {
+			msg.writeByte(1);
 		} else {
-			ClientSession disSes = disconnectedSessions.remove(sessionId);
-			if (disSes == null) {
+			msg.writeByte(0);
+			msg.writeString(ses.getId()); // New id
+			sessions.put(ses.getId(), disSes);
+			try {
+				disSes.setSession(ses.getSession());
+			} catch (IOException e) {
 				msg.writeByte(1);
-			} else {
-				msg.writeByte(0);
-				msg.writeString(ses.getId()); // New id
-				sessions.put(ses.getId(), disSes);
-				try {
-					disSes.setSession(ses.getSession());
-				} catch (IOException e) {
-					msg.writeByte(1);
-					e.printStackTrace();
-					return;
-				}
+				e.printStackTrace();
+				return;
 			}
 		}
 	}
@@ -819,6 +844,12 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 		msg.writeByte(CONFIRM_TEMPLATE);
 		msg.writeString(ses.getId());
 		String templateHash = msg.readString();
+		long timeOut = msg.readLong();
+		if (timeOut < 0) {
+			ses.setTimeOut(RECONNECT_TIMEOUT);
+		} else {
+			ses.setTimeOut(timeOut < RECONNECT_TIMEOUT ? timeOut : RECONNECT_TIMEOUT);
+		}
 		if (templateManager.hasTemplate(templateHash)) {
 			ses.template = templateManager.getTemplate(templateHash);
 			msg.writeByte(0);

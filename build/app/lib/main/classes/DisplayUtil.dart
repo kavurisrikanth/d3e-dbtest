@@ -1,4 +1,5 @@
 import '../models/Creatable.dart';
+import '../models/Embedded.dart';
 import '../models/NonCreatable.dart';
 
 class DisplayUtil {
@@ -43,7 +44,7 @@ class DisplayUtil {
     }
 
     if (c.emb != null) {
-      sb.write(c.emb);
+      sb.write(DisplayUtil.displayEmbedded(c.emb));
     }
 
     return sb.toString();
@@ -57,11 +58,19 @@ class DisplayUtil {
     StringBuffer sb = StringBuffer();
 
     if (nc.emb != null) {
-      sb.write(nc.emb);
+      sb.write(DisplayUtil.displayEmbedded(nc.emb));
     }
 
     sb.write(nc.name);
 
     return sb.toString();
+  }
+
+  static String displayEmbedded(Embedded e) {
+    if (e == null) {
+      return 'Unnamed Embedded';
+    }
+
+    return e.embName;
   }
 }

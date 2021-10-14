@@ -16,10 +16,10 @@ public class ReportOutColumn extends DBObject {
 
   public ReportOutColumn() {}
 
-  public ReportOutColumn(String type, String value, List<ReportOutAttribute> attributes) {
+  public ReportOutColumn(List<ReportOutAttribute> attributes, String type, String value) {
+    this.attributes = attributes;
     this.type = type;
     this.value = value;
-    this.attributes = attributes;
   }
 
   public long getId() {

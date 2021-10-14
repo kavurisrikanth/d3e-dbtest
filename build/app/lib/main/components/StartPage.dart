@@ -2,6 +2,7 @@ import '../utils/ObservableState.dart';
 import '../classes/DBResult.dart';
 import '../classes/DBResultStatus.dart';
 import '../classes/DisplayUtil.dart';
+import '../classes/NameUtil.dart';
 import '../classes/Query.dart';
 import '../models/Creatable.dart';
 import '../models/NonCreatable.dart';
@@ -126,7 +127,7 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void createBasic() async {
-    Creatable c = Creatable();
+    Creatable c = Creatable(name: NameUtil.getName());
 
     DBResult r = (await c.save());
 

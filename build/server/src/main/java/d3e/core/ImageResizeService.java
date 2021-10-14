@@ -63,6 +63,7 @@ public class ImageResizeService implements Runnable {
             File file = resource.getFile();
             // Do resize operation here.
             DFile dFile = new DFile();
+            dFile.setMimeType(FileUtils.detectMimeType(file));
             dFile.setId(FileUtils.getResizedName(job.fileName, job.width, job.height));
             job.handler.save(dFile);
         } catch (IOException e) {

@@ -368,6 +368,7 @@ public class RocketMessage {
 		writeString(value.getId());
 		writeString(value.getName());
 		writeLong(value.getSize());
+		writeString(value.getMimeType());
 	}
 
 	public void writePrimitiveField(Object val, DField field, Template template) {
@@ -520,6 +521,7 @@ public class RocketMessage {
 		file.setId(str);
 		file.setName(readString());
 		file.setSize(readLong());
+		file.setMimeType(readString());
 		return file;
 	}
 

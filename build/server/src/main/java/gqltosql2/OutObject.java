@@ -19,7 +19,7 @@ public class OutObject implements IOutValue {
 
 	public int getType() {
 		Long index = getLong("__typeindex");
-		if(index == null) {
+		if(index == null || index == 0l) {
 			for(Integer i : types) {
 				if(i != -1) {
 					return i;
@@ -70,14 +70,15 @@ public class OutObject implements IOutValue {
 		}
 		IOutValue val = get(field);
 		if (val == null) {
-			return null;
+			return 0l;
 		}
 		OutPrimitive pri = (OutPrimitive) val;
 		Object object = pri.getVal();
 		if(object instanceof Integer) {
 			return (long)((int)object);
 		}
-		return (Long) pri.getVal();
+		 Long v = (Long) pri.getVal();
+		 return v == null ? 0L : v;
 	}
 
 	public OutObject getObject(String field) {

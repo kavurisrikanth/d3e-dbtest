@@ -3,10 +3,14 @@ import '../utils/CloneContext.dart';
 import '../utils/DBObject.dart';
 
 class Embedded extends DBObject {
+  static const int _EMBNAME = 0;
   int id = 0;
   DBObject otherMaster;
+  String _embName = '';
   int childPropertyInMaster = 0;
-  Embedded() {}
+  Embedded({String embName}) {
+    this.setEmbName(embName ?? '');
+  }
   String get d3eType {
     return 'Embedded';
   }
@@ -15,8 +19,30 @@ class Embedded extends DBObject {
     this.d3eChanges.clear();
   }
 
+  String get embName {
+    return _embName;
+  }
+
+  void setEmbName(String val) {
+    bool isValChanged = _embName != val;
+
+    if (!isValChanged) {
+      return;
+    }
+
+    this.updateD3EChanges(_EMBNAME, _embName);
+
+    _embName = val;
+
+    fire('embName', this);
+  }
+
   Object get(int field) {
     switch (field) {
+      case _EMBNAME:
+        {
+          return this._embName;
+        }
       default:
         {
           return null;
@@ -53,6 +79,8 @@ TODO: Might be removed
     Embedded obj = (dbObj as Embedded);
 
     obj.id = id;
+
+    obj.setEmbName(_embName);
   }
 
   void setTo(Embedded obj) {
@@ -77,6 +105,11 @@ TODO: Might be removed
 
   void set(int field, Object value) {
     switch (field) {
+      case _EMBNAME:
+        {
+          this.setEmbName((value as String));
+          break;
+        }
     }
   }
 }

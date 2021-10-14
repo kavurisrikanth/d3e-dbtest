@@ -18,11 +18,11 @@ public class ReportOutCell extends DBObject {
 
   public ReportOutCell() {}
 
-  public ReportOutCell(String key, String type, String value, List<ReportOutAttribute> attributes) {
+  public ReportOutCell(List<ReportOutAttribute> attributes, String key, String type, String value) {
+    this.attributes = attributes;
     this.key = key;
     this.type = type;
     this.value = value;
-    this.attributes = attributes;
   }
 
   public long getId() {

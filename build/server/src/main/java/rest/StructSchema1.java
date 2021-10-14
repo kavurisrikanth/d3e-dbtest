@@ -221,26 +221,12 @@ public class StructSchema1 {
   private void addLoginResultFields() {
     DModel<LoginResult> m = getType2("LoginResult");
     m.addPrimitive(
-        "failureMessage",
-        LoginResult._FAILUREMESSAGE,
-        null,
-        FieldPrimitiveType.String,
-        (s) -> s.getFailureMessage(),
-        (s, v) -> s.setFailureMessage(v));
-    m.addPrimitive(
         "success",
         LoginResult._SUCCESS,
         null,
         FieldPrimitiveType.Boolean,
         (s) -> s.isSuccess(),
         (s, v) -> s.setSuccess(v));
-    m.addPrimitive(
-        "token",
-        LoginResult._TOKEN,
-        null,
-        FieldPrimitiveType.String,
-        (s) -> s.getToken(),
-        (s, v) -> s.setToken(v));
     m.addReference(
         "userObject",
         LoginResult._USEROBJECT,
@@ -250,5 +236,19 @@ public class StructSchema1 {
         (s) -> s.getUserObject(),
         (s, v) -> s.setUserObject(v),
         (s) -> s.getUserObjectRef());
+    m.addPrimitive(
+        "token",
+        LoginResult._TOKEN,
+        null,
+        FieldPrimitiveType.String,
+        (s) -> s.getToken(),
+        (s, v) -> s.setToken(v));
+    m.addPrimitive(
+        "failureMessage",
+        LoginResult._FAILUREMESSAGE,
+        null,
+        FieldPrimitiveType.String,
+        (s) -> s.getFailureMessage(),
+        (s, v) -> s.setFailureMessage(v));
   }
 }

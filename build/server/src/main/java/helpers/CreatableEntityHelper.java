@@ -1,8 +1,6 @@
 package helpers;
 
-import classes.AutoGenerateUtil;
 import d3e.core.D3EResourceHandler;
-import d3e.core.QueryProvider;
 import models.Creatable;
 import models.NonCreatable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +29,9 @@ public class CreatableEntityHelper<T extends Creatable> implements EntityHelper<
 
   @Override
   public void fromInput(T entity, GraphQLInputContext ctx) {
+    if (ctx.has("name")) {
+      entity.setName(ctx.readString("name"));
+    }
     if (ctx.has("ref")) {
       entity.setRef(ctx.readRef("ref", "Creatable"));
     }
@@ -83,7 +84,6 @@ public class CreatableEntityHelper<T extends Creatable> implements EntityHelper<
         helper.validateOnUpdate(entity.getEmb(), validationContext.child("emb", null, 0l));
       }
     }
-    validateFieldNameUnique(entity, validationContext);
   }
 
   public void validateOnCreate(T entity, EntityValidationContext validationContext) {
@@ -92,19 +92,6 @@ public class CreatableEntityHelper<T extends Creatable> implements EntityHelper<
 
   public void validateOnUpdate(T entity, EntityValidationContext validationContext) {
     validateInternal(entity, validationContext, false, true);
-  }
-
-  public void generateName(T entity) {
-    String oldName = QueryProvider.get().getOldCreatableName();
-    if (entity.getId() == 0) {
-      entity.setName(AutoGenerateUtil.generateNextSequenceString(0, 1, "creatable", "", oldName));
-    }
-  }
-
-  public void validateFieldNameUnique(T entity, EntityValidationContext validationContext) {
-    if (!(creatableRepository.checkNameUnique(entity.getId(), entity.getName()))) {
-      validationContext.addFieldError("name", "Creatable with given name already exists");
-    }
   }
 
   @Override
@@ -147,7 +134,6 @@ public class CreatableEntityHelper<T extends Creatable> implements EntityHelper<
       EmbeddedEntityHelper helper = mutator.getHelperByInstance(entity.getEmb());
       helper.compute(entity.getEmb());
     }
-    this.generateName(entity);
   }
 
   private void deleteRefInCreatable(T entity, EntityValidationContext deletionContext) {

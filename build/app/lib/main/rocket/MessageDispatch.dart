@@ -167,11 +167,14 @@ class MessageDispatch {
       if (update) {
         DBObject obj = reader.readRef(0, null);
         if (obj != null) {
-          obj.saveStatus = DBSaveStatus.Deleted;
+          obj.saveStatus = DBSaveStatus.Saved;
         }
       } else {
-        reader.readInteger();
-        reader.readInteger();
+        DBObject obj =
+            _cache.findObject(reader.readInteger(), reader.readInteger());
+        if (obj != null) {
+          obj.saveStatus = DBSaveStatus.Deleted;
+        }
       }
       count--;
     }
@@ -224,6 +227,7 @@ class MessageDispatch {
     writer.writeInteger(mid);
     writer.writeByte(CONFIRM_TEMPLATE);
     writer.writeString(Template.HASH);
+    writer.writeInteger(-1);
     _client.send(writer.out);
     WSReader reader =
         await respStream.firstWhere((e) => e.id == mid).then((r) => r.reader);
@@ -391,6 +395,8 @@ class MessageDispatch {
       reader.done();
       return obj as T;
     } else {
+      List<String> errors = reader.readStringList();
+      print('ObjectQuery Errors: ' + errors.toString());
       return null;
     }
   }
@@ -431,12 +437,14 @@ class MessageDispatch {
         subId = reader.readString();
       }
       DBObject obj = reader.readRef(0, null);
-      if (synchronize) {
+      if (synchronize && subId != null) {
         this.subscriptions[obj] = subId;
       }
       reader.done();
       return obj as T;
     } else {
+      List<String> errors = reader.readStringList();
+      print('DataQuery Errors: ' + errors.toString());
       return null;
     }
   }

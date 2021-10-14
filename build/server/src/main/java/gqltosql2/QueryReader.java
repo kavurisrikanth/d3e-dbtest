@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import d3e.core.SchemaConstants;
+
 public class QueryReader {
 
 	private List<QueryTypeReader> byType = new ArrayList<>();
 	private int id;
 	private boolean embedded;
+	private boolean file;
 
 	public QueryReader(int id, boolean embedded) {
 		this.id = id;
@@ -49,7 +52,7 @@ public class QueryReader {
 				return null;
 			}
 		} else {
-			if(rowId == null && !isCollection()) {
+			if(!file && rowId == null && !isCollection()) {
 				return null;
 			}
 		}
@@ -94,6 +97,9 @@ public class QueryReader {
 			if (tr.getType() == type) {
 				return tr;
 			}
+		}
+		if(type == SchemaConstants.DFile) {
+			file = true;
 		}
 		QueryTypeReader tr = new QueryTypeReader(type);
 		byType.add(tr);

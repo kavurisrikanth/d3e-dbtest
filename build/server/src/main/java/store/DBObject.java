@@ -40,6 +40,9 @@ public abstract class DBObject {
 	public BitSet _changes() {
 		return _changes;
 	}
+	public Map<Integer, Object> _oldValues() {
+		return _oldValues;
+	}
 
 	public void fieldChanged(int field, Object oldValue) {
 		this._changes.set(field);
@@ -66,8 +69,8 @@ public abstract class DBObject {
 	}
 	
 	public void _updateChanges(DBObject other) {
-		this._changes = other._changes;
-		this._oldValues = other._oldValues;
+		this._changes = other._changes();
+		this._oldValues = other._oldValues();
 	}
 	
 	protected void onPropertySet() {

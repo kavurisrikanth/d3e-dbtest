@@ -1,5 +1,6 @@
 import 'TemplateTypes.dart';
 import '../classes/ConnectionStatus.dart';
+import '../classes/DBResultStatus.dart';
 import '../classes/LoginResult.dart';
 import '../models/Creatable.dart';
 import '../models/Embedded.dart';
@@ -11,31 +12,33 @@ const int CONNECTIONSTATUS = 1;
 
 const int CREATABLE = 2;
 
-const int DFILE = 3;
+const int DBRESULTSTATUS = 3;
 
-const int DATE = 4;
+const int DFILE = 4;
 
-const int DATETIME = 5;
+const int DATE = 5;
 
-const int DOUBLE = 6;
+const int DATETIME = 6;
 
-const int DURATION = 7;
+const int DOUBLE = 7;
 
-const int EMBEDDED = 8;
+const int DURATION = 8;
 
-const int INTEGER = 9;
+const int EMBEDDED = 9;
 
-const int LOGINRESULT = 10;
+const int INTEGER = 10;
 
-const int NONCREATABLE = 11;
+const int LOGINRESULT = 11;
 
-const int STRING = 12;
+const int NONCREATABLE = 12;
 
-const int TIME = 13;
+const int STRING = 13;
 
-const int TYPE = 14;
+const int TIME = 14;
 
-const int USER = 15;
+const int TYPE = 15;
+
+const int USER = 16;
 
 class UsageConstants {
   static final int
@@ -48,7 +51,7 @@ class ChannelConstants {
 }
 
 class Template {
-  static String HASH = 'fd9dbb996f168938fe05db4d212846e6';
+  static String HASH = '7f7e347916083ee1993eab7d3013e3ea';
   static List<Usage> _usages = [
     Usage(
         'StartPage_eventHandlers_createBasic_block_Query_loadCreatable',
@@ -56,27 +59,37 @@ class Template {
           TypeUsage(CREATABLE, [
             FieldUsage(0, [
               TypeUsage(NONCREATABLE, [
-                FieldUsage(0, [TypeUsage(EMBEDDED, [])]),
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
                 FieldUsage(1, [])
               ])
             ]),
             FieldUsage(1, [
               TypeUsage(NONCREATABLE, [
-                FieldUsage(0, [TypeUsage(EMBEDDED, [])]),
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
                 FieldUsage(1, [])
               ])
             ]),
-            FieldUsage(2, [TypeUsage(EMBEDDED, [])]),
+            FieldUsage(2, [
+              TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+            ]),
             FieldUsage(3, [
-              TypeUsage(DFILE,
-                  [FieldUsage(0, []), FieldUsage(1, []), FieldUsage(2, [])])
+              TypeUsage(DFILE, [
+                FieldUsage(0, []),
+                FieldUsage(3, []),
+                FieldUsage(1, []),
+                FieldUsage(2, [])
+              ])
             ]),
             FieldUsage(4, []),
             FieldUsage(5, [TypeUsage(CREATABLE, [])]),
             FieldUsage(6, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '70abc4f63bdd876a916940228be9d1f1')
+        '94190277ec30aa16483467018a7ea4f9')
   ];
   static List<TemplateType> _types = [
     TemplateType('Boolean', '27226c864bac7454a8504f8edb15d95b', []),
@@ -106,16 +119,26 @@ class Template {
         ],
         refType: RefType.Model,
         creator: () => Creatable()),
-    TemplateType('DFile', 'aa71e3af30ba21b5a98feb6b0c43da81', [
+    TemplateType(
+        'DBResultStatus',
+        'b7ade0f723488459cca2566a1b4959b5',
+        [
+          TemplateField('Success', 0, FieldType.Enum),
+          TemplateField('Errors', 0, FieldType.Enum)
+        ],
+        refType: RefType.Enum),
+    TemplateType('DFile', '71a781845a8ebe8adf67352a573af199', [
       TemplateField('id', STRING, FieldType.String),
       TemplateField('name', STRING, FieldType.String),
-      TemplateField('size', INTEGER, FieldType.Integer)
+      TemplateField('size', INTEGER, FieldType.Integer),
+      TemplateField('mimeType', STRING, FieldType.String)
     ]),
     TemplateType('Date', '44749712dbec183e983dcd78a7736c41', []),
     TemplateType('DateTime', '8cf10d2341ed01492506085688270c1e', []),
     TemplateType('Double', 'd909d38d705ce75386dd86e611a82f5b', []),
     TemplateType('Duration', 'e02d2ae03de9d493df2b6b2d2813d302', []),
-    TemplateType('Embedded', '069e7821d3b4c0bbf437147263eb4d0e', [],
+    TemplateType('Embedded', '87d928bca2046f10bdcc74e683623d09',
+        [TemplateField('embName', STRING, FieldType.String)],
         embedded: true, refType: RefType.Model, creator: () => Embedded()),
     TemplateType('Integer', 'a0faef0851b4294c06f2b94bb1cb2044', []),
     TemplateType(
@@ -235,6 +258,11 @@ The field cannot be in _type's child, so subtract _type.parentField from val, an
       case CONNECTIONSTATUS:
         {
           return ConnectionStatus.values[field] as T;
+        }
+
+      case DBRESULTSTATUS:
+        {
+          return DBResultStatus.values[field] as T;
         }
     }
   }

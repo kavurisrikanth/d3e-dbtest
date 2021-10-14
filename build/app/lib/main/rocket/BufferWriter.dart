@@ -49,10 +49,55 @@ class BufferWriter {
   }
 
   void writeBytes(Uint8List val) {
-    writeInt(val.length);
-    _ensureBytes(val.length);
+    int toWrite = val.length;
+    int dataSize = data.length;
+    writeInt(toWrite);
+    if (toWrite > dataSize) {
+      // if val is too big to fit, some other arrangement has to be made
+      _writeBytesOnOverflow(val);
+      return;
+    }
+
+    _ensureBytes(toWrite);
     data.setAll(index, val);
     index += val.length;
+  }
+
+  void _writeBytesOnOverflow(Uint8List val) {
+    int dataSize = data.length;
+
+    int _stillToWrite = val.length;
+    int _idx = 0;
+    while (_stillToWrite > 0) {
+      // There is still data to write
+
+      // Take a chunk
+      int _chunkSize;
+
+      if (_stillToWrite >= dataSize) {
+        // If the amount still left to write is more than data size, then chunk size will be data size
+        _chunkSize = dataSize;
+      } else {
+        // What we need to write fits inside data. So, chunk size is same as _stillToWrite
+        _chunkSize = _stillToWrite;
+      }
+
+      // Get proper end index
+      int _endIdx = _idx + _chunkSize;
+
+      // ensure space
+      _ensureBytes(_chunkSize);
+
+      // Splice and write
+      Uint8List piece = Uint8List.sublistView(val, _idx, _endIdx);
+
+      data.setAll(index, piece);
+      index += piece.length;
+
+      // Loop management
+      _stillToWrite -= piece.length;
+      _idx = _endIdx;
+    }
   }
 
   ByteData _readByteData(int sizeInBytes) {

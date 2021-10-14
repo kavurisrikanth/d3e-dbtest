@@ -56,14 +56,6 @@ public class QueryProvider {
     return findById.orElse(null);
   }
 
-  public boolean checkNameUniqueInCreatable(long creatableId, String name) {
-    return creatableRepository.checkNameUnique(creatableId, name);
-  }
-
-  public String getOldCreatableName() {
-    return creatableRepository.getOldName();
-  }
-
   public OneTimePassword getOneTimePasswordById(long id) {
     Optional<OneTimePassword> findById = oneTimePasswordRepository.findById(id);
     return findById.orElse(null);

@@ -1,0 +1,9 @@
+client class NameUtil {
+    static Integer _idx = 0;
+
+    static String getName() {
+        String name = '_name_' + _idx.toString();
+        _idx++;
+        return name;
+    }
+}

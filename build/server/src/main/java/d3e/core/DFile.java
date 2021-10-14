@@ -10,7 +10,8 @@ public class DFile {
     @Id
     private String id;
     private long size;
-
+    private String mimeType;
+    
     public String getId() {
         return id;
     }
@@ -34,4 +35,12 @@ public class DFile {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public String getMimeType() {
+		return mimeType;
+	}
+    
+    public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
 }

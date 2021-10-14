@@ -22,6 +22,7 @@ public class ClientSession {
 	private ReentrantLock lock = new ReentrantLock();
 	Map<String, AbstractClientProxy> proxies = MapExt.Map();
 	List<BinaryMessage> queue = new ArrayList<>();
+	private long timeout;
 
 	public ClientSession(WebSocketSession session) {
 		this.session = session;
@@ -73,5 +74,12 @@ public class ClientSession {
 			queue.clear();
 		}
 	}
+
+	public void setTimeOut(long timeout) {
+		this.timeout = timeout;
+	}
 	
+	public long getTimeout() {
+		return timeout;
+	}
 }

@@ -2,6 +2,7 @@ package rest;
 
 import classes.ChangeEventType;
 import classes.ConnectionStatus;
+import classes.DBResultStatus;
 import classes.IconType;
 import classes.ImageFrom;
 import classes.LoginResult;
@@ -37,6 +38,7 @@ import models.UserSession;
 @org.springframework.stereotype.Service
 public class ModelSchema extends AbstractModelSchema {
   protected void createAllEnums() {
+    addEnum(DBResultStatus.class, SchemaConstants.DBResultStatus);
     addEnum(ConnectionStatus.class, SchemaConstants.ConnectionStatus);
     addEnum(MutateResultStatus.class, SchemaConstants.MutateResultStatus);
     addEnum(ChangeEventType.class, SchemaConstants.ChangeEventType);

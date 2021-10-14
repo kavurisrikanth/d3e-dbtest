@@ -7,7 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import org.apache.tika.Tika;
+
 public class FileUtils {
+	static Tika tika = new Tika();
     static Path getFilePath(String name, String prefix, String targetPath) {
         Path filePath;
         if (name.startsWith(prefix)) {
@@ -19,11 +22,20 @@ public class FileUtils {
             throw new RuntimeException("File not found " + name);
         }
     }
+    
+    public static String detectMimeType(File file) {
+    	try {
+    		return tika.detect(file);
+    	}catch (Exception e) {
+    		return "";
+    	}
+    }
 
     static DFile storeFile(InputStream fileStream, File file, String name, String id) throws IOException {
         Path filePath = file.toPath();
         Files.copy(fileStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         DFile out = new DFile();
+        out.setMimeType(detectMimeType(file));
         out.setId(id);
         out.setName(name);
         out.setSize(file.length());

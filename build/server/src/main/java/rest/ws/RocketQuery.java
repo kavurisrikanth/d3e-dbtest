@@ -111,7 +111,7 @@ public class RocketQuery extends AbstractRocketQuery {
         }
     }
     D3ELogger.info("Query Not found");
-    return null;
+    throw new ValidationFailedException(ListExt.asList("Invalid Query: " + query));
   }
 
   private LoginResult loginWithOTP(String token, String code, String deviceToken) throws Exception {

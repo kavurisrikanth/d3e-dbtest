@@ -209,6 +209,25 @@ public class ArgumentInputContext extends GraphQLInputContext {
 		}
 		throw new RuntimeException("Unsupported");
 	}
+	
+	@Override
+	public List<Long> readIntegerColl(String field) {
+		Object any = readAny(field);
+		if (any instanceof JSONArray) {
+			try {
+				JSONArray array = (JSONArray) any;
+				int length = array.length();
+				List<Long> res = new ArrayList<>();
+				for (int i = 0; i < length; i++) {
+					res.add(array.getLong(i));
+				}
+				return res;
+			} catch (JSONException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		throw new RuntimeException("Unsupported");
+	}
 
 	@Override
 	public List<String> readStringColl(String field) {

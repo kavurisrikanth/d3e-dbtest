@@ -397,7 +397,7 @@ public abstract class BaseReportExecutor {
         row = rows.get(rowIndex);
 
         // Row has changed. So create a new one.
-        resultRow = new ReportOutRow(row.getKey(), row.getParentKey(), ListExt.List(), row.getGroupingKey());
+        resultRow = new ReportOutRow(ListExt.List(), row.getGroupingKey(), row.getKey(), row.getParentKey());
 
         // Step 1 - Add the non-dataset columns to the row
         for (ReportOutCell cell : row.getCells()) {
@@ -711,7 +711,7 @@ public abstract class BaseReportExecutor {
     first.setKey(currentRowKey.toString());
     first.setParentKey(null);
     currentRowKey++;
-    List<ReportOutCell> cells = ListExt.asList(new ReportOutCell("", null, value, new ArrayList<>()));
+    List<ReportOutCell> cells = ListExt.asList(new ReportOutCell(new ArrayList<>(), "", null, value));
     addNEmptyCells(numCols - 1, cells);
     first.setCells(cells);
     return first;

@@ -685,53 +685,6 @@
 					"deprecationReason": null
 				},
 				{
-					"name": "getOldCreatableName",
-					"description": "",
-					"args": [
-
-					],
-					"type": {
-						"kind": "SCALAR",
-						"name": "String",
-						"ofType": null
-					},
-					"isDeprecated": false,
-					"deprecationReason": null
-				},
-				{
-					"name": "checkNameUniqueInCreatable",
-					"description": "",
-					"args": [
-						{
-							"name": "creatableId",
-							"description": "",
-							"type": {
-								"kind": "SCALAR",
-								"name": "Long",
-								"ofType": null
-							},
-							"defaultValue": null
-						},
-						{
-							"name": "name",
-							"description": "",
-							"type": {
-								"kind": "SCALAR",
-								"name": "String",
-								"ofType": null
-							},
-							"defaultValue": null
-						}
-					],
-					"type": {
-						"kind": "SCALAR",
-						"name": "Boolean",
-						"ofType": null
-					},
-					"isDeprecated": false,
-					"deprecationReason": null
-				},
-				{
 					"name": "getOneTimePasswordById",
 					"description": "",
 					"args": [
@@ -1869,6 +1822,20 @@
 					"type": {
 						"kind": "SCALAR",
 						"name": "Long",
+						"ofType": null
+					},
+					"isDeprecated": false,
+					"deprecationReason": null
+				},
+				{
+					"name": "name",
+					"description": "",
+					"args": [
+
+					],
+					"type": {
+						"kind": "SCALAR",
+						"name": "String",
 						"ofType": null
 					},
 					"isDeprecated": false,

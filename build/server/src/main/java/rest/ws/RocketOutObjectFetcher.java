@@ -1,18 +1,11 @@
 package rest.ws;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import d3e.core.DFile;
+import d3e.core.SchemaConstants;
 import gqltosql.schema.DField;
 import gqltosql.schema.DModel;
 import gqltosql2.IOutValue;
@@ -35,13 +28,7 @@ public class RocketOutObjectFetcher {
 
 	private void fetchValue(TemplateUsage usage, Object value) {
 		if (value == null) {
-			DModel<?> ref = usage.getField().getField().getReference();
-			if (ref != null && ref.isEmbedded()) {
-				msg.writeInt(template.toClientTypeIdx(ref.getIndex()));
-				msg.writeNull();
-			} else {
-				msg.writeNull();
-			}
+			msg.writeNull();
 		} else if (value instanceof Collection) {
 			List<?> coll = new ArrayList<>((Collection<?>) value);
 			// D3ELogger.info("w coll: " + coll.size());
@@ -69,13 +56,16 @@ public class RocketOutObjectFetcher {
 		msg.writePrimitiveField(val, df, template);
 	}
 
-	private void fetchDFile(DFile value) {
-		if (value == null) {
-			msg.writeNull();
+	private void fetchDFile(OutObject db) {
+		String id = db.getString("id");
+		if(id == null) {
+			msg.writeString(null);
+			return;
 		}
-		msg.writeString(value.getId());
-		msg.writeString(value.getName());
-		msg.writeLong(value.getSize());
+		msg.writeString(id);
+		msg.writeString(db.getString("name"));
+		msg.writeLong(db.getLong("size"));
+		msg.writeString(db.getString("mimeType"));
 	}
 
 	private void fetchReferenceInternal(TemplateType type, UsageType usage, OutObject value) {
@@ -109,8 +99,12 @@ public class RocketOutObjectFetcher {
 			OutObject db = (OutObject) value;
 			// D3ELogger.info("w ref: " + db.getTypes());
 			int typeIdx = template.toClientTypeIdx(db.getType());
-			msg.writeInt(typeIdx);
 			DModel<?> ref = df.getReference();
+			if (ref.getIndex() == SchemaConstants.DFile) {
+				fetchDFile(db);
+				return;
+			}
+			msg.writeInt(typeIdx);
 			if (!ref.isEmbedded()) {
 				msg.writeLong(db.getId());
 			}

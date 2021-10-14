@@ -21,16 +21,16 @@ public class ReportOutput extends DBObject {
   public ReportOutput() {}
 
   public ReportOutput(
-      List<ReportOutOption> options,
-      List<ReportOutColumn> columns,
-      List<ReportOutColumn> subColumns,
       List<ReportOutAttribute> attributes,
-      List<ReportOutRow> rows) {
-    this.options = options;
-    this.columns = columns;
-    this.subColumns = subColumns;
+      List<ReportOutColumn> columns,
+      List<ReportOutOption> options,
+      List<ReportOutRow> rows,
+      List<ReportOutColumn> subColumns) {
     this.attributes = attributes;
+    this.columns = columns;
+    this.options = options;
     this.rows = rows;
+    this.subColumns = subColumns;
   }
 
   public long getId() {

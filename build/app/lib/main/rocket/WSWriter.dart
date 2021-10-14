@@ -100,6 +100,7 @@ class WSWriter {
     writeString(file.id);
     writeString(file.name);
     writeInteger(file.size);
+    writeString(file.mimeType);
   }
 
   void writeObj<T extends DBObject>(T obj) {

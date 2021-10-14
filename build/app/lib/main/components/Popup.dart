@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:math' as math;
+import '../utils/EventBus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'LayoutAware.dart';
+import 'PopupEvent.dart';
 
 typedef void _OnShowChange();
 
@@ -61,6 +64,7 @@ class Popup {
   static const bool _defaultPreferBelow = true;
   static const bool _defaultShowConnector = false;
   static const BoxConstraints _defaultConstriants = BoxConstraints();
+  static int openPopupsCount = 0;
 
   bool preferBelow;
   OverlayEntry _entry;
@@ -69,6 +73,7 @@ class Popup {
   Rect _placeHolderBounds;
   Offset _mouseDownAt;
   Offset _positionAtMouseDown;
+  FocusNode _lastFocus;
 
   void initState() {
     GestureBinding.instance.pointerRouter.addGlobalRoute(_handlePointerEvent);
@@ -99,13 +104,19 @@ class Popup {
       this.onClose();
       //ToSend Event when hiding by clicking outside the popup
     }
+    openPopupsCount--;
+    EventBus.get().fire(PopupEvent(openPopupsCount));
     _removeEntry();
+    _lastFocus?.requestFocus();
   }
 
   void showPopup(BuildContext context) {
     if (_entry != null) {
       return;
     }
+    openPopupsCount++;
+    this._lastFocus = FocusManager.instance.primaryFocus;
+    EventBus.get().fire(PopupEvent(openPopupsCount));
     initState();
     _createNewEntry(context);
   }
@@ -164,7 +175,10 @@ class Popup {
     if (_entry != null) {
       GestureBinding.instance.pointerRouter
           .removeGlobalRoute(_handlePointerEvent);
+      openPopupsCount--;
+      EventBus.get().fire(PopupEvent(openPopupsCount));
       _removeEntry();
+      _lastFocus?.requestFocus();
     }
   }
 }

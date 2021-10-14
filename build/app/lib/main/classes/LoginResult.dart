@@ -7,10 +7,10 @@ class LoginResult extends DBObject {
   static const int _SUCCESS = 1;
   static const int _TOKEN = 2;
   static const int _USEROBJECT = 3;
-  String _failureMessage = '';
   bool _success = false;
-  String _token = '';
   User _userObject;
+  String _token = '';
+  String _failureMessage = '';
   LoginResult(
       {String failureMessage, bool success, String token, User userObject}) {
     if (failureMessage != null) {
@@ -47,24 +47,6 @@ class LoginResult extends DBObject {
     super.initListeners();
   }
 
-  String get failureMessage {
-    return _failureMessage;
-  }
-
-  void setFailureMessage(String val) {
-    bool isValChanged = _failureMessage != val;
-
-    if (!isValChanged) {
-      return;
-    }
-
-    this.updateD3EChanges(_FAILUREMESSAGE, _failureMessage);
-
-    _failureMessage = val;
-
-    fire('failureMessage', this);
-  }
-
   bool get success {
     return _success;
   }
@@ -81,24 +63,6 @@ class LoginResult extends DBObject {
     _success = val;
 
     fire('success', this);
-  }
-
-  String get token {
-    return _token;
-  }
-
-  void setToken(String val) {
-    bool isValChanged = _token != val;
-
-    if (!isValChanged) {
-      return;
-    }
-
-    this.updateD3EChanges(_TOKEN, _token);
-
-    _token = val;
-
-    fire('token', this);
   }
 
   User get userObject {
@@ -121,17 +85,53 @@ class LoginResult extends DBObject {
     fire('userObject', this);
   }
 
+  String get token {
+    return _token;
+  }
+
+  void setToken(String val) {
+    bool isValChanged = _token != val;
+
+    if (!isValChanged) {
+      return;
+    }
+
+    this.updateD3EChanges(_TOKEN, _token);
+
+    _token = val;
+
+    fire('token', this);
+  }
+
+  String get failureMessage {
+    return _failureMessage;
+  }
+
+  void setFailureMessage(String val) {
+    bool isValChanged = _failureMessage != val;
+
+    if (!isValChanged) {
+      return;
+    }
+
+    this.updateD3EChanges(_FAILUREMESSAGE, _failureMessage);
+
+    _failureMessage = val;
+
+    fire('failureMessage', this);
+  }
+
   void set(int field, Object value) {
     switch (field) {
-      case _FAILUREMESSAGE:
-        {
-          this.setFailureMessage((value as String));
-          break;
-        }
-
       case _SUCCESS:
         {
           this.setSuccess((value as bool));
+          break;
+        }
+
+      case _USEROBJECT:
+        {
+          this.setUserObject((value as User));
           break;
         }
 
@@ -141,9 +141,9 @@ class LoginResult extends DBObject {
           break;
         }
 
-      case _USEROBJECT:
+      case _FAILUREMESSAGE:
         {
-          this.setUserObject((value as User));
+          this.setFailureMessage((value as String));
           break;
         }
     }
@@ -151,14 +151,14 @@ class LoginResult extends DBObject {
 
   Object get(int field) {
     switch (field) {
-      case _FAILUREMESSAGE:
-        {
-          return this._failureMessage;
-        }
-
       case _SUCCESS:
         {
           return this._success;
+        }
+
+      case _USEROBJECT:
+        {
+          return this._userObject;
         }
 
       case _TOKEN:
@@ -166,9 +166,9 @@ class LoginResult extends DBObject {
           return this._token;
         }
 
-      case _USEROBJECT:
+      case _FAILUREMESSAGE:
         {
-          return this._userObject;
+          return this._failureMessage;
         }
       default:
         {
@@ -180,18 +180,18 @@ class LoginResult extends DBObject {
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is LoginResult &&
-            _failureMessage == other._failureMessage &&
             _success == other._success &&
+            _userObject == other._userObject &&
             _token == other._token &&
-            _userObject == other._userObject;
+            _failureMessage == other._failureMessage;
   }
 
   @override
   int get hashCode {
-    return _failureMessage?.hashCode ??
-        0 + _success?.hashCode ??
-        0 + _token?.hashCode ??
+    return _success?.hashCode ??
         0 + _userObject?.hashCode ??
+        0 + _token?.hashCode ??
+        0 + _failureMessage?.hashCode ??
         0;
   }
 }

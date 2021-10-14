@@ -129,6 +129,8 @@ public abstract class AbstractModelSchema implements IModelSchema{
 	        "name", 1, "_name", FieldPrimitiveType.String, (s) -> s.getName(), (s, v) -> s.setName(v));
 	    m.addPrimitive(
 	        "size", 2, "_size", FieldPrimitiveType.Integer, (s) -> s.getSize(), (s, v) -> s.setSize(v));
+	    m.addPrimitive(
+		        "mimeType", 2, "_mime_type", FieldPrimitiveType.String, (s) -> s.getSize(), (s, v) -> s.setSize(v));
 	}
 	  
 	protected void recordNumChannels(int num) {

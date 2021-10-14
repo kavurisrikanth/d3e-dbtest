@@ -32,11 +32,12 @@ public class SchemaConstants {
   public static final int ReportOutRow = 28;
   public static final int ReportOutCell = 29;
   public static final int LoginResult = 30;
-  public static final int ConnectionStatus = 31;
-  public static final int MutateResultStatus = 32;
-  public static final int ChangeEventType = 33;
-  public static final int TrackSizeType = 34;
-  public static final int IconType = 35;
-  public static final int ImageFrom = 36;
-  public static final int _TOTAL_COUNT = 37;
+  public static final int DBResultStatus = 31;
+  public static final int ConnectionStatus = 32;
+  public static final int MutateResultStatus = 33;
+  public static final int ChangeEventType = 34;
+  public static final int TrackSizeType = 35;
+  public static final int IconType = 36;
+  public static final int ImageFrom = 37;
+  public static final int _TOTAL_COUNT = 38;
 }

@@ -313,4 +313,8 @@ public class FileExt {
   public static File getUserHome() {
     return new File(System.getProperty("user.home"));
   }
+
+  public static String detectMimeType(File f) {
+	return d3e.core.FileUtils.detectMimeType(f);
+  }
 }

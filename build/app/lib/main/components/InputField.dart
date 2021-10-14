@@ -494,6 +494,12 @@ class _InputFieldState extends State<InputField>
                     behavior: HitTestBehavior.translucent,
                     child: child,
                   )));
+
+    child = DefaultTextEditingShortcuts(
+      child: DefaultTextEditingActions(
+        child: child,
+      ),
+    );
     return child;
   }
 

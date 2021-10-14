@@ -44,7 +44,7 @@ public class ObjectsToSend {
 		if (field.isEmpty()) {
 			return;
 		}
-		D3ELogger.info("Sending " + object + " and field " + field);
+		//D3ELogger.info("Sending " + object + " and field " + field);
 		Map<DBObject, BitSet> map2 = addMap.get(session);
 		if (map2 == null) {
 			map2 = new HashMap<>();

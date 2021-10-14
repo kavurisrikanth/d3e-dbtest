@@ -14,6 +14,11 @@ public abstract class AbstractChannels {
   
   public boolean connect(DChannel dm, ClientSession ses, EntityHelperService helperService, Template template) {
 	D3ELogger.info("Channel connected: " + dm.getName());
+	AbstractClientProxy existing = ses.proxies.get(dm.getName());
+	if(existing != null) {
+		D3ELogger.info("Channel existed: " + dm.getName());
+		return true;
+	}
     ServerChannel channel = allChannels.get(dm.getName());
     AbstractClientProxy proxy = getChannelClientProxy(dm.getIndex(), ses, helperService, template);
     boolean val = channel.onConnect(proxy);

@@ -31,10 +31,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     // Each method
     if (request.getRequestURI().startsWith("/api/")) {
       if (Objects.equals(request.getMethod(), "OPTIONS")) {
-        response.addHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
       }
-      response.addHeader("Access-Control-Allow-Origin", "*");
-      response.addHeader("Content-Type", request.getContentType());
+      response.setHeader("Access-Control-Allow-Origin", "*");
+      response.setHeader("Content-Type", request.getContentType());
     }
     String token = null;
     String requestTokenHeader = request.getHeader("Authorization");

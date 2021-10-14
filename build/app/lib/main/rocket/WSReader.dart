@@ -182,6 +182,7 @@ class WSReader {
     file.id = id;
     file.name = readString();
     file.size = readInteger();
+    file.mimeType = readString();
     return file;
   }
 

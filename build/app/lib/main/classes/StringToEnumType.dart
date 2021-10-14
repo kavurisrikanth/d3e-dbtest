@@ -695,6 +695,29 @@ class StringToEnumType {
     }
   }
 
+  static KeyEventResult stringToKeyEventResult(String str) {
+    switch (str) {
+      case 'handled':
+        {
+          return KeyEventResult.handled;
+        }
+
+      case 'ignored':
+        {
+          return KeyEventResult.ignored;
+        }
+
+      case 'skipRemainingHandlers':
+        {
+          return KeyEventResult.skipRemainingHandlers;
+        }
+      default:
+        {
+          return null;
+        }
+    }
+  }
+
   static LogicalKeyboardKey stringToLogicalKeyboardKey(String str) {
     switch (str) {
       case 'escape':
@@ -1185,6 +1208,26 @@ class StringToEnumType {
       case 'period':
         {
           return LogicalKeyboardKey.period;
+        }
+
+      case 'exclamation':
+        {
+          return LogicalKeyboardKey.exclamation;
+        }
+
+      case 'at':
+        {
+          return LogicalKeyboardKey.at;
+        }
+
+      case 'numberSign':
+        {
+          return LogicalKeyboardKey.numberSign;
+        }
+
+      case 'dollar':
+        {
+          return LogicalKeyboardKey.dollar;
         }
       default:
         {

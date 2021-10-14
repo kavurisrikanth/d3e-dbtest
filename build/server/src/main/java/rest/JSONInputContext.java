@@ -197,6 +197,21 @@ public class JSONInputContext extends GraphQLInputContext implements IDocumentRe
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public List<Long> readIntegerColl (String field) {
+		try {
+			JSONArray array = json.getJSONArray(field);
+			int length = array.length();
+			List<Long> res = new ArrayList<>();
+			for (int i = 0; i < length; i++) {
+				res.add(array.getLong(i));
+			}
+			return res;
+		} catch (JSONException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Override
 	public List<String> readStringColl(String field) {

@@ -18,11 +18,11 @@ public class ReportOutRow extends DBObject {
 
   public ReportOutRow() {}
 
-  public ReportOutRow(String key, String parentKey, List<ReportOutCell> cells, String groupingKey) {
-    this.key = key;
-    this.parentKey = parentKey;
+  public ReportOutRow(List<ReportOutCell> cells, String groupingKey, String key, String parentKey) {
     this.cells = cells;
     this.groupingKey = groupingKey;
+    this.key = key;
+    this.parentKey = parentKey;
   }
 
   public long getId() {

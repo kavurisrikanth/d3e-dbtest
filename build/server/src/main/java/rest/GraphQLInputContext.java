@@ -146,6 +146,8 @@ public abstract class GraphQLInputContext {
 	public abstract List<Long> readLongColl(String field);
 
 	public abstract List<String> readStringColl(String field);
+	
+	public abstract List<Long> readIntegerColl(String field);
 
 	public abstract <T> List<T> readChildColl(String field, String type);
 

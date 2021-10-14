@@ -36,6 +36,7 @@ dependencies {
    implementation("de.siegmar:logback-gelf:2.0.0")
    implementation("org.codehaus.janino:janino:2.7.8")
    implementation("org.json:json:20210307")
+   implementation("org.apache.tika:tika-core:2.1.0")
    testCompile("com.h2database:h2:1.4.193")
    testCompile("org.springframework.boot:spring-boot-starter-test:2.1.6.RELEASE")
    compileOnly("org.projectlombok:lombok:1.18.8")

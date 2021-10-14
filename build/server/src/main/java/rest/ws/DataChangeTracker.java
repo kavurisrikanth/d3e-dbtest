@@ -292,6 +292,10 @@ public class DataChangeTracker {
 			}
 			id = dbObj.getId();
 		}
+		DModel<?> model = this.schema.getType(type);
+		if(model.isEmbedded()) {
+			return;
+		}
 		Selection sel = field.getSelectionForType(type);
 		if (sel == null || sel.getFields().isEmpty()) {
 			return;
@@ -321,11 +325,7 @@ public class DataChangeTracker {
 		dl.types.add(type);
 		if (toSend != null && dbObj != null) {
 			BitSet set = field.getBitSet(allParents);
-			if (parentField != null && parentField.getReference().isEmbedded()) {
-				toSend.addEmbedded(dl.session, parent, parentField, set);
-			} else {
-				toSend.add(dl.session, dbObj, set);
-			}
+			toSend.add(dl.session, dbObj, set);
 		}
 //		DModel<?> objType = schema.getType(type);
 //		 D3ELogger.info("WATCHING " + SEL.GETTYPE().GETTYPE() + " ID: " + ID + " FIELDS: "
@@ -442,7 +442,11 @@ public class DataChangeTracker {
 	}
 
 	public DBObject fromTypeAndId(TypeAndId ti) {
-		String type = schema.getType(ti.type).getType();
+		DModel<?> model = schema.getType(ti.type);
+		if(model.isEmbedded()) {
+			return null;
+		}
+		String type = model.getType();
 		return helperService.getObject().get(type, ti.id);
 	}
 
@@ -501,9 +505,21 @@ public class DataChangeTracker {
 				int fieldIndex = dField.getIndex();
 				FieldType fieldType = dField.getType();
 				if (fieldType == FieldType.Reference) {
+					if(dField.getReference().isEmbedded() && changeType != StoreEventType.Delete) {
+						for (ObjectListener ol : interests.fieldListeners) {
+							if (ol.listener instanceof DisposableListener) {
+								DisposableListener dl = (DisposableListener) ol.listener;
+								BitSet set = new BitSet();
+								set.or(ol.fields);
+								set.and(changes);
+								toSend.addEmbedded(dl.session, object, dField, set);
+							}
+						}
+						continue;
+					}
 					Object _oldValue = object._oldValue(field);
 					Object _newValue = dField.getValue(object);
-					if (_oldValue != null) {
+					if (_oldValue != null && _newValue == null) {
 						DBObject dbObj = null;
 						int oldType = 0;
 						long oldId = 0;
