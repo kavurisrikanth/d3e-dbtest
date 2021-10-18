@@ -6,6 +6,9 @@
         'properties_creatables_computation'
     ]
     struct #Creatables
+    usage [
+        'items.*'
+    ]
 })
 
 (QueryUsage StartPage_creatables_synchronise_Subscription_onCreatablesChange {
@@ -26,6 +29,9 @@
         'eventHandlers_createBasic_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_createRef_block_Query_loadCreatable {
@@ -36,6 +42,9 @@
         'eventHandlers_createRef_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_createRefColl_block_Query_loadCreatable {
@@ -46,6 +55,9 @@
         'eventHandlers_createRefColl_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_createChildColl_block_Query_loadCreatable {
@@ -56,6 +68,9 @@
         'eventHandlers_createChildColl_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_createFile_block_Query_loadCreatable {
@@ -66,6 +81,9 @@
         'eventHandlers_createFile_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_createChild_block_Query_loadCreatable {
@@ -76,6 +94,9 @@
         'eventHandlers_createChild_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_createEmb_block_Query_loadCreatable {
@@ -86,6 +107,9 @@
         'eventHandlers_createEmb_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_updateBasic_block_Query_loadCreatable {
@@ -96,6 +120,9 @@
         'eventHandlers_updateBasic_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_updateRef_block_Query_loadCreatable {
@@ -106,6 +133,9 @@
         'eventHandlers_updateRef_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_updateRefColl_block_Query_loadCreatable {
@@ -116,6 +146,9 @@
         'eventHandlers_updateRefColl_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_updateChild_block_Query_loadCreatable {
@@ -126,6 +159,9 @@
         'eventHandlers_updateChild_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_updateChildColl_block_Query_loadCreatable {
@@ -136,6 +172,9 @@
         'eventHandlers_updateChildColl_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_updateEmb_block_Query_loadCreatable {
@@ -146,6 +185,9 @@
         'eventHandlers_updateEmb_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
 })
 
 (QueryUsage StartPage_eventHandlers_updateFile_block_Query_loadCreatable {
@@ -156,4 +198,98 @@
         'eventHandlers_updateFile_block'
     ]
     model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage StartPage_eventHandlers_deleteBasic_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_deleteBasic_block'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage StartPage_eventHandlers_deleteRef_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_deleteRef_block'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage StartPage_eventHandlers_deleteRefColl_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_deleteRefColl_block'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage StartPage_eventHandlers_deleteChild_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_deleteChild_block'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage StartPage_eventHandlers_deleteChildColl_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_deleteChildColl_block'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage StartPage_eventHandlers_deleteEmb_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_deleteEmb_block'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage StartPage_eventHandlers_deleteFile_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_deleteFile_block'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
 })

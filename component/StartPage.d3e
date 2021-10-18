@@ -144,7 +144,7 @@
                         data [
                             ({
                                 prop #data
-                                value 'NonCreatable: '
+                                value 'Message: '
                             })
                         ]
                         style #heading1
@@ -155,7 +155,7 @@
                             ({
                                 prop #data
                                 bind true
-                                bindTo `DisplayUtil.displayNonCreatable(this.nonCreatable)`
+                                bindTo `(this.message == null || this.message.length == 0) ? 'No Message' : this.message`
                             })
                         ]
                     })
@@ -392,6 +392,115 @@
                             })
                         ]
                     })
+                    (CRef id {
+                        component #Column
+                        data [
+                            ({
+                                prop #mainAxisAlignment
+                                value 'center'
+                            })
+                            ({
+                                prop #vscroll
+                                value 'true'
+                            })
+                        ]
+                        children [
+                            (CRef id {
+                                component #TextView
+                                data [
+                                    ({
+                                        prop #data
+                                        value 'Delete'
+                                    })
+                                ]
+                                style #heading1
+                            })
+                            (CRef dBasic {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Delete basic Creatable'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef dWithRef {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Delete Creatable with Ref'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef dWithRefColl {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Delete Creatable with Ref Collection'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef dWithChild {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Delete Creatable with Child'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef dWithChildColl {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Delete Creatable with Child Collection'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef dWithEmb {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Delete Creatable with Embedded'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef dWithFile {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Delete Creatable with File'
+                                        })
+                                    ]
+                                })
+                            })
+                        ]
+                    })
                 ]
             })
         ]
@@ -566,7 +675,7 @@
         })
         (updateChildColl {
             type OnEvent
-            on #uWithRef
+            on #uWithChildColl
             event #onPressed
             block ```
                 Creatable ref = EventUtil.updateChildColl(this.allCreatables).await;
@@ -580,7 +689,7 @@
         })
         (updateEmb {
             type OnEvent
-            on #uWithRef
+            on #uWithEmb
             event #onPressed
             block ```
                 Creatable ref = EventUtil.updateEmb(this.allCreatables).await;
@@ -594,7 +703,7 @@
         })
         (updateFile {
             type OnEvent
-            on #uWithRef
+            on #uWithFile
             event #onPressed
             block ```
                 Creatable ref = EventUtil.updateFile(this.allCreatables).await;
@@ -603,6 +712,107 @@
                     this.creatable = Query.loadCreatable(ref).await;
                 } else {
                     this.message = 'Creatable update with file failed.';
+                }
+            ```
+        })
+
+        (deleteBasic {
+            type OnEvent
+            on #dBasic
+            event #onPressed
+            block ```
+                Creatable obj = EventUtil.deleteBasic(this.allCreatables).await;
+                if (obj != null) {
+                    String message = 'Creatable delete success';
+                    Creatable fromDb = Query.loadCreatable(obj).await;
+                    this.message = message;
+                    this.creatable = fromDb;
+                } else {
+                    this.message = 'Creatable delete failed.';
+                }
+            ```
+        })
+        (deleteRef {
+            type OnEvent
+            on #dWithRef
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.deleteRef(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable delete with ref success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable delete with ref failed.';
+                }
+            ```
+        })
+        (deleteRefColl {
+            type OnEvent
+            on #dWithRefColl
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.deleteRefColl(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable delete with ref collection success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable delete with ref collection failed.';
+                }
+            ```
+        })
+        (deleteChild {
+            type OnEvent
+            on #dWithChild
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.deleteChild(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable delete with child success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable delete with child failed.';
+                }
+            ```
+        })
+        (deleteChildColl {
+            type OnEvent
+            on #dWithChildColl
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.deleteChildColl(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable delete with child collection success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable delete with child collection failed.';
+                }
+            ```
+        })
+        (deleteEmb {
+            type OnEvent
+            on #dWithEmb
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.deleteEmb(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable delete with embedded success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable delete with embedded failed.';
+                }
+            ```
+        })
+        (deleteFile {
+            type OnEvent
+            on #dWithFile
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.deleteFile(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable delete with file success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable delete with file failed.';
                 }
             ```
         })

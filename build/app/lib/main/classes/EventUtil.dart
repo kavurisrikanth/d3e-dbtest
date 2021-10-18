@@ -297,4 +297,146 @@ class EventUtil {
       return null;
     }
   }
+
+  static Future<Creatable> deleteBasic(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.isBasic, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createBasic();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DBResult r = (await obj.delete());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> deleteRef(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.ref != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createRef();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DBResult r = (await obj.delete());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> deleteRefColl(List<Creatable> all) async {
+    Creatable obj =
+        all.firstWhere((c) => c.refColl.isNotEmpty, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createRefColl();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DBResult r = (await obj.delete());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> deleteChild(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.child != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createChild();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DBResult r = (await obj.delete());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> deleteChildColl(List<Creatable> all) async {
+    Creatable obj =
+        all.firstWhere((c) => c.childColl.isNotEmpty, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createChildColl();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DBResult r = (await obj.delete());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> deleteEmb(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.emb != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createEmb();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DBResult r = (await obj.delete());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> deleteFile(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.file != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createFile();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DBResult r = (await obj.delete());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
 }

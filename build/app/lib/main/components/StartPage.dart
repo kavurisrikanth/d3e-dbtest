@@ -61,10 +61,7 @@ class _StartPageState extends ObservableState<StartPage> {
       'creatable.name',
       'creatable.ref',
       'creatable.refColl',
-      'nonCreatable',
-      'nonCreatable.emb',
-      'nonCreatable.emb.embName',
-      'nonCreatable.name'
+      'message'
     ], rebuild);
   }
 
@@ -240,11 +237,13 @@ class _StartPageState extends ObservableState<StartPage> {
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Container(
                     padding: cStyle.tTextViewHeading1PaddingOn,
-                    child: Text('NonCreatable: ',
+                    child: Text('Message: ',
                         style: TextStyle(
                             color: cStyle.tTextViewHeading1ColorOn,
                             fontSize: cStyle.tTextViewHeading1FontSizeOn))),
-                Text(DisplayUtil.displayNonCreatable(this.nonCreatable))
+                Text((this.message == null || this.message.length == 0)
+                    ? 'No Message'
+                    : this.message)
               ]),
               scrollDirection: Axis.horizontal),
           ScrollView2(
@@ -319,12 +318,6 @@ class _StartPageState extends ObservableState<StartPage> {
                           Button(
                               onPressed: () {
                                 updateRef();
-
-                                updateChildColl();
-
-                                updateEmb();
-
-                                updateFile();
                               },
                               child: Text('Update Creatable with Ref')),
                           Button(
@@ -339,10 +332,71 @@ class _StartPageState extends ObservableState<StartPage> {
                               },
                               child: Text('Update Creatable with Child')),
                           Button(
+                              onPressed: () {
+                                updateChildColl();
+                              },
                               child: Text(
                                   'Update Creatable with Child Collection')),
-                          Button(child: Text('Update Creatable with Embedded')),
-                          Button(child: Text('Update Creatable with File'))
+                          Button(
+                              onPressed: () {
+                                updateEmb();
+                              },
+                              child: Text('Update Creatable with Embedded')),
+                          Button(
+                              onPressed: () {
+                                updateFile();
+                              },
+                              child: Text('Update Creatable with File'))
+                        ]),
+                    scrollDirection: Axis.vertical),
+                ScrollView2(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                              padding: cStyle.tTextViewHeading1PaddingOn,
+                              child: Text('Delete',
+                                  style: TextStyle(
+                                      color: cStyle.tTextViewHeading1ColorOn,
+                                      fontSize:
+                                          cStyle.tTextViewHeading1FontSizeOn))),
+                          Button(
+                              onPressed: () {
+                                deleteBasic();
+                              },
+                              child: Text('Delete basic Creatable')),
+                          Button(
+                              onPressed: () {
+                                deleteRef();
+                              },
+                              child: Text('Delete Creatable with Ref')),
+                          Button(
+                              onPressed: () {
+                                deleteRefColl();
+                              },
+                              child:
+                                  Text('Delete Creatable with Ref Collection')),
+                          Button(
+                              onPressed: () {
+                                deleteChild();
+                              },
+                              child: Text('Delete Creatable with Child')),
+                          Button(
+                              onPressed: () {
+                                deleteChildColl();
+                              },
+                              child: Text(
+                                  'Delete Creatable with Child Collection')),
+                          Button(
+                              onPressed: () {
+                                deleteEmb();
+                              },
+                              child: Text('Delete Creatable with Embedded')),
+                          Button(
+                              onPressed: () {
+                                deleteFile();
+                              },
+                              child: Text('Delete Creatable with File'))
                         ]),
                     scrollDirection: Axis.vertical)
               ]),
@@ -576,6 +630,115 @@ class _StartPageState extends ObservableState<StartPage> {
           ref.id)));
     } else {
       this.setMessage('Creatable update with file failed.');
+    }
+  }
+
+  void deleteBasic() async {
+    Creatable obj = (await EventUtil.deleteBasic(this.allCreatables));
+
+    if (obj != null) {
+      String message = 'Creatable delete success';
+
+      Creatable fromDb = (await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_DELETEBASIC_BLOCK_QUERY_LOADCREATABLE,
+          obj.id));
+
+      this.setMessage(message);
+
+      this.setCreatable(fromDb);
+    } else {
+      this.setMessage('Creatable delete failed.');
+    }
+  }
+
+  void deleteRef() async {
+    Creatable ref = (await EventUtil.deleteRef(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable delete with ref success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_DELETEREF_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable delete with ref failed.');
+    }
+  }
+
+  void deleteRefColl() async {
+    Creatable ref = (await EventUtil.deleteRefColl(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable delete with ref collection success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_DELETEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable delete with ref collection failed.');
+    }
+  }
+
+  void deleteChild() async {
+    Creatable ref = (await EventUtil.deleteChild(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable delete with child success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_DELETECHILD_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable delete with child failed.');
+    }
+  }
+
+  void deleteChildColl() async {
+    Creatable ref = (await EventUtil.deleteChildColl(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable delete with child collection success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_DELETECHILDCOLL_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable delete with child collection failed.');
+    }
+  }
+
+  void deleteEmb() async {
+    Creatable ref = (await EventUtil.deleteEmb(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable delete with embedded success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_DELETEEMB_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable delete with embedded failed.');
+    }
+  }
+
+  void deleteFile() async {
+    Creatable ref = (await EventUtil.deleteFile(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable delete with file success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_DELETEFILE_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable delete with file failed.');
     }
   }
 
