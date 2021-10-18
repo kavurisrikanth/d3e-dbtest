@@ -318,19 +318,19 @@
                                     ]
                                 })
                             })
-                            (CRef cWithRef {
+                            (CRef uWithRef {
                                 component #Button
                                 child (CRef id {
                                     component #TextView
                                     data [
                                         ({
                                             prop #data
-                                            value 'Create Creatable with Ref'
+                                            value 'Update Creatable with Ref'
                                         })
                                     ]
                                 })
                             })
-                            (CRef cWithRefColl {
+                            (CRef uWithRefColl {
                                 component #Button
                                 child (CRef id {
                                     component #TextView
@@ -342,7 +342,7 @@
                                     ]
                                 })
                             })
-                            (CRef cWithChild {
+                            (CRef uWithChild {
                                 component #Button
                                 child (CRef id {
                                     component #TextView
@@ -354,7 +354,7 @@
                                     ]
                                 })
                             })
-                            (CRef cWithChildColl {
+                            (CRef uWithChildColl {
                                 component #Button
                                 child (CRef id {
                                     component #TextView
@@ -366,7 +366,7 @@
                                     ]
                                 })
                             })
-                            (CRef cWithEmb {
+                            (CRef uWithEmb {
                                 component #Button
                                 child (CRef id {
                                     component #TextView
@@ -374,6 +374,18 @@
                                         ({
                                             prop #data
                                             value 'Create Creatable with Embedded'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef uWithFile {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with File'
                                         })
                                     ]
                                 })
@@ -585,6 +597,54 @@
                     this.creatable = obj;
                 } else {
                     this.message = 'Creatable update failed.';
+                }
+            ```
+        })
+        (updateRef {
+            type OnEvent
+            on #uWithRef
+            event #onPressed
+            block ```
+                Creatable ref = this.allCreatables.firstWhere((c) => c.ref != null);
+                if (ref == null) {
+                    createRef();
+                    Creatable c = Creatable(
+                        name: NameUtil.getName()
+                    );
+                    DBResult r = c.save().await;
+                    if (r.status == Success) {
+                        this.message = 'Reference creation success.';
+                        this.creatable = Query.loadCreatable(ref).await;
+                        ref = Creatable(
+                            name: NameUtil.getName(),
+                            ref: ref
+                        );
+                        r = ref.save().await;
+                        if (r.status == Success) {
+                            this.message = 'Creatable creation success.';
+                            ref = Query.loadCreatable(ref).await;
+                            this.creatable = ref;
+                        } else {
+                            this.message = 'Creatable creation failed.';
+                        }
+                    }
+                }
+                if (ref == null) {
+                    this.message = 'Reference creation failed.';
+                }
+                Creatable c = Creatable(
+                    name: NameUtil.getName()
+                );
+                ref = Creatable(
+                    name: NameUtil.getName(),
+                    ref: c
+                );
+                DBResult r = ref.save().await;
+                if (r.status == Success) {
+                    this.message = 'Creatable update with ref success.';
+                    this.creatable = Query.loadCreatable(c).await;
+                } else {
+                    this.message = 'Creatable update with ref failed.';
                 }
             ```
         })

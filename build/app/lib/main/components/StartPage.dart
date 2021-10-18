@@ -319,7 +319,11 @@ class _StartPageState extends ObservableState<StartPage> {
                                 updateBasic();
                               },
                               child: Text('Update basic Creatable')),
-                          Button(child: Text('Create Creatable with Ref')),
+                          Button(
+                              onPressed: () {
+                                updateRef();
+                              },
+                              child: Text('Update Creatable with Ref')),
                           Button(
                               child:
                                   Text('Create Creatable with Ref Collection')),
@@ -327,7 +331,8 @@ class _StartPageState extends ObservableState<StartPage> {
                           Button(
                               child: Text(
                                   'Create Creatable with Child Collection')),
-                          Button(child: Text('Create Creatable with Embedded'))
+                          Button(child: Text('Create Creatable with Embedded')),
+                          Button(child: Text('Create Creatable with File'))
                         ]),
                     scrollDirection: Axis.vertical)
               ]),
@@ -556,6 +561,66 @@ class _StartPageState extends ObservableState<StartPage> {
       this.setCreatable(obj);
     } else {
       this.setMessage('Creatable update failed.');
+    }
+  }
+
+  void updateRef() async {
+    Creatable ref =
+        this.allCreatables.firstWhere((c) => c.ref != null, orElse: () => null);
+
+    if (ref == null) {
+      createRef();
+
+      Creatable c = Creatable(name: NameUtil.getName());
+
+      DBResult r = (await c.save());
+
+      if (r.status == DBResultStatus.Success) {
+        this.setMessage('Reference creation success.');
+
+        this.setCreatable((await Query.get().getCreatableById(
+            UsageConstants
+                .STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE,
+            ref.id)));
+
+        ref = Creatable(name: NameUtil.getName(), ref: ref);
+
+        r = (await ref.save());
+
+        if (r.status == DBResultStatus.Success) {
+          this.setMessage('Creatable creation success.');
+
+          ref = (await Query.get().getCreatableById(
+              UsageConstants
+                  .STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE,
+              ref.id));
+
+          this.setCreatable(ref);
+        } else {
+          this.setMessage('Creatable creation failed.');
+        }
+      }
+    }
+
+    if (ref == null) {
+      this.setMessage('Reference creation failed.');
+    }
+
+    Creatable c = Creatable(name: NameUtil.getName());
+
+    ref = Creatable(name: NameUtil.getName(), ref: c);
+
+    DBResult r = (await ref.save());
+
+    if (r.status == DBResultStatus.Success) {
+      this.setMessage('Creatable update with ref success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE,
+          c.id)));
+    } else {
+      this.setMessage('Creatable update with ref failed.');
     }
   }
 

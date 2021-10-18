@@ -97,3 +97,13 @@
     ]
     model #Creatable
 })
+
+(QueryUsage StartPage_eventHandlers_updateRef_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_updateRef_block'
+    ]
+    model #Creatable
+})

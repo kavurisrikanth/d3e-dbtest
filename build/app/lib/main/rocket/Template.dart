@@ -62,8 +62,10 @@ class UsageConstants {
       7;
   static final int
       STARTPAGE_EVENTHANDLERS_UPDATEBASIC_BLOCK_QUERY_LOADCREATABLE = 8;
+  static final int STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE =
+      9;
   static final int
-      STARTPAGE_PROPERTIES_CREATABLES_COMPUTATION_QUERY_GETCREATABLES = 9;
+      STARTPAGE_PROPERTIES_CREATABLES_COMPUTATION_QUERY_GETCREATABLES = 10;
 }
 
 class ChannelConstants {
@@ -72,7 +74,7 @@ class ChannelConstants {
 }
 
 class Template {
-  static String HASH = 'b10f063aee31eb28498015d7119b636d';
+  static String HASH = 'd6fef0ac47d3dde38934fad7457aaf23';
   static List<Usage> _usages = [
     Usage(
         'StartPage_creatables_synchronise_Subscription_onCreatablesChange',
@@ -350,6 +352,44 @@ class Template {
         'de5c9dd79f093bbe6ed4f8487ba015c5'),
     Usage(
         'StartPage_eventHandlers_updateBasic_block_Query_loadCreatable',
+        [
+          TypeUsage(CREATABLE, [
+            FieldUsage(0, [
+              TypeUsage(NONCREATABLE, [
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
+                FieldUsage(1, [])
+              ])
+            ]),
+            FieldUsage(1, [
+              TypeUsage(NONCREATABLE, [
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
+                FieldUsage(1, [])
+              ])
+            ]),
+            FieldUsage(2, [
+              TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+            ]),
+            FieldUsage(3, [
+              TypeUsage(DFILE, [
+                FieldUsage(0, []),
+                FieldUsage(3, []),
+                FieldUsage(1, []),
+                FieldUsage(2, [])
+              ])
+            ]),
+            FieldUsage(4, []),
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
+          ])
+        ],
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
+    Usage(
+        'StartPage_eventHandlers_updateRef_block_Query_loadCreatable',
         [
           TypeUsage(CREATABLE, [
             FieldUsage(0, [
