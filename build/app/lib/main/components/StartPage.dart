@@ -6,12 +6,14 @@ import '../classes/DisplayUtil.dart';
 import '../classes/NameUtil.dart';
 import '../classes/Query.dart';
 import '../models/Creatable.dart';
+import '../models/Embedded.dart';
 import '../models/NonCreatable.dart';
 import '../rocket/MessageDispatch.dart';
 import '../rocket/Template.dart';
 import '../utils/CollectionUtils.dart';
 import 'Button.dart';
 import 'ScrollView2.dart';
+import 'ThemeWrapper.dart';
 import 'package:flutter/widgets.dart';
 
 class StartPage extends StatefulWidget {
@@ -33,6 +35,8 @@ class _StartPageState extends ObservableState<StartPage> {
     initListeners();
 
     enableBuild = true;
+
+    onInit();
   }
 
   void initListeners() {
@@ -203,54 +207,104 @@ class _StartPageState extends ObservableState<StartPage> {
 
   @override
   Widget build(BuildContext context) {
+    var cStyle = ThemeWrapper.of(context);
+
     return ScrollView2(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           ScrollView2(
-              child: Row(
+              child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Container(
+                        padding: cStyle.tTextViewHeading1PaddingOn,
+                        child: Text('All Creatables from Database',
+                            style: TextStyle(
+                                color: cStyle.tTextViewHeading1ColorOn,
+                                fontSize: cStyle.tTextViewHeading1FontSizeOn))),
                     for (var item in this.allCreatables)
                       Text(DisplayUtil.displayCreatable(item))
                   ]),
+              scrollDirection: Axis.vertical),
+          ScrollView2(
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Container(
+                    padding: cStyle.tTextViewHeading1PaddingOn,
+                    child: Text('Creatable: ',
+                        style: TextStyle(
+                            color: cStyle.tTextViewHeading1ColorOn,
+                            fontSize: cStyle.tTextViewHeading1FontSizeOn))),
+                Text(DisplayUtil.displayCreatable(this.creatable))
+              ]),
               scrollDirection: Axis.horizontal),
           ScrollView2(
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Creatable'),
-                    Text(DisplayUtil.displayCreatable(this.creatable))
-                  ]),
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Container(
+                    padding: cStyle.tTextViewHeading1PaddingOn,
+                    child: Text('NonCreatable: ',
+                        style: TextStyle(
+                            color: cStyle.tTextViewHeading1ColorOn,
+                            fontSize: cStyle.tTextViewHeading1FontSizeOn))),
+                Text(DisplayUtil.displayNonCreatable(this.nonCreatable))
+              ]),
               scrollDirection: Axis.horizontal),
           ScrollView2(
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('NonCreatable'),
-                    Text(DisplayUtil.displayNonCreatable(this.nonCreatable))
-                  ]),
-              scrollDirection: Axis.horizontal),
-          Button(
-              onPressed: () {
-                createBasic();
-              },
-              child: Text('Create basic Creatable')),
-          Button(
-              onPressed: () {
-                createRef();
-              },
-              child: Text('Create Creatable with Ref')),
-          Button(
-              onPressed: () {
-                createRefColl();
-              },
-              child: Text('Create Creatable with Ref Collection')),
-          Button(
-              onPressed: () {
-                basicNC();
-              },
-              child: Text('Create basic NonCreatable'))
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                ScrollView2(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                              padding: cStyle.tTextViewHeading1PaddingOn,
+                              child: Text('Create',
+                                  style: TextStyle(
+                                      color: cStyle.tTextViewHeading1ColorOn,
+                                      fontSize:
+                                          cStyle.tTextViewHeading1FontSizeOn))),
+                          Button(
+                              onPressed: () {
+                                createBasic();
+                              },
+                              child: Text('Create basic Creatable')),
+                          Button(
+                              onPressed: () {
+                                createRef();
+                              },
+                              child: Text('Create Creatable with Ref')),
+                          Button(
+                              onPressed: () {
+                                createRefColl();
+                              },
+                              child:
+                                  Text('Create Creatable with Ref Collection')),
+                          Button(
+                              onPressed: () {
+                                createChild();
+                              },
+                              child: Text('Create Creatable with Child')),
+                          Button(
+                              onPressed: () {
+                                createChildColl();
+                              },
+                              child: Text(
+                                  'Create Creatable with Child Collection')),
+                          Button(
+                              onPressed: () {
+                                createEmb();
+                              },
+                              child: Text('Create Creatable with Embedded'))
+                        ]),
+                    scrollDirection: Axis.vertical)
+              ]),
+              scrollDirection: Axis.horizontal)
         ]),
         scrollDirection: Axis.vertical);
+  }
+
+  void onInit() {
+    NameUtil.setIndex(this.allCreatables.length);
   }
 
   void createBasic() async {
@@ -344,17 +398,67 @@ class _StartPageState extends ObservableState<StartPage> {
     }
   }
 
-  void basicNC() async {
-    NonCreatable c = NonCreatable();
+  void createChild() async {
+    Creatable ref = Creatable(
+        name: NameUtil.getName(),
+        child: NonCreatable(name: NameUtil.getName()));
+
+    DBResult r = (await ref.save());
+
+    if (r.status == DBResultStatus.Success) {
+      this.setMessage('With Child creation success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_CREATECHILD_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('With Child creation failed.');
+    }
+  }
+
+  void createChildColl() async {
+    int i = 3;
+
+    List<NonCreatable> refs = [];
+
+    for (int x = 0; x < 3; x++) {
+      NonCreatable ref = NonCreatable(name: NameUtil.getName());
+
+      refs.add(ref);
+    }
+
+    Creatable c = Creatable(name: NameUtil.getName(), childColl: refs);
 
     DBResult r = (await c.save());
 
     if (r.status == DBResultStatus.Success) {
-      String message = 'NonCreatable creation success';
+      this.setMessage('With child collection creation success.');
 
-      this.setMessage(message);
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_CREATECHILDCOLL_BLOCK_QUERY_LOADCREATABLE,
+          c.id)));
     } else {
-      this.setMessage('NonCreatable creation failed.');
+      this.setMessage('With child collection creation failed.');
+    }
+  }
+
+  void createEmb() async {
+    Creatable ref = Creatable(
+        name: NameUtil.getName(), emb: Embedded(embName: NameUtil.getName()));
+
+    DBResult r = (await ref.save());
+
+    if (r.status == DBResultStatus.Success) {
+      this.setMessage('With Embedded creation success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_CREATEEMB_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('With Embedded creation failed.');
     }
   }
 

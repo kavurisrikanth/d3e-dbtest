@@ -50,18 +50,28 @@
         ]
         children [
             (CRef row {
-                component #Row
+                component #Column
                 data [
                     ({
                         prop #mainAxisAlignment
                         value 'center'
                     })
                     ({
-                        prop #hscroll
+                        prop #vscroll
                         value 'true'
                     })
                 ]
                 children [
+                    (CRef id {
+                        component #TextView
+                        data [
+                            ({
+                                prop #data
+                                value 'All Creatables from Database'
+                            })
+                        ]
+                        style #heading1
+                    })
                     (CFor cf {
                         var 'item'
                         items `this.allCreatables`
@@ -99,9 +109,10 @@
                         data [
                             ({
                                 prop #data
-                                value 'Creatable'
+                                value 'Creatable: '
                             })
                         ]
+                        style #heading1
                     })
                     (CRef id {
                         component #TextView
@@ -133,9 +144,10 @@
                         data [
                             ({
                                 prop #data
-                                value 'NonCreatable'
+                                value 'NonCreatable: '
                             })
                         ]
+                        style #heading1
                     })
                     (CRef id {
                         component #TextView
@@ -149,57 +161,126 @@
                     })
                 ]
             })
-            (CRef basicC {
-                component #Button
-                child (CRef id {
-                    component #TextView
-                    data [
-                        ({
-                            prop #data
-                            value 'Create basic Creatable'
-                        })
-                    ]
-                })
-            })
-            (CRef cWithRef {
-                component #Button
-                child (CRef id {
-                    component #TextView
-                    data [
-                        ({
-                            prop #data
-                            value 'Create Creatable with Ref'
-                        })
-                    ]
-                })
-            })
-            (CRef cWithRefColl {
-                component #Button
-                child (CRef id {
-                    component #TextView
-                    data [
-                        ({
-                            prop #data
-                            value 'Create Creatable with Ref Collection'
-                        })
-                    ]
-                })
-            })
-            (CRef basicNC {
-                component #Button
-                child (CRef id {
-                    component #TextView
-                    data [
-                        ({
-                            prop #data
-                            value 'Create basic NonCreatable'
-                        })
-                    ]
-                })
+            (CRef id {
+                component #Row
+                data [
+                    ({
+                        prop #mainAxisAlignment
+                        value 'center'
+                    })
+                    ({
+                        prop #hscroll
+                        value 'true'
+                    })
+                ]
+                children [
+                    (CRef id {
+                        component #Column
+                        data [
+                            ({
+                                prop #mainAxisAlignment
+                                value 'center'
+                            })
+                            ({
+                                prop #vscroll
+                                value 'true'
+                            })
+                        ]
+                        children [
+                            (CRef id {
+                                component #TextView
+                                data [
+                                    ({
+                                        prop #data
+                                        value 'Create'
+                                    })
+                                ]
+                                style #heading1
+                            })
+                            (CRef basicC {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create basic Creatable'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithRef {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Ref'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithRefColl {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Ref Collection'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithChild {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Child'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithChildColl {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Child Collection'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithEmb {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Embedded'
+                                        })
+                                    ]
+                                })
+                            })
+                        ]
+                    })
+                ]
             })
         ]
     })
     eventHandlers [
+        (onInit {
+            block ```
+                NameUtil.setIndex(this.allCreatables.length);
+            ```
+        })
         (createBasic {
             type OnEvent
             on #basicC
@@ -279,18 +360,69 @@
                 }
             ```
         })
-        (basicNC {
+        (createChild {
             type OnEvent
-            on #basicNC
+            on #cWithChild
             event #onPressed
             block ```
-                NonCreatable c = NonCreatable();
+                Creatable ref = Creatable(
+                    name: NameUtil.getName(),
+                    child: NonCreatable(
+                        name: NameUtil.getName()
+                    )
+                );
+                DBResult r = ref.save().await;
+                if (r.status == Success) {
+                    this.message = 'With Child creation success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'With Child creation failed.';
+                }
+            ```
+        })
+        (createChildColl {
+            type OnEvent
+            on #cWithChildColl
+            event #onPressed
+            block ```
+                Integer i = 3;
+                List<NonCreatable> refs = [];
+                for (Integer x = 0; x < 3; x++) {
+                    NonCreatable ref = NonCreatable(
+                        name: NameUtil.getName()
+                    );
+                    refs.add(ref);
+                }
+                Creatable c = Creatable(
+                    name: NameUtil.getName(),
+                    childColl: refs
+                );
                 DBResult r = c.save().await;
                 if (r.status == Success) {
-                    String message = 'NonCreatable creation success';
-                    this.message = message;
+                    this.message = 'With child collection creation success.';
+                    this.creatable = Query.loadCreatable(c).await;
                 } else {
-                    this.message = 'NonCreatable creation failed.';
+                    this.message = 'With child collection creation failed.';
+                }
+            ```
+        })
+        (createEmb {
+            type OnEvent
+            on #cWithEmb
+            event #onPressed
+            block ```
+                Creatable ref = Creatable(
+                    name: NameUtil.getName(),
+                    emb: Embedded(
+                        embName: NameUtil.getName()
+                    )
+                );
+                DBResult r = ref.save().await;
+                if (r.status == Success) {
+                    this.message = 'With Embedded creation success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'With Embedded creation failed.';
                 }
             ```
         })

@@ -6,4 +6,8 @@ client class NameUtil {
         _idx++;
         return name;
     }
+
+    static void setIndex(Integer idx) {
+        _idx = idx;
+    }
 }

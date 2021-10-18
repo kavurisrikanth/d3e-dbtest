@@ -85,3 +85,36 @@
         })
     ]
 })
+
+(Style heading1 {
+    name 'Heading1'
+    component #TextView
+    states [
+        ({
+            values [
+                ({
+                    prop #fontSize
+                    value '30.0'
+                })
+                ({
+                    prop #color
+                    value '@c13'
+                })
+                ({
+                    prop #padding
+                    values [
+                        ({
+                            prop #top
+                            value '15.0'
+                        })
+                        ({
+                            prop #bottom
+                            value '20.0'
+                        })
+                    ]
+                })
+            ]
+        })
+    ]
+    theme #basic
+})

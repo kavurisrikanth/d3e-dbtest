@@ -47,3 +47,33 @@
     ]
     model #Creatable
 })
+
+(QueryUsage StartPage_eventHandlers_createChild_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createChild_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_createChildColl_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createChildColl_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_createEmb_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createEmb_block'
+    ]
+    model #Creatable
+})

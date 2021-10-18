@@ -24,9 +24,15 @@ class StyleThemeData {
   final Color c18;
   final Color c19;
   final Color c20;
+  final double tTextViewHeading1FontSizeOn;
+  final Color tTextViewHeading1ColorOn;
+  final EdgeInsets tTextViewHeading1PaddingOn;
   static StyleThemeData current;
   StyleThemeData(
       {this.themeName,
+      this.tTextViewHeading1FontSizeOn,
+      this.tTextViewHeading1ColorOn,
+      this.tTextViewHeading1PaddingOn,
       this.c1,
       this.c2,
       this.c3,
@@ -50,6 +56,9 @@ class StyleThemeData {
   static StyleThemeData createbasic() {
     basic = StyleThemeData(
         themeName: 'basic',
+        tTextViewHeading1FontSizeOn: 30.0,
+        tTextViewHeading1ColorOn: Color(0xff2d2d50),
+        tTextViewHeading1PaddingOn: EdgeInsets.only(top: 15.0, bottom: 20.0),
         c1: Color(0xff16163a),
         c2: Color(0xfffe941e),
         c3: Color(0xffd7dde2),
