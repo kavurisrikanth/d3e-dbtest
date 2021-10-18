@@ -27,12 +27,20 @@ class StyleThemeData {
   final double tTextViewHeading1FontSizeOn;
   final Color tTextViewHeading1ColorOn;
   final EdgeInsets tTextViewHeading1PaddingOn;
+  final double tTextViewLabelFontSizeOn;
+  final Color tTextViewLabelColorOn;
+  final TextAlign tTextViewLabelTextAlignOn;
+  final EdgeInsets tTextViewLabelPaddingOn;
   static StyleThemeData current;
   StyleThemeData(
       {this.themeName,
       this.tTextViewHeading1FontSizeOn,
       this.tTextViewHeading1ColorOn,
       this.tTextViewHeading1PaddingOn,
+      this.tTextViewLabelFontSizeOn,
+      this.tTextViewLabelColorOn,
+      this.tTextViewLabelTextAlignOn,
+      this.tTextViewLabelPaddingOn,
       this.c1,
       this.c2,
       this.c3,
@@ -59,6 +67,10 @@ class StyleThemeData {
         tTextViewHeading1FontSizeOn: 30.0,
         tTextViewHeading1ColorOn: Color(0xff2d2d50),
         tTextViewHeading1PaddingOn: EdgeInsets.only(top: 15.0, bottom: 20.0),
+        tTextViewLabelFontSizeOn: 15.0,
+        tTextViewLabelColorOn: Color(0xff2d2d50),
+        tTextViewLabelTextAlignOn: TextAlign.start,
+        tTextViewLabelPaddingOn: EdgeInsets.only(top: 5.0, bottom: 5.0),
         c1: Color(0xff16163a),
         c2: Color(0xfffe941e),
         c3: Color(0xffd7dde2),

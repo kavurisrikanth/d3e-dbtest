@@ -87,6 +87,7 @@
                                     bindTo `DisplayUtil.displayCreatable(item)`
                                 })
                             ]
+                            style #label
                         })
                     })
                 ]
@@ -123,6 +124,7 @@
                                 bindTo `DisplayUtil.displayCreatable(this.creatable)`
                             })
                         ]
+                        style #label
                     })
                 ]
             })
@@ -158,6 +160,7 @@
                                 bindTo `(this.message == null || this.message.length == 0) ? 'No Message' : this.message`
                             })
                         ]
+                        style #label
                     })
                 ]
             })

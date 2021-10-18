@@ -217,7 +217,13 @@ class _StartPageState extends ObservableState<StartPage> {
                                 color: cStyle.tTextViewHeading1ColorOn,
                                 fontSize: cStyle.tTextViewHeading1FontSizeOn))),
                     for (var item in this.allCreatables)
-                      Text(DisplayUtil.displayCreatable(item))
+                      Container(
+                          padding: cStyle.tTextViewLabelPaddingOn,
+                          child: Text(DisplayUtil.displayCreatable(item),
+                              textAlign: cStyle.tTextViewLabelTextAlignOn,
+                              style: TextStyle(
+                                  color: cStyle.tTextViewLabelColorOn,
+                                  fontSize: cStyle.tTextViewLabelFontSizeOn)))
                   ]),
               scrollDirection: Axis.vertical),
           ScrollView2(
@@ -229,7 +235,13 @@ class _StartPageState extends ObservableState<StartPage> {
                         style: TextStyle(
                             color: cStyle.tTextViewHeading1ColorOn,
                             fontSize: cStyle.tTextViewHeading1FontSizeOn))),
-                Text(DisplayUtil.displayCreatable(this.creatable))
+                Container(
+                    padding: cStyle.tTextViewLabelPaddingOn,
+                    child: Text(DisplayUtil.displayCreatable(this.creatable),
+                        textAlign: cStyle.tTextViewLabelTextAlignOn,
+                        style: TextStyle(
+                            color: cStyle.tTextViewLabelColorOn,
+                            fontSize: cStyle.tTextViewLabelFontSizeOn)))
               ]),
               scrollDirection: Axis.horizontal),
           ScrollView2(
@@ -241,9 +253,16 @@ class _StartPageState extends ObservableState<StartPage> {
                         style: TextStyle(
                             color: cStyle.tTextViewHeading1ColorOn,
                             fontSize: cStyle.tTextViewHeading1FontSizeOn))),
-                Text((this.message == null || this.message.length == 0)
-                    ? 'No Message'
-                    : this.message)
+                Container(
+                    padding: cStyle.tTextViewLabelPaddingOn,
+                    child: Text(
+                        (this.message == null || this.message.length == 0)
+                            ? 'No Message'
+                            : this.message,
+                        textAlign: cStyle.tTextViewLabelTextAlignOn,
+                        style: TextStyle(
+                            color: cStyle.tTextViewLabelColorOn,
+                            fontSize: cStyle.tTextViewLabelFontSizeOn)))
               ]),
               scrollDirection: Axis.horizontal),
           ScrollView2(

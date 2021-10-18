@@ -44,7 +44,11 @@ class DisplayUtil {
     }
 
     if (c.emb != null) {
-      sb.write(DisplayUtil.displayEmbedded(c.emb));
+      String emb = DisplayUtil.displayEmbedded(c.emb);
+
+      if (emb != null && emb.length > 0) {
+        sb.write(emb);
+      }
     }
 
     return sb.toString();
@@ -58,7 +62,11 @@ class DisplayUtil {
     StringBuffer sb = StringBuffer();
 
     if (nc.emb != null) {
-      sb.write(DisplayUtil.displayEmbedded(nc.emb));
+      String emb = DisplayUtil.displayEmbedded(nc.emb);
+
+      if (emb != null && emb.length > 0) {
+        sb.write(emb);
+      }
     }
 
     sb.write(nc.name);

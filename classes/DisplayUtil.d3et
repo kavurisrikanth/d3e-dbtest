@@ -26,7 +26,10 @@ client class DisplayUtil {
             sb.write(c.file.id);
         }
         if (c.emb != null) {
-            sb.write(displayEmbedded(c.emb));
+            String emb = displayEmbedded(c.emb);
+            if (emb != null && emb.length > 0) {
+                sb.write(emb);
+            }
         }
         return sb.toString();
     }
@@ -37,7 +40,10 @@ client class DisplayUtil {
         }
         StringBuffer sb = StringBuffer();
         if (nc.emb != null) {
-            sb.write(displayEmbedded(nc.emb));
+            String emb = displayEmbedded(nc.emb);
+            if (emb != null && emb.length > 0) {
+                sb.write(emb);
+            }
         }
         sb.write(nc.name);
         return sb.toString();

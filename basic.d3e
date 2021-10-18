@@ -118,3 +118,40 @@
     ]
     theme #basic
 })
+
+(Style label {
+    name 'Label'
+    component #TextView
+    states [
+        ({
+            values [
+                ({
+                    prop #fontSize
+                    value '15'
+                })
+                ({
+                    prop #color
+                    value '@c13'
+                })
+                ({
+                    prop #textAlign
+                    value 'start'
+                })
+                ({
+                    prop #padding
+                    values [
+                        ({
+                            prop #top
+                            value '5.0'
+                        })
+                        ({
+                            prop #bottom
+                            value '5.0'
+                        })
+                    ]
+                })
+            ]
+        })
+    ]
+    theme #basic
+})
