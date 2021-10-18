@@ -1,7 +1,5 @@
 import '../utils/ObservableState.dart';
 import '../classes/Creatables.dart';
-import '../classes/DBResult.dart';
-import '../classes/DBResultStatus.dart';
 import '../classes/DisplayUtil.dart';
 import '../classes/EventUtil.dart';
 import '../classes/NameUtil.dart';
@@ -321,17 +319,30 @@ class _StartPageState extends ObservableState<StartPage> {
                           Button(
                               onPressed: () {
                                 updateRef();
+
+                                updateChildColl();
+
+                                updateEmb();
+
+                                updateFile();
                               },
                               child: Text('Update Creatable with Ref')),
                           Button(
+                              onPressed: () {
+                                updateRefColl();
+                              },
                               child:
-                                  Text('Create Creatable with Ref Collection')),
-                          Button(child: Text('Create Creatable with Child')),
+                                  Text('Update Creatable with Ref Collection')),
+                          Button(
+                              onPressed: () {
+                                updateChild();
+                              },
+                              child: Text('Update Creatable with Child')),
                           Button(
                               child: Text(
-                                  'Create Creatable with Child Collection')),
-                          Button(child: Text('Create Creatable with Embedded')),
-                          Button(child: Text('Create Creatable with File'))
+                                  'Update Creatable with Child Collection')),
+                          Button(child: Text('Update Creatable with Embedded')),
+                          Button(child: Text('Update Creatable with File'))
                         ]),
                     scrollDirection: Axis.vertical)
               ]),
@@ -342,6 +353,12 @@ class _StartPageState extends ObservableState<StartPage> {
 
   void onInit() {
     NameUtil.setIndex(this.allCreatables.length);
+
+    NameUtil.getName();
+
+    NameUtil.getFileName();
+
+    this.allCreatables.firstWhere((c) => c.isBasic, orElse: () => null);
   }
 
   void createBasic() async {
@@ -357,7 +374,7 @@ class _StartPageState extends ObservableState<StartPage> {
 
       this.setMessage(message);
 
-      this.setCreatable(c);
+      this.setCreatable(fromDb);
     } else {
       this.setMessage('Creatable creation failed.');
     }
@@ -454,31 +471,9 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void updateBasic() async {
-    Creatable obj =
-        this.allCreatables.firstWhere((c) => c.isBasic, orElse: () => null);
+    Creatable obj = (await EventUtil.updateBasic(this.allCreatables));
 
-    if (obj == null) {
-      Creatable c = Creatable(name: NameUtil.getName());
-
-      DBResult r = (await c.save());
-
-      if (r.status == DBResultStatus.Success) {
-        obj = (await Query.get().getCreatableById(
-            UsageConstants
-                .STARTPAGE_EVENTHANDLERS_UPDATEBASIC_BLOCK_QUERY_LOADCREATABLE,
-            c.id));
-      }
-    }
-
-    if (obj == null) {
-      this.setMessage('Creatable creation failed.');
-    }
-
-    obj.setName(NameUtil.getName());
-
-    DBResult r = (await obj.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (obj != null) {
       String message = 'Creatable update success';
 
       Creatable fromDb = (await Query.get().getCreatableById(
@@ -488,69 +483,99 @@ class _StartPageState extends ObservableState<StartPage> {
 
       this.setMessage(message);
 
-      this.setCreatable(obj);
+      this.setCreatable(fromDb);
     } else {
       this.setMessage('Creatable update failed.');
     }
   }
 
   void updateRef() async {
-    Creatable ref =
-        this.allCreatables.firstWhere((c) => c.ref != null, orElse: () => null);
+    Creatable ref = (await EventUtil.updateRef(this.allCreatables));
 
-    if (ref == null) {
-      createRef();
-
-      Creatable c = Creatable(name: NameUtil.getName());
-
-      DBResult r = (await c.save());
-
-      if (r.status == DBResultStatus.Success) {
-        this.setMessage('Reference creation success.');
-
-        this.setCreatable((await Query.get().getCreatableById(
-            UsageConstants
-                .STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE,
-            ref.id)));
-
-        ref = Creatable(name: NameUtil.getName(), ref: ref);
-
-        r = (await ref.save());
-
-        if (r.status == DBResultStatus.Success) {
-          this.setMessage('Creatable creation success.');
-
-          ref = (await Query.get().getCreatableById(
-              UsageConstants
-                  .STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE,
-              ref.id));
-
-          this.setCreatable(ref);
-        } else {
-          this.setMessage('Creatable creation failed.');
-        }
-      }
-    }
-
-    if (ref == null) {
-      this.setMessage('Reference creation failed.');
-    }
-
-    Creatable c = Creatable(name: NameUtil.getName());
-
-    ref = Creatable(name: NameUtil.getName(), ref: c);
-
-    DBResult r = (await ref.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (ref != null) {
       this.setMessage('Creatable update with ref success.');
 
       this.setCreatable((await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE,
-          c.id)));
+          ref.id)));
     } else {
       this.setMessage('Creatable update with ref failed.');
+    }
+  }
+
+  void updateRefColl() async {
+    Creatable ref = (await EventUtil.updateRefColl(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable update with ref collection success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_UPDATEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable update with ref collection failed.');
+    }
+  }
+
+  void updateChild() async {
+    Creatable ref = (await EventUtil.updateChild(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable update with child success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_UPDATECHILD_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable update with child failed.');
+    }
+  }
+
+  void updateChildColl() async {
+    Creatable ref = (await EventUtil.updateChildColl(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable update with child collection success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_UPDATECHILDCOLL_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable update with child collection failed.');
+    }
+  }
+
+  void updateEmb() async {
+    Creatable ref = (await EventUtil.updateEmb(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable update with embedded success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_UPDATEEMB_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable update with embedded failed.');
+    }
+  }
+
+  void updateFile() async {
+    Creatable ref = (await EventUtil.updateFile(this.allCreatables));
+
+    if (ref != null) {
+      this.setMessage('Creatable update with file success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_UPDATEFILE_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('Creatable update with file failed.');
     }
   }
 

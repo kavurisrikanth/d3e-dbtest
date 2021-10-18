@@ -129,4 +129,172 @@ class EventUtil {
       return null;
     }
   }
+
+  static Future<Creatable> updateBasic(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.isBasic, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createBasic();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    obj.setName(NameUtil.getName());
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> updateRef(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.ref != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createRef();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    Creatable newRef = await createBasic();
+
+    if (newRef == null) {
+      return null;
+    }
+
+    obj.setRef(newRef);
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> updateRefColl(List<Creatable> all) async {
+    Creatable obj =
+        all.firstWhere((c) => c.refColl.isNotEmpty, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createRefColl();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    obj.refColl.removeLast();
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> updateChild(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.child != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createChild();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    NonCreatable newChild = NonCreatable(name: NameUtil.getName());
+
+    obj.setChild(newChild);
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> updateChildColl(List<Creatable> all) async {
+    Creatable obj =
+        all.firstWhere((c) => c.childColl.isNotEmpty, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createChildColl();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    obj.childColl.removeLast();
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> updateEmb(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.emb != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createEmb();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    obj.setEmb(Embedded(embName: NameUtil.getName()));
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Creatable> updateFile(List<Creatable> all) async {
+    Creatable obj = all.firstWhere((c) => c.file != null, orElse: () => null);
+
+    if (obj == null) {
+      obj = await createFile();
+    }
+
+    if (obj == null) {
+      return null;
+    }
+
+    DFile newFile = DFile();
+    newFile.name = NameUtil.getFileName();
+    newFile.size = 234;
+
+    obj.setFile(newFile);
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      return obj;
+    } else {
+      return null;
+    }
+  }
 }

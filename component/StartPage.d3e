@@ -337,7 +337,7 @@
                                     data [
                                         ({
                                             prop #data
-                                            value 'Create Creatable with Ref Collection'
+                                            value 'Update Creatable with Ref Collection'
                                         })
                                     ]
                                 })
@@ -349,7 +349,7 @@
                                     data [
                                         ({
                                             prop #data
-                                            value 'Create Creatable with Child'
+                                            value 'Update Creatable with Child'
                                         })
                                     ]
                                 })
@@ -361,7 +361,7 @@
                                     data [
                                         ({
                                             prop #data
-                                            value 'Create Creatable with Child Collection'
+                                            value 'Update Creatable with Child Collection'
                                         })
                                     ]
                                 })
@@ -373,7 +373,7 @@
                                     data [
                                         ({
                                             prop #data
-                                            value 'Create Creatable with Embedded'
+                                            value 'Update Creatable with Embedded'
                                         })
                                     ]
                                 })
@@ -385,7 +385,7 @@
                                     data [
                                         ({
                                             prop #data
-                                            value 'Create Creatable with File'
+                                            value 'Update Creatable with File'
                                         })
                                     ]
                                 })
@@ -400,6 +400,9 @@
         (onInit {
             block ```
                 NameUtil.setIndex(this.allCreatables.length);
+                NameUtil.getName();
+                NameUtil.getFileName();
+                this.allCreatables.firstWhere((c) => c.isBasic);
             ```
         })
         (createBasic {
@@ -508,26 +511,12 @@
             on #uBasic
             event #onPressed
             block ```
-                Creatable obj = this.allCreatables.firstWhere((c) => c.isBasic);
-                if (obj == null) {
-                    Creatable c = Creatable(
-                        name: NameUtil.getName()
-                    );
-                    DBResult r = c.save().await;
-                    if (r.status == Success) {
-                        obj = Query.loadCreatable(c).await;
-                    }
-                }
-                if (obj == null) {
-                    this.message = 'Creatable creation failed.';
-                }
-                obj.name = NameUtil.getName();
-                DBResult r = obj.save().await;
-                if (r.status == Success) {
+                Creatable obj = EventUtil.updateBasic(this.allCreatables).await;
+                if (obj != null) {
                     String message = 'Creatable update success';
                     Creatable fromDb = Query.loadCreatable(obj).await;
                     this.message = message;
-                    this.creatable = obj;
+                    this.creatable = fromDb;
                 } else {
                     this.message = 'Creatable update failed.';
                 }
@@ -538,46 +527,82 @@
             on #uWithRef
             event #onPressed
             block ```
-                Creatable ref = this.allCreatables.firstWhere((c) => c.ref != null);
-                if (ref == null) {
-                    createRef();
-                    Creatable c = Creatable(
-                        name: NameUtil.getName()
-                    );
-                    DBResult r = c.save().await;
-                    if (r.status == Success) {
-                        this.message = 'Reference creation success.';
-                        this.creatable = Query.loadCreatable(ref).await;
-                        ref = Creatable(
-                            name: NameUtil.getName(),
-                            ref: ref
-                        );
-                        r = ref.save().await;
-                        if (r.status == Success) {
-                            this.message = 'Creatable creation success.';
-                            ref = Query.loadCreatable(ref).await;
-                            this.creatable = ref;
-                        } else {
-                            this.message = 'Creatable creation failed.';
-                        }
-                    }
-                }
-                if (ref == null) {
-                    this.message = 'Reference creation failed.';
-                }
-                Creatable c = Creatable(
-                    name: NameUtil.getName()
-                );
-                ref = Creatable(
-                    name: NameUtil.getName(),
-                    ref: c
-                );
-                DBResult r = ref.save().await;
-                if (r.status == Success) {
+                Creatable ref = EventUtil.updateRef(this.allCreatables).await;
+                if (ref != null) {
                     this.message = 'Creatable update with ref success.';
-                    this.creatable = Query.loadCreatable(c).await;
+                    this.creatable = Query.loadCreatable(ref).await;
                 } else {
                     this.message = 'Creatable update with ref failed.';
+                }
+            ```
+        })
+        (updateRefColl {
+            type OnEvent
+            on #uWithRefColl
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.updateRefColl(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable update with ref collection success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable update with ref collection failed.';
+                }
+            ```
+        })
+        (updateChild {
+            type OnEvent
+            on #uWithChild
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.updateChild(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable update with child success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable update with child failed.';
+                }
+            ```
+        })
+        (updateChildColl {
+            type OnEvent
+            on #uWithRef
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.updateChildColl(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable update with child collection success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable update with child collection failed.';
+                }
+            ```
+        })
+        (updateEmb {
+            type OnEvent
+            on #uWithRef
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.updateEmb(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable update with embedded success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable update with embedded failed.';
+                }
+            ```
+        })
+        (updateFile {
+            type OnEvent
+            on #uWithRef
+            event #onPressed
+            block ```
+                Creatable ref = EventUtil.updateFile(this.allCreatables).await;
+                if (ref != null) {
+                    this.message = 'Creatable update with file success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'Creatable update with file failed.';
                 }
             ```
         })

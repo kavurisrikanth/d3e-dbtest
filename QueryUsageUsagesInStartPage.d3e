@@ -68,6 +68,26 @@
     model #Creatable
 })
 
+(QueryUsage StartPage_eventHandlers_createChild_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createChild_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_createEmb_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createEmb_block'
+    ]
+    model #Creatable
+})
+
 (QueryUsage StartPage_eventHandlers_updateBasic_block_Query_loadCreatable {
     query [
         'Query'
@@ -88,22 +108,52 @@
     model #Creatable
 })
 
-(QueryUsage StartPage_eventHandlers_createChild_block_Query_loadCreatable {
+(QueryUsage StartPage_eventHandlers_updateRefColl_block_Query_loadCreatable {
     query [
         'Query'
         'loadCreatable'
         'StartPage'
-        'eventHandlers_createChild_block'
+        'eventHandlers_updateRefColl_block'
     ]
     model #Creatable
 })
 
-(QueryUsage StartPage_eventHandlers_createEmb_block_Query_loadCreatable {
+(QueryUsage StartPage_eventHandlers_updateChild_block_Query_loadCreatable {
     query [
         'Query'
         'loadCreatable'
         'StartPage'
-        'eventHandlers_createEmb_block'
+        'eventHandlers_updateChild_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_updateChildColl_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_updateChildColl_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_updateEmb_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_updateEmb_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_updateFile_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_updateFile_block'
     ]
     model #Creatable
 })

@@ -13,4 +13,32 @@ client class EventUtil {
     static Future<Creatable> createEmb() async;
 
     static Future<Creatable> createFile() async;
+
+    static Future<Creatable> updateBasic(List<Creatable> all) async;
+
+    static Future<Creatable> updateRef(List<Creatable> all) async;
+
+    static Future<Creatable> updateRefColl(List<Creatable> all) async;
+
+    static Future<Creatable> updateChild(List<Creatable> all) async;
+
+    static Future<Creatable> updateChildColl(List<Creatable> all) async;
+
+    static Future<Creatable> updateEmb(List<Creatable> all) async;
+
+    static Future<Creatable> updateFile(List<Creatable> all) async;
+
+    static Future<Creatable> deleteBasic(List<Creatable> all) async;
+
+    static Future<Creatable> deleteRef(List<Creatable> all) async;
+
+    static Future<Creatable> deleteRefColl(List<Creatable> all) async;
+
+    static Future<Creatable> deleteChild(List<Creatable> all) async;
+
+    static Future<Creatable> deleteChildColl(List<Creatable> all) async;
+
+    static Future<Creatable> deleteEmb(List<Creatable> all) async;
+
+    static Future<Creatable> deleteFile(List<Creatable> all) async;
 }
