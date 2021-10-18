@@ -9,6 +9,14 @@ class NameUtil {
     return name;
   }
 
+  static String getFileName() {
+    String name = '_file_name_' + NameUtil._idx.toString();
+
+    NameUtil._idx++;
+
+    return name;
+  }
+
   static void setIndex(int idx) {
     NameUtil._idx = idx;
   }

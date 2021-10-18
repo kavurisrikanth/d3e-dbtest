@@ -185,6 +185,7 @@ type Creatable
 	childColl : [NonCreatable]
 	file : DFile
 	emb : Embedded
+	isBasic : Boolean
 }
 
 input CreatableEntityInput

@@ -12,9 +12,10 @@ class Creatable extends DBObject {
   static const int _CHILDCOLL = 1;
   static const int _EMB = 2;
   static const int _FILE = 3;
-  static const int _NAME = 4;
-  static const int _REF = 5;
-  static const int _REFCOLL = 6;
+  static const int _ISBASIC = 4;
+  static const int _NAME = 5;
+  static const int _REF = 6;
+  static const int _REFCOLL = 7;
   int id = 0;
   DBObject otherMaster;
   String _name = '';
@@ -24,6 +25,7 @@ class Creatable extends DBObject {
   List<NonCreatable> _childColl = [];
   DFile _file;
   Embedded _emb = Embedded();
+  bool _isBasic = false;
   Creatable(
       {NonCreatable child,
       List<NonCreatable> childColl,
@@ -312,6 +314,24 @@ class Creatable extends DBObject {
     _emb.setTo(val);
   }
 
+  bool get isBasic {
+    return _isBasic;
+  }
+
+  void setIsBasic(bool val) {
+    bool isValChanged = _isBasic != val;
+
+    if (!isValChanged) {
+      return;
+    }
+
+    this.updateD3EChanges(_ISBASIC, _isBasic);
+
+    _isBasic = val;
+
+    fire('isBasic', this);
+  }
+
   Object get(int field) {
     switch (field) {
       case _NAME:
@@ -347,6 +367,11 @@ class Creatable extends DBObject {
       case _EMB:
         {
           return this._emb;
+        }
+
+      case _ISBASIC:
+        {
+          return this._isBasic;
         }
       default:
         {
@@ -403,6 +428,8 @@ TODO: Might be removed
     obj.setFile(_file);
 
     _emb.deepCloneIntoObj(obj._emb, ctx);
+
+    obj.setIsBasic(_isBasic);
   }
 
   Future<DBResult> save() async {
@@ -454,6 +481,12 @@ TODO: Might be removed
       case _EMB:
         {
           this.setEmb((value as Embedded));
+          break;
+        }
+
+      case _ISBASIC:
+        {
+          this.setIsBasic((value as bool));
           break;
         }
     }

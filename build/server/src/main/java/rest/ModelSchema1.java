@@ -139,6 +139,13 @@ public class ModelSchema1 {
         getType("Embedded"),
         (s) -> s.getEmb(),
         (s, v) -> s.setEmb(v));
+    m.addPrimitive(
+        "isBasic",
+        Creatable._ISBASIC,
+        "_is_basic",
+        FieldPrimitiveType.Boolean,
+        (s) -> s.isIsBasic(),
+        (s, v) -> s.setIsBasic(v));
   }
 
   private void addCreatablesRequestFields() {

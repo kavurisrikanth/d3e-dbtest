@@ -77,3 +77,23 @@
     ]
     model #Creatable
 })
+
+(QueryUsage StartPage_eventHandlers_createFile_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_createFile_block'
+    ]
+    model #Creatable
+})
+
+(QueryUsage StartPage_eventHandlers_updateBasic_block_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'StartPage'
+        'eventHandlers_updateBasic_block'
+    ]
+    model #Creatable
+})

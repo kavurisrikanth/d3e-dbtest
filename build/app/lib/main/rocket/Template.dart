@@ -55,11 +55,15 @@ class UsageConstants {
   static final int STARTPAGE_EVENTHANDLERS_CREATEEMB_BLOCK_QUERY_LOADCREATABLE =
       4;
   static final int
-      STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE = 5;
-  static final int STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE =
-      6;
+      STARTPAGE_EVENTHANDLERS_CREATEFILE_BLOCK_QUERY_LOADCREATABLE = 5;
   static final int
-      STARTPAGE_PROPERTIES_CREATABLES_COMPUTATION_QUERY_GETCREATABLES = 7;
+      STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE = 6;
+  static final int STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE =
+      7;
+  static final int
+      STARTPAGE_EVENTHANDLERS_UPDATEBASIC_BLOCK_QUERY_LOADCREATABLE = 8;
+  static final int
+      STARTPAGE_PROPERTIES_CREATABLES_COMPUTATION_QUERY_GETCREATABLES = 9;
 }
 
 class ChannelConstants {
@@ -68,7 +72,7 @@ class ChannelConstants {
 }
 
 class Template {
-  static String HASH = '7f9caa01acb92b1407414fb6abf50780';
+  static String HASH = 'b10f063aee31eb28498015d7119b636d';
   static List<Usage> _usages = [
     Usage(
         'StartPage_creatables_synchronise_Subscription_onCreatablesChange',
@@ -110,11 +114,12 @@ class Template {
               ])
             ]),
             FieldUsage(4, []),
-            FieldUsage(5, [TypeUsage(CREATABLE, [])]),
-            FieldUsage(6, [TypeUsage(CREATABLE, [])])
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '94190277ec30aa16483467018a7ea4f9'),
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
     Usage(
         'StartPage_eventHandlers_createChildColl_block_Query_loadCreatable',
         [
@@ -147,11 +152,12 @@ class Template {
               ])
             ]),
             FieldUsage(4, []),
-            FieldUsage(5, [TypeUsage(CREATABLE, [])]),
-            FieldUsage(6, [TypeUsage(CREATABLE, [])])
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '94190277ec30aa16483467018a7ea4f9'),
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
     Usage(
         'StartPage_eventHandlers_createChild_block_Query_loadCreatable',
         [
@@ -184,11 +190,12 @@ class Template {
               ])
             ]),
             FieldUsage(4, []),
-            FieldUsage(5, [TypeUsage(CREATABLE, [])]),
-            FieldUsage(6, [TypeUsage(CREATABLE, [])])
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '94190277ec30aa16483467018a7ea4f9'),
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
     Usage(
         'StartPage_eventHandlers_createEmb_block_Query_loadCreatable',
         [
@@ -221,11 +228,50 @@ class Template {
               ])
             ]),
             FieldUsage(4, []),
-            FieldUsage(5, [TypeUsage(CREATABLE, [])]),
-            FieldUsage(6, [TypeUsage(CREATABLE, [])])
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '94190277ec30aa16483467018a7ea4f9'),
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
+    Usage(
+        'StartPage_eventHandlers_createFile_block_Query_loadCreatable',
+        [
+          TypeUsage(CREATABLE, [
+            FieldUsage(0, [
+              TypeUsage(NONCREATABLE, [
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
+                FieldUsage(1, [])
+              ])
+            ]),
+            FieldUsage(1, [
+              TypeUsage(NONCREATABLE, [
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
+                FieldUsage(1, [])
+              ])
+            ]),
+            FieldUsage(2, [
+              TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+            ]),
+            FieldUsage(3, [
+              TypeUsage(DFILE, [
+                FieldUsage(0, []),
+                FieldUsage(3, []),
+                FieldUsage(1, []),
+                FieldUsage(2, [])
+              ])
+            ]),
+            FieldUsage(4, []),
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
+          ])
+        ],
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
     Usage(
         'StartPage_eventHandlers_createRefColl_block_Query_loadCreatable',
         [
@@ -258,11 +304,12 @@ class Template {
               ])
             ]),
             FieldUsage(4, []),
-            FieldUsage(5, [TypeUsage(CREATABLE, [])]),
-            FieldUsage(6, [TypeUsage(CREATABLE, [])])
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '94190277ec30aa16483467018a7ea4f9'),
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
     Usage(
         'StartPage_eventHandlers_createRef_block_Query_loadCreatable',
         [
@@ -295,11 +342,50 @@ class Template {
               ])
             ]),
             FieldUsage(4, []),
-            FieldUsage(5, [TypeUsage(CREATABLE, [])]),
-            FieldUsage(6, [TypeUsage(CREATABLE, [])])
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
           ])
         ],
-        '94190277ec30aa16483467018a7ea4f9'),
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
+    Usage(
+        'StartPage_eventHandlers_updateBasic_block_Query_loadCreatable',
+        [
+          TypeUsage(CREATABLE, [
+            FieldUsage(0, [
+              TypeUsage(NONCREATABLE, [
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
+                FieldUsage(1, [])
+              ])
+            ]),
+            FieldUsage(1, [
+              TypeUsage(NONCREATABLE, [
+                FieldUsage(0, [
+                  TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+                ]),
+                FieldUsage(1, [])
+              ])
+            ]),
+            FieldUsage(2, [
+              TypeUsage(EMBEDDED, [FieldUsage(0, [])])
+            ]),
+            FieldUsage(3, [
+              TypeUsage(DFILE, [
+                FieldUsage(0, []),
+                FieldUsage(3, []),
+                FieldUsage(1, []),
+                FieldUsage(2, [])
+              ])
+            ]),
+            FieldUsage(4, []),
+            FieldUsage(5, []),
+            FieldUsage(6, [TypeUsage(CREATABLE, [])]),
+            FieldUsage(7, [TypeUsage(CREATABLE, [])])
+          ])
+        ],
+        'de5c9dd79f093bbe6ed4f8487ba015c5'),
     Usage(
         'StartPage_properties_creatables_computation_Query_getCreatables',
         [
@@ -324,13 +410,14 @@ class Template {
         refType: RefType.Enum),
     TemplateType(
         'Creatable',
-        '7eea5a206636a10558684c55a753297d',
+        'b1a485d74233df68c29f46f5997e3fdb',
         [
           TemplateField('child', NONCREATABLE, FieldType.Ref, child: true),
           TemplateField('childColl', NONCREATABLE, FieldType.Ref,
               child: true, collection: true),
           TemplateField('emb', EMBEDDED, FieldType.Ref, child: true),
           TemplateField('file', DFILE, FieldType.DFile),
+          TemplateField('isBasic', BOOLEAN, FieldType.Boolean),
           TemplateField('name', STRING, FieldType.String),
           TemplateField('ref', CREATABLE, FieldType.Ref),
           TemplateField('refColl', CREATABLE, FieldType.Ref, collection: true)

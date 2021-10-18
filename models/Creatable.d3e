@@ -41,5 +41,12 @@
             })
             child true
         })
+        (isBasic {
+            type ({
+                primitive Boolean
+            })
+            computed true
+            computation `this.ref == null && this.refColl.isEmpty && this.child == null && this.childColl.isEmpty && this.file == null && this.emb == null`
+        })
     ]
 })

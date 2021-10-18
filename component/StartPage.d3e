@@ -269,6 +269,115 @@
                                     ]
                                 })
                             })
+                            (CRef cWithFile {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with File'
+                                        })
+                                    ]
+                                })
+                            })
+                        ]
+                    })
+                    (CRef id {
+                        component #Column
+                        data [
+                            ({
+                                prop #mainAxisAlignment
+                                value 'center'
+                            })
+                            ({
+                                prop #vscroll
+                                value 'true'
+                            })
+                        ]
+                        children [
+                            (CRef id {
+                                component #TextView
+                                data [
+                                    ({
+                                        prop #data
+                                        value 'Update'
+                                    })
+                                ]
+                                style #heading1
+                            })
+                            (CRef uBasic {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Update basic Creatable'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithRef {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Ref'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithRefColl {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Ref Collection'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithChild {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Child'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithChildColl {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Child Collection'
+                                        })
+                                    ]
+                                })
+                            })
+                            (CRef cWithEmb {
+                                component #Button
+                                child (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Create Creatable with Embedded'
+                                        })
+                                    ]
+                                })
+                            })
                         ]
                     })
                 ]
@@ -423,6 +532,59 @@
                     this.creatable = Query.loadCreatable(ref).await;
                 } else {
                     this.message = 'With Embedded creation failed.';
+                }
+            ```
+        })
+        (createFile {
+            type OnEvent
+            on #cWithFile
+            event #onPressed
+            block ```
+                DFile file = DFile();
+                file.name = NameUtil.getFileName();
+                file.size = 123;
+
+                Creatable ref = Creatable(
+                    name: NameUtil.getName(),
+                    file: file
+                );
+                DBResult r = ref.save().await;
+                if (r.status == Success) {
+                    this.message = 'With File creation success.';
+                    this.creatable = Query.loadCreatable(ref).await;
+                } else {
+                    this.message = 'With File creation failed.';
+                }
+            ```
+        })
+
+        (updateBasic {
+            type OnEvent
+            on #uBasic
+            event #onPressed
+            block ```
+                Creatable obj = this.allCreatables.firstWhere((c) => c.isBasic);
+                if (obj == null) {
+                    Creatable c = Creatable(
+                        name: NameUtil.getName()
+                    );
+                    DBResult r = c.save().await;
+                    if (r.status == Success) {
+                        obj = Query.loadCreatable(c).await;
+                    }
+                }
+                if (obj == null) {
+                    this.message = 'Creatable creation failed.';
+                }
+                obj.name = NameUtil.getName();
+                DBResult r = obj.save().await;
+                if (r.status == Success) {
+                    String message = 'Creatable update success';
+                    Creatable fromDb = Query.loadCreatable(obj).await;
+                    this.message = message;
+                    this.creatable = obj;
+                } else {
+                    this.message = 'Creatable update failed.';
                 }
             ```
         })

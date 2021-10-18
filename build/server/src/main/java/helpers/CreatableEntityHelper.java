@@ -1,6 +1,7 @@
 package helpers;
 
 import d3e.core.D3EResourceHandler;
+import java.util.List;
 import models.Creatable;
 import models.NonCreatable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,19 @@ public class CreatableEntityHelper<T extends Creatable> implements EntityHelper<
     validateInternal(entity, validationContext, false, true);
   }
 
+  public void computeIsBasic(T entity) {
+    try {
+      entity.setIsBasic(
+          entity.getRef() == null
+              && entity.getRefColl().isEmpty()
+              && entity.getChild() == null
+              && entity.getChildColl().isEmpty()
+              && entity.getFile() == null
+              && entity.getEmb() == null);
+    } catch (RuntimeException e) {
+    }
+  }
+
   @Override
   public T clone(T entity) {
     return null;
@@ -134,6 +148,7 @@ public class CreatableEntityHelper<T extends Creatable> implements EntityHelper<
       EmbeddedEntityHelper helper = mutator.getHelperByInstance(entity.getEmb());
       helper.compute(entity.getEmb());
     }
+    this.computeIsBasic(entity);
   }
 
   private void deleteRefInCreatable(T entity, EntityValidationContext deletionContext) {

@@ -2,6 +2,7 @@ import '../utils/ObservableState.dart';
 import '../classes/Creatables.dart';
 import '../classes/DBResult.dart';
 import '../classes/DBResultStatus.dart';
+import '../classes/DFile.dart';
 import '../classes/DisplayUtil.dart';
 import '../classes/NameUtil.dart';
 import '../classes/Query.dart';
@@ -294,7 +295,39 @@ class _StartPageState extends ObservableState<StartPage> {
                               onPressed: () {
                                 createEmb();
                               },
-                              child: Text('Create Creatable with Embedded'))
+                              child: Text('Create Creatable with Embedded')),
+                          Button(
+                              onPressed: () {
+                                createFile();
+                              },
+                              child: Text('Create Creatable with File'))
+                        ]),
+                    scrollDirection: Axis.vertical),
+                ScrollView2(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                              padding: cStyle.tTextViewHeading1PaddingOn,
+                              child: Text('Update',
+                                  style: TextStyle(
+                                      color: cStyle.tTextViewHeading1ColorOn,
+                                      fontSize:
+                                          cStyle.tTextViewHeading1FontSizeOn))),
+                          Button(
+                              onPressed: () {
+                                updateBasic();
+                              },
+                              child: Text('Update basic Creatable')),
+                          Button(child: Text('Create Creatable with Ref')),
+                          Button(
+                              child:
+                                  Text('Create Creatable with Ref Collection')),
+                          Button(child: Text('Create Creatable with Child')),
+                          Button(
+                              child: Text(
+                                  'Create Creatable with Child Collection')),
+                          Button(child: Text('Create Creatable with Embedded'))
                         ]),
                     scrollDirection: Axis.vertical)
               ]),
@@ -459,6 +492,70 @@ class _StartPageState extends ObservableState<StartPage> {
           ref.id)));
     } else {
       this.setMessage('With Embedded creation failed.');
+    }
+  }
+
+  void createFile() async {
+    DFile file = DFile();
+
+    file.name = NameUtil.getFileName();
+
+    file.size = 123;
+
+    Creatable ref = Creatable(name: NameUtil.getName(), file: file);
+
+    DBResult r = (await ref.save());
+
+    if (r.status == DBResultStatus.Success) {
+      this.setMessage('With File creation success.');
+
+      this.setCreatable((await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_CREATEFILE_BLOCK_QUERY_LOADCREATABLE,
+          ref.id)));
+    } else {
+      this.setMessage('With File creation failed.');
+    }
+  }
+
+  void updateBasic() async {
+    Creatable obj =
+        this.allCreatables.firstWhere((c) => c.isBasic, orElse: () => null);
+
+    if (obj == null) {
+      Creatable c = Creatable(name: NameUtil.getName());
+
+      DBResult r = (await c.save());
+
+      if (r.status == DBResultStatus.Success) {
+        obj = (await Query.get().getCreatableById(
+            UsageConstants
+                .STARTPAGE_EVENTHANDLERS_UPDATEBASIC_BLOCK_QUERY_LOADCREATABLE,
+            c.id));
+      }
+    }
+
+    if (obj == null) {
+      this.setMessage('Creatable creation failed.');
+    }
+
+    obj.setName(NameUtil.getName());
+
+    DBResult r = (await obj.save());
+
+    if (r.status == DBResultStatus.Success) {
+      String message = 'Creatable update success';
+
+      Creatable fromDb = (await Query.get().getCreatableById(
+          UsageConstants
+              .STARTPAGE_EVENTHANDLERS_UPDATEBASIC_BLOCK_QUERY_LOADCREATABLE,
+          obj.id));
+
+      this.setMessage(message);
+
+      this.setCreatable(obj);
+    } else {
+      this.setMessage('Creatable update failed.');
     }
   }
 

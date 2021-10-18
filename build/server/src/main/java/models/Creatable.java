@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import org.apache.solr.client.solrj.beans.Field;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.solr.core.mapping.ChildDocument;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import store.Database;
@@ -33,6 +34,7 @@ public class Creatable extends CreatableObject {
   public static final int _CHILDCOLL = 4;
   public static final int _FILE = 5;
   public static final int _EMB = 6;
+  public static final int _ISBASIC = 7;
   @Field private String name;
 
   @Field
@@ -57,6 +59,11 @@ public class Creatable extends CreatableObject {
   private DFile file;
 
   @Field @ChildDocument @javax.persistence.Embedded private Embedded emb = new Embedded();
+
+  @Field
+  @ColumnDefault("false")
+  private boolean isBasic = false;
+
   private transient Creatable old;
 
   @Override
@@ -71,7 +78,7 @@ public class Creatable extends CreatableObject {
 
   @Override
   public int _fieldsCount() {
-    return 7;
+    return 8;
   }
 
   public void addToRefColl(Creatable val, long index) {
@@ -221,6 +228,18 @@ public class Creatable extends CreatableObject {
     this.emb._setChildIdx(_EMB);
   }
 
+  public boolean isIsBasic() {
+    return this.isBasic;
+  }
+
+  public void setIsBasic(boolean isBasic) {
+    if (Objects.equals(this.isBasic, isBasic)) {
+      return;
+    }
+    fieldChanged(_ISBASIC, this.isBasic);
+    this.isBasic = isBasic;
+  }
+
   public Creatable getOld() {
     return this.old;
   }
@@ -268,6 +287,7 @@ public class Creatable extends CreatableObject {
     ctx.cloneChildList(childColl, (v) -> _obj.setChildColl(v));
     _obj.setFile(file);
     ctx.cloneChild(emb, (v) -> _obj.setEmb(v));
+    _obj.setIsBasic(isBasic);
   }
 
   public Creatable cloneInstance(Creatable cloneObj) {
@@ -285,6 +305,7 @@ public class Creatable extends CreatableObject {
             .collect(Collectors.toList()));
     cloneObj.setFile(this.getFile());
     cloneObj.setEmb(this.getEmb().cloneInstance(null));
+    cloneObj.setIsBasic(this.isIsBasic());
     return cloneObj;
   }
 

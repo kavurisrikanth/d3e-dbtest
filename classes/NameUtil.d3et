@@ -7,6 +7,12 @@ client class NameUtil {
         return name;
     }
 
+    static String getFileName() {
+        String name = '_file_name_' + _idx.toString();
+        _idx++;
+        return name;
+    }
+
     static void setIndex(Integer idx) {
         _idx = idx;
     }

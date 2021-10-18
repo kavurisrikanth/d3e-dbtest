@@ -75,7 +75,7 @@ public class ModelSchema extends AbstractModelSchema {
         new DModel<Creatable>(
             "Creatable",
             SchemaConstants.Creatable,
-            7,
+            8,
             0,
             "_creatable",
             DModelType.MODEL,
