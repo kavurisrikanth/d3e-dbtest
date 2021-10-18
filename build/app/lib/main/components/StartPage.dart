@@ -2,12 +2,11 @@ import '../utils/ObservableState.dart';
 import '../classes/Creatables.dart';
 import '../classes/DBResult.dart';
 import '../classes/DBResultStatus.dart';
-import '../classes/DFile.dart';
 import '../classes/DisplayUtil.dart';
+import '../classes/EventUtil.dart';
 import '../classes/NameUtil.dart';
 import '../classes/Query.dart';
 import '../models/Creatable.dart';
-import '../models/Embedded.dart';
 import '../models/NonCreatable.dart';
 import '../rocket/MessageDispatch.dart';
 import '../rocket/Template.dart';
@@ -346,11 +345,9 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void createBasic() async {
-    Creatable c = Creatable(name: NameUtil.getName());
+    Creatable c = (await EventUtil.createBasic());
 
-    DBResult r = (await c.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (c != null) {
       String message = 'Creatable creation success';
 
       Creatable fromDb = (await Query.get().getCreatableById(
@@ -367,64 +364,24 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void createRef() async {
-    Creatable ref = Creatable(name: NameUtil.getName());
+    Creatable ref = (await EventUtil.createRef());
 
-    DBResult r = (await ref.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (ref != null) {
       this.setMessage('Reference creation success.');
 
       this.setCreatable((await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE,
           ref.id)));
-
-      Creatable c = Creatable(name: NameUtil.getName(), ref: ref);
-
-      r = (await c.save());
-
-      if (r.status == DBResultStatus.Success) {
-        this.setMessage('Creatable creation success.');
-
-        this.setCreatable((await Query.get().getCreatableById(
-            UsageConstants
-                .STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE,
-            c.id)));
-      } else {
-        this.setMessage('Creatable creation failed.');
-      }
     } else {
       this.setMessage('Reference creation failed.');
     }
   }
 
   void createRefColl() async {
-    int i = 3;
+    Creatable c = (await EventUtil.createRefColl());
 
-    List<Creatable> refs = [];
-
-    for (int x = 0; x < 3; x++) {
-      Creatable ref = Creatable(name: NameUtil.getName());
-
-      DBResult r = (await ref.save());
-
-      if (r.status == DBResultStatus.Success) {
-        this.setMessage('Reference creation success.');
-
-        this.setCreatable((await Query.get().getCreatableById(
-            UsageConstants
-                .STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
-            ref.id)));
-      } else {
-        this.setMessage('Reference creation failed.');
-      }
-    }
-
-    Creatable c = Creatable(name: NameUtil.getName(), refColl: refs);
-
-    DBResult r = (await c.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (c != null) {
       this.setMessage('Reference creation success.');
 
       this.setCreatable((await Query.get().getCreatableById(
@@ -437,13 +394,9 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void createChild() async {
-    Creatable ref = Creatable(
-        name: NameUtil.getName(),
-        child: NonCreatable(name: NameUtil.getName()));
+    Creatable ref = (await EventUtil.createChild());
 
-    DBResult r = (await ref.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (ref != null) {
       this.setMessage('With Child creation success.');
 
       this.setCreatable((await Query.get().getCreatableById(
@@ -456,21 +409,9 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void createChildColl() async {
-    int i = 3;
+    Creatable c = (await EventUtil.createChildColl());
 
-    List<NonCreatable> refs = [];
-
-    for (int x = 0; x < 3; x++) {
-      NonCreatable ref = NonCreatable(name: NameUtil.getName());
-
-      refs.add(ref);
-    }
-
-    Creatable c = Creatable(name: NameUtil.getName(), childColl: refs);
-
-    DBResult r = (await c.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (c != null) {
       this.setMessage('With child collection creation success.');
 
       this.setCreatable((await Query.get().getCreatableById(
@@ -483,12 +424,9 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void createEmb() async {
-    Creatable ref = Creatable(
-        name: NameUtil.getName(), emb: Embedded(embName: NameUtil.getName()));
+    Creatable ref = (await EventUtil.createEmb());
 
-    DBResult r = (await ref.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (ref != null) {
       this.setMessage('With Embedded creation success.');
 
       this.setCreatable((await Query.get().getCreatableById(
@@ -501,17 +439,9 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void createFile() async {
-    DFile file = DFile();
+    Creatable ref = (await EventUtil.createFile());
 
-    file.name = NameUtil.getFileName();
-
-    file.size = 123;
-
-    Creatable ref = Creatable(name: NameUtil.getName(), file: file);
-
-    DBResult r = (await ref.save());
-
-    if (r.status == DBResultStatus.Success) {
+    if (ref != null) {
       this.setMessage('With File creation success.');
 
       this.setCreatable((await Query.get().getCreatableById(

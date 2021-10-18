@@ -1,0 +1,16 @@
+@Dart('classes#EventUtil')
+client class EventUtil {
+    static Future<Creatable> createBasic() async;
+
+    static Future<Creatable> createRef() async;
+
+    static Future<Creatable> createRefColl() async;
+
+    static Future<Creatable> createChild() async;
+
+    static Future<Creatable> createChildColl() async;
+
+    static Future<Creatable> createEmb() async;
+
+    static Future<Creatable> createFile() async;
+}

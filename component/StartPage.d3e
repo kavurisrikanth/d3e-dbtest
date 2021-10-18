@@ -407,15 +407,12 @@
             on #basicC
             event #onPressed
             block ```
-                Creatable c = Creatable(
-                    name: NameUtil.getName()
-                );
-                DBResult r = c.save().await;
-                if (r.status == Success) {
+                Creatable c = EventUtil.createBasic().await;
+                if (c != null) {
                     String message = 'Creatable creation success';
                     Creatable fromDb = Query.loadCreatable(c).await;
                     this.message = message;
-                    this.creatable = c;
+                    this.creatable = fromDb;
                 } else {
                     this.message = 'Creatable creation failed.';
                 }
@@ -426,24 +423,10 @@
             on #cWithRef
             event #onPressed
             block ```
-                Creatable ref = Creatable(
-                    name: NameUtil.getName()
-                );
-                DBResult r = ref.save().await;
-                if (r.status == Success) {
+                Creatable ref = EventUtil.createRef().await;
+                if (ref != null) {
                     this.message = 'Reference creation success.';
                     this.creatable = Query.loadCreatable(ref).await;
-                    Creatable c = Creatable(
-                        name: NameUtil.getName(),
-                        ref: ref
-                    );
-                    r = c.save().await;
-                    if (r.status == Success) {
-                        this.message = 'Creatable creation success.';
-                        this.creatable = Query.loadCreatable(c).await;
-                    } else {
-                        this.message = 'Creatable creation failed.';
-                    }
                 } else {
                     this.message = 'Reference creation failed.';
                 }
@@ -454,26 +437,8 @@
             on #cWithRefColl
             event #onPressed
             block ```
-                Integer i = 3;
-                List<Creatable> refs = [];
-                for (Integer x = 0; x < 3; x++) {
-                    Creatable ref = Creatable(
-                        name: NameUtil.getName()
-                    );
-                    DBResult r = ref.save().await;
-                    if (r.status == Success) {
-                        this.message = 'Reference creation success.';
-                        this.creatable = Query.loadCreatable(ref).await;
-                    } else {
-                        this.message = 'Reference creation failed.';
-                    }
-                }
-                Creatable c = Creatable(
-                    name: NameUtil.getName(),
-                    refColl: refs
-                );
-                DBResult r = c.save().await;
-                if (r.status == Success) {
+                Creatable c = EventUtil.createRefColl().await;
+                if (c != null) {
                     this.message = 'Reference creation success.';
                     this.creatable = Query.loadCreatable(c).await;
                 } else {
@@ -486,14 +451,8 @@
             on #cWithChild
             event #onPressed
             block ```
-                Creatable ref = Creatable(
-                    name: NameUtil.getName(),
-                    child: NonCreatable(
-                        name: NameUtil.getName()
-                    )
-                );
-                DBResult r = ref.save().await;
-                if (r.status == Success) {
+                Creatable ref = EventUtil.createChild().await;
+                if (ref != null) {
                     this.message = 'With Child creation success.';
                     this.creatable = Query.loadCreatable(ref).await;
                 } else {
@@ -506,20 +465,8 @@
             on #cWithChildColl
             event #onPressed
             block ```
-                Integer i = 3;
-                List<NonCreatable> refs = [];
-                for (Integer x = 0; x < 3; x++) {
-                    NonCreatable ref = NonCreatable(
-                        name: NameUtil.getName()
-                    );
-                    refs.add(ref);
-                }
-                Creatable c = Creatable(
-                    name: NameUtil.getName(),
-                    childColl: refs
-                );
-                DBResult r = c.save().await;
-                if (r.status == Success) {
+                Creatable c = EventUtil.createChildColl().await;
+                if (c != null) {
                     this.message = 'With child collection creation success.';
                     this.creatable = Query.loadCreatable(c).await;
                 } else {
@@ -532,14 +479,8 @@
             on #cWithEmb
             event #onPressed
             block ```
-                Creatable ref = Creatable(
-                    name: NameUtil.getName(),
-                    emb: Embedded(
-                        embName: NameUtil.getName()
-                    )
-                );
-                DBResult r = ref.save().await;
-                if (r.status == Success) {
+                Creatable ref = EventUtil.createEmb().await;
+                if (ref != null) {
                     this.message = 'With Embedded creation success.';
                     this.creatable = Query.loadCreatable(ref).await;
                 } else {
@@ -552,16 +493,8 @@
             on #cWithFile
             event #onPressed
             block ```
-                DFile file = DFile();
-                file.name = NameUtil.getFileName();
-                file.size = 123;
-
-                Creatable ref = Creatable(
-                    name: NameUtil.getName(),
-                    file: file
-                );
-                DBResult r = ref.save().await;
-                if (r.status == Success) {
+                Creatable ref = EventUtil.createFile().await;
+                if (ref != null) {
                     this.message = 'With File creation success.';
                     this.creatable = Query.loadCreatable(ref).await;
                 } else {
