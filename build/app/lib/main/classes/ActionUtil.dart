@@ -336,16 +336,6 @@ class ActionUtil {
         });
   }
 
-  static Future<DBAction> deleteRef() async {
-    return DBAction(
-        title: 'Delete Ref',
-        exe: (a) {
-          DBAction action = (a as DBAction);
-
-          action.setSuccess(true);
-        });
-  }
-
   static Future<DBAction> deleteRefColl() async {
     return DBAction(
         title: 'Delete Ref Coll',
