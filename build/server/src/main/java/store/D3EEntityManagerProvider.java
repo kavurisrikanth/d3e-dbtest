@@ -4,12 +4,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,7 +20,10 @@ import org.springframework.stereotype.Service;
 
 import d3e.core.D3ELogger;
 import d3e.core.DFile;
+import gqltosql.schema.DField;
 import gqltosql.schema.DModel;
+import gqltosql.schema.FieldPrimitiveType;
+import gqltosql.schema.FieldType;
 import gqltosql.schema.IModelSchema;
 
 @Service
@@ -49,6 +55,103 @@ public class D3EEntityManagerProvider {
 
 	public IEntityManager get() {
 		return entityManager.get();
+	}
+
+	static class RowField {
+		DField field;
+		List<RowField> subFields;
+
+		public RowField(DField df) {
+			this.field = df;
+		}
+
+		public RowField(DField df, List<RowField> subFields) {
+			this.field = df;
+			this.subFields = subFields;
+		}
+	}
+
+	private class SingleObjectMapper implements RowMapper<DatabaseObject> {
+
+		private D3EPrimaryCache cache;
+		private DatabaseObject obj;
+		private DModel dm;
+		private List<RowField> selectedFields;
+
+		public SingleObjectMapper(D3EPrimaryCache cache, DatabaseObject obj, DModel dm, List<RowField> selectedFields) {
+			this.cache = cache;
+			this.obj = obj;
+			this.dm = dm;
+			this.selectedFields = selectedFields;
+		}
+
+		@Override
+		public DatabaseObject mapRow(ResultSet rs, int rowNum) throws SQLException {
+			int i = 1;
+			rs.getObject(i); // Just read id;
+			readObject(rs, i, obj, selectedFields);
+			return obj;
+		}
+
+		private int readObject(ResultSet rs, int i, Object obj, List<RowField> fields) throws SQLException {
+			for (RowField rf : fields) {
+				DField df = rf.field;
+				if (rf.subFields != null) { // Embedded
+					i = readObject(rs, i, df.getValue(obj), rf.subFields);
+					continue;
+				}
+				FieldType type = df.getType();
+				switch (type) {
+				case Primitive:
+					FieldPrimitiveType pt = df.getPrimitiveType();
+					switch (pt) {
+					case Boolean:
+						df.setValue(obj, rs.getBoolean(i++));
+						break;
+					case Date:
+						throw new UnsupportedOperationException();
+					case DateTime:
+						throw new UnsupportedOperationException();
+					case Double:
+						df.setValue(obj, rs.getDouble(i++));
+						break;
+					case Duration:
+						throw new UnsupportedOperationException();
+					case Enum:
+						String str = rs.getString(i++);
+						DModel<?> enmType = schema.getType(df.getEnumType());
+						Object val = enmType.getField(str).getValue(null);
+						df.setValue(obj, val);
+						break;
+					case Integer:
+						df.setValue(obj, rs.getLong(i++));
+						break;
+					case String:
+						df.setValue(obj, rs.getString(i++));
+						break;
+					case Time:
+						throw new UnsupportedOperationException();
+					default:
+						break;
+					}
+					break;
+				case Reference:
+					DModel ref = df.getReference();
+					long id = rs.getLong(i++);
+					DatabaseObject val = cache.getOrCreate(ref, id);
+					df.setValue(obj, val);
+					break;
+				case InverseCollection:
+				case PrimitiveCollection:
+				case ReferenceCollection:
+					break;
+				default:
+					break;
+
+				}
+			}
+			return i;
+		}
 	}
 
 	private class EntityManagerImpl implements IEntityManager {
@@ -91,48 +194,20 @@ public class D3EEntityManagerProvider {
 		}
 
 		private DatabaseObject load(DModel<?> dm, long id) {
-			DatabaseObject obj = getFromCache(dm, id);
-			return obj;
-		}
-
-		private DatabaseObject getFromCache(DModel<?> dm, long id) {
-			DatabaseObject obj = cache.get(dm.getIndex(), id);
-			if (obj == null) {
-				DatabaseObject ins = (DatabaseObject) dm.newInstance();
-				ins.setId(id);
-				ins._markProxy();
-				cache.add(ins, dm.getIndex());
-			}
-			return obj;
+			return cache.getOrCreate(dm, id);
 		}
 
 		@Override
 		public <T> T getById(int type, long id) {
-			PreparedStatement stmt = null;
-			try {
-				DModel<?> dm = schema.getType(type);
-				StringBuilder sb = new StringBuilder();
-				sb.append("SELECT _id FROM ").append(dm.getTableName()).append(" WHERE _id = ").append(id);
-				String query = sb.toString();
-				stmt = null;// TODO
-				ResultSet rs = stmt.executeQuery();
-				if (rs.first()) {
-					DatabaseObject obj = getFromCache(dm, id);
-					return (T) obj;
-				} else {
-					return null;
-				}
-			} catch (SQLException e) {
-				// TODO: handle exception
-				e.printStackTrace();
+			DModel<?> dm = schema.getType(type);
+			StringBuilder sb = new StringBuilder();
+			sb.append("SELECT _id FROM ").append(dm.getTableName()).append(" WHERE _id = ").append(id);
+			String query = sb.toString();
+			List<Map<String, Object>> list = jdbcTemplate.getJdbcTemplate().queryForList(query);
+			if (list.isEmpty()) {
 				return null;
-			} finally {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 			}
+			return (T) cache.getOrCreate(dm, id);
 		}
 
 		@Override
@@ -173,34 +248,14 @@ public class D3EEntityManagerProvider {
 
 		@Override
 		public void unproxy(DatabaseObject obj) {
-			PreparedStatement stmt = null;
-			try {
-				DModel<?> type = schema.getType(obj._typeIdx());
-				String query = queryBuilder.generateSelectAllQuery(type, obj.getId());
-				stmt = null;//
-				ResultSet rs = stmt.executeQuery();
-				if (rs.first()) {
-					readObject(type, obj, rs);
-				}
-			} catch (SQLException e) {
-				// TODO: handle exception
-				e.printStackTrace();
-			} finally {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+			DModel<?> type = schema.getType(obj._typeIdx());
+			List<RowField> selectedFields = new ArrayList<>();
+			String query = queryBuilder.generateSelectAllQuery(type, selectedFields, obj.getId());
+			jdbcTemplate.getJdbcTemplate().query(query, new SingleObjectMapper(cache, obj, type, selectedFields));
 		}
 
 		@Override
 		public void unproxyCollection(D3EPersistanceList<?> list) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException();
-		}
-
-		private void readObject(DModel<?> type, DatabaseObject obj, ResultSet rs) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException();
 		}

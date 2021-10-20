@@ -52,7 +52,7 @@ public class ModelSchema extends AbstractModelSchema {
   protected void createAllTables() {
     addTable(
         new DModel<DFile>(
-            "DFile", SchemaConstants.DFile, 3, 0, "_dfile", DModelType.MODEL, () -> new DFile()));
+            "DFile", SchemaConstants.DFile, 4, 0, "_dfile", DModelType.MODEL, () -> new DFile()));
     addTable(
         new DModel<AnonymousUser>(
             "AnonymousUser",

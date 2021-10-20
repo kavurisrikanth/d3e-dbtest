@@ -127,7 +127,7 @@ public abstract class AbstractModelSchema implements IModelSchema {
 		m.addPrimitive("name", 1, "_name", FieldPrimitiveType.String, (s) -> s.getName(), (s, v) -> s.setName(v), null);
 		m.addPrimitive("size", 2, "_size", FieldPrimitiveType.Integer, (s) -> s.getSize(), (s, v) -> s.setSize(v), null)
 				.notNull();
-		m.addPrimitive("mimeType", 2, "_mime_type", FieldPrimitiveType.String, (s) -> s.getSize(),
+		m.addPrimitive("mimeType", 3, "_mime_type", FieldPrimitiveType.String, (s) -> s.getSize(),
 				(s, v) -> s.setSize(v)).notNull();
 	}
 

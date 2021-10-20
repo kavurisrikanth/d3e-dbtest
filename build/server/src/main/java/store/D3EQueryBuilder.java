@@ -20,6 +20,7 @@ import gqltosql.schema.DModelType;
 import gqltosql.schema.FieldType;
 import gqltosql.schema.IModelSchema;
 import gqltosql2.AliasGenerator;
+import store.D3EEntityManagerProvider.RowField;
 
 @Service
 public class D3EQueryBuilder {
@@ -61,8 +62,8 @@ public class D3EQueryBuilder {
 						handleEmbedded(ref, cols, params, args, arg);
 						continue;
 					}
-					
-					if(arg == null) {
+
+					if (arg == null) {
 						continue;
 					}
 
@@ -445,13 +446,13 @@ public class D3EQueryBuilder {
 		return query;
 	}
 
-	public String generateSelectAllQuery(DModel type, long id) {
+	public String generateSelectAllQuery(DModel type, List<RowField> selectedFields, long id) {
 		AliasGenerator ag = new AliasGenerator();
 		StringBuilder sb = new StringBuilder();
 		sb.append("select _id");
 		List<String> joins = new ArrayList<>();
 		String alias = ag.next();
-		appendAllColumns(sb, type, joins, ag, alias);
+		appendAllColumns(sb, type, selectedFields, joins, ag, alias);
 		sb.append(" from ").append(type.getTableName()).append(" ").append(alias);
 		for (String j : joins) {
 			sb.append(" ").append(j);
@@ -460,13 +461,15 @@ public class D3EQueryBuilder {
 		return sb.toString();
 	}
 
-	private void appendAllColumns(StringBuilder sb, DModel type, List<String> joins, AliasGenerator ag, String alias) {
+	private void appendAllColumns(StringBuilder sb, DModel type, List<RowField> selectedFields, List<String> joins,
+			AliasGenerator ag, String alias) {
 		DField[] fields = type.getFields();
 		for (DField df : fields) {
 			FieldType ft = df.getType();
 			switch (ft) {
 			case Primitive:
 				sb.append(", ").append(alias).append(".").append(df.getColumnName());
+				selectedFields.add(new RowField(df));
 				break;
 			case Reference:
 				DModel ref = df.getReference();
@@ -474,10 +477,14 @@ public class D3EQueryBuilder {
 				if (mt == DModelType.MODEL) {
 					if (ref.isDocument()) {
 						sb.append(", ").append(alias).append(".").append(df.getColumnName());
+						selectedFields.add(new RowField(df));
 					} else if (ref.isEmbedded()) {
-						appendAllColumns(sb, ref, joins, ag, alias);// TODO
+						List<RowField> subFields = new ArrayList<>();
+						appendAllColumns(sb, ref, subFields, joins, ag, alias);
+						selectedFields.add(new RowField(df, subFields));
 					} else if (ref.isNormal()) {
 						sb.append(", ").append(alias).append(".").append(df.getColumnName());
+						selectedFields.add(new RowField(df));
 					}
 				}
 				break;
@@ -493,7 +500,7 @@ public class D3EQueryBuilder {
 		if (parent != null) {
 			String ja = ag.next();
 			joins.add(parent.getTableName() + " " + ja);
-			appendAllColumns(sb, parent, joins, ag, ja);
+			appendAllColumns(sb, parent, selectedFields, joins, ag, ja);
 		}
 	}
 }
