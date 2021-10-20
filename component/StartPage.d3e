@@ -1,37 +1,32 @@
 (D3EPage StartPage {
     properties [
-        (message {
+        (createAcctions {
             type ({
-                primitive String
-            })
-            internal true
-        })
-        (hasError {
-            type ({
-                primitive Boolean
-            })
-            internal true
-        })
-        (creatables {
-            type ({
-                struct #Creatables
-            })
-            internal true
-            computed true
-            computation `Query.getCreatables().await`
-            synchronise true
-        })
-        (allCreatables {
-            type ({
-                model #Creatable
+                struct #DBAction
             })
             collection true
             computed true
-            computation `creatables.items`
+            computation `ActionUtil.createActions().await`
+        })
+        (updateAcctions {
+            type ({
+                struct #DBAction
+            })
+            collection true
+            computed true
+            computation `ActionUtil.updateActions().await`
+        })
+        (deleteAcctions {
+            type ({
+                struct #DBAction
+            })
+            collection true
+            computed true
+            computation `ActionUtil.deleteActions().await`
         })
     ]
     build (CRef col {
-        component #Column
+        component #Row
         data [
             ({
                 prop #mainAxisAlignment
@@ -61,445 +56,111 @@
                         data [
                             ({
                                 prop #data
-                                value 'All Creatables from Database'
+                                value 'Create Actions'
                             })
                         ]
                         style #heading1
                     })
                     (CFor cf {
-                        var 'item'
-                        items `this.allCreatables`
+                        var 'action'
+                        items `this.createAcctions`
                         type ({
-                            model #Creatable
+                            struct #DBAction
                         })
                         item (CRef id {
-                            component #TextView
+                            component #CheckAction
                             data [
                                 ({
-                                    prop #data
+                                    prop #action
                                     bind true
-                                    bindTo `DisplayUtil.displayCreatable(item)`
+                                    bindTo `action`
                                 })
                             ]
-                            style #label
                         })
                     })
                 ]
             })
-            (CIf id {
-                condition `this.hasError`
-                then (CRef row {
-                    component #Row
-                    data [
-                        ({
-                            prop #mainAxisAlignment
-                            value 'center'
-                        })
-                        ({
-                            prop #hscroll
-                            value 'true'
-                        })
-                    ]
-                    children [
-                        (CRef id {
-                            component #TextView
-                            data [
-                                ({
-                                    prop #data
-                                    value 'Message: '
-                                })
-                            ]
-                            style #errorMessage
-                        })
-                        (CRef id {
-                            component #TextView
-                            data [
-                                ({
-                                    prop #data
-                                    bind true
-                                    bindTo `(this.message == null || this.message.length == 0) ? 'No Message' : this.message`
-                                })
-                            ]
-                            style #errorMessage
-                        })
-                    ]
-                })
-                else (CRef row {
-                    component #Row
-                    data [
-                        ({
-                            prop #mainAxisAlignment
-                            value 'center'
-                        })
-                        ({
-                            prop #hscroll
-                            value 'true'
-                        })
-                    ]
-                    children [
-                        (CRef id {
-                            component #TextView
-                            data [
-                                ({
-                                    prop #data
-                                    value 'Message: '
-                                })
-                            ]
-                            style #successMessage
-                        })
-                        (CRef id {
-                            component #TextView
-                            data [
-                                ({
-                                    prop #data
-                                    bind true
-                                    bindTo `(this.message == null || this.message.length == 0) ? 'No Message' : this.message`
-                                })
-                            ]
-                            style #successMessage
-                        })
-                    ]
-                })
-            })
-            (CRef id {
-                component #Row
+            (CRef row {
+                component #Column
                 data [
                     ({
                         prop #mainAxisAlignment
                         value 'center'
                     })
                     ({
-                        prop #hscroll
+                        prop #vscroll
                         value 'true'
                     })
                 ]
                 children [
                     (CRef id {
-                        component #Column
+                        component #TextView
                         data [
                             ({
-                                prop #mainAxisAlignment
-                                value 'center'
-                            })
-                            ({
-                                prop #vscroll
-                                value 'true'
+                                prop #data
+                                value 'Update Actions'
                             })
                         ]
-                        children [
-                            (CRef id {
-                                component #TextView
-                                data [
-                                    ({
-                                        prop #data
-                                        value 'Create'
-                                    })
-                                ]
-                                style #heading1
-                            })
-                            (CRef basicC {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Create basic Creatable'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef cWithRef {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Create Creatable with Ref'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef cWithRefColl {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Create Creatable with Ref Collection'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef cWithChild {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Create Creatable with Child'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef cWithChildColl {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Create Creatable with Child Collection'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef cWithEmb {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Create Creatable with Embedded'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef cWithFile {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Create Creatable with File'
-                                        })
-                                    ]
-                                })
-                            })
-                        ]
+                        style #heading1
                     })
-                    (CRef id {
-                        component #Column
-                        data [
-                            ({
-                                prop #mainAxisAlignment
-                                value 'center'
-                            })
-                            ({
-                                prop #vscroll
-                                value 'true'
-                            })
-                        ]
-                        children [
-                            (CRef id {
-                                component #TextView
-                                data [
-                                    ({
-                                        prop #data
-                                        value 'Update'
-                                    })
-                                ]
-                                style #heading1
-                            })
-                            (CRef uBasic {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Update basic Creatable'
-                                        })
-                                    ]
+                    (CFor cf {
+                        var 'action'
+                        items `this.updateAcctions`
+                        type ({
+                            struct #DBAction
+                        })
+                        item (CRef id {
+                            component #CheckAction
+                            data [
+                                ({
+                                    prop #action
+                                    bind true
+                                    bindTo `action`
                                 })
-                            })
-                            (CRef uWithRef {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Update Creatable with Ref'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef uWithRefColl {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Update Creatable with Ref Collection'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef uWithChild {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Update Creatable with Child'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef uWithChildColl {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Update Creatable with Child Collection'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef uWithEmb {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Update Creatable with Embedded'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef uWithFile {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Update Creatable with File'
-                                        })
-                                    ]
-                                })
-                            })
-                        ]
+                            ]
+                        })
                     })
+                ]
+            })
+            (CRef row {
+                component #Column
+                data [
+                    ({
+                        prop #mainAxisAlignment
+                        value 'center'
+                    })
+                    ({
+                        prop #vscroll
+                        value 'true'
+                    })
+                ]
+                children [
                     (CRef id {
-                        component #Column
+                        component #TextView
                         data [
                             ({
-                                prop #mainAxisAlignment
-                                value 'center'
-                            })
-                            ({
-                                prop #vscroll
-                                value 'true'
+                                prop #data
+                                value 'Delete Actions'
                             })
                         ]
-                        children [
-                            (CRef id {
-                                component #TextView
-                                data [
-                                    ({
-                                        prop #data
-                                        value 'Delete'
-                                    })
-                                ]
-                                style #heading1
-                            })
-                            (CRef dBasic {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Delete basic Creatable'
-                                        })
-                                    ]
+                        style #heading1
+                    })
+                    (CFor cf {
+                        var 'action'
+                        items `this.deleteAcctions`
+                        type ({
+                            struct #DBAction
+                        })
+                        item (CRef id {
+                            component #CheckAction
+                            data [
+                                ({
+                                    prop #action
+                                    bind true
+                                    bindTo `action`
                                 })
-                            })
-                            (CRef dWithRef {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Delete Creatable with Ref'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef dWithRefColl {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Delete Creatable with Ref Collection'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef dWithChild {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Delete Creatable with Child'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef dWithChildColl {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Delete Creatable with Child Collection'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef dWithEmb {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Delete Creatable with Embedded'
-                                        })
-                                    ]
-                                })
-                            })
-                            (CRef dWithFile {
-                                component #Button
-                                child (CRef id {
-                                    component #TextView
-                                    data [
-                                        ({
-                                            prop #data
-                                            value 'Delete Creatable with File'
-                                        })
-                                    ]
-                                })
-                            })
-                        ]
+                            ]
+                        })
                     })
                 ]
             })
@@ -509,459 +170,6 @@
         (onInit {
             block ```
                 ElementUtils.removeInitialLoader();
-                NameUtil.setIndex(this.allCreatables.length);
-                NameUtil.getName();
-                NameUtil.getFileName();
-                this.allCreatables.firstWhere((c) => c.isBasic);
-            ```
-        })
-        (reset {
-            block ```
-                this.message = null;
-                this.hasError = false;
-            ```
-        })
-        (createBasic {
-            type OnEvent
-            on #basicC
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.createBasic().await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (createRef {
-            type OnEvent
-            on #cWithRef
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.createRef().await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (createRefColl {
-            type OnEvent
-            on #cWithRefColl
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.createRefColl().await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (createChild {
-            type OnEvent
-            on #cWithChild
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.createChild().await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (createChildColl {
-            type OnEvent
-            on #cWithChildColl
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.createChildColl().await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (createEmb {
-            type OnEvent
-            on #cWithEmb
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.createEmb().await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (createFile {
-            type OnEvent
-            on #cWithFile
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.createFile().await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-
-        (updateBasic {
-            type OnEvent
-            on #uBasic
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.updateBasic(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (updateRef {
-            type OnEvent
-            on #uWithRef
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.updateRef(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (updateRefColl {
-            type OnEvent
-            on #uWithRefColl
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.updateRefColl(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (updateChild {
-            type OnEvent
-            on #uWithChild
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.updateChild(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (updateChildColl {
-            type OnEvent
-            on #uWithChildColl
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.updateChildColl(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (updateEmb {
-            type OnEvent
-            on #uWithEmb
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.updateEmb(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (updateFile {
-            type OnEvent
-            on #uWithFile
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.updateFile(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-
-        (deleteBasic {
-            type OnEvent
-            on #dBasic
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.deleteBasic(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (deleteRef {
-            type OnEvent
-            on #dWithRef
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.deleteRef(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (deleteRefColl {
-            type OnEvent
-            on #dWithRefColl
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.deleteRefColl(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (deleteChild {
-            type OnEvent
-            on #dWithChild
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.deleteChild(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (deleteChildColl {
-            type OnEvent
-            on #dWithChildColl
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.deleteChildColl(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (deleteEmb {
-            type OnEvent
-            on #dWithEmb
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.deleteEmb(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
-            ```
-        })
-        (deleteFile {
-            type OnEvent
-            on #dWithFile
-            event #onPressed
-            block ```
-                reset();
-                Creatable c = EventUtil.deleteFile(this.allCreatables).await;
-                if (c != null) {
-                    Creatable fromDb = Query.loadCreatable(c).await;
-                    if (EqualsUtil.checkCreatable(c, fromDb)) {
-                        this.message = 'Creatable creation success';
-                    } else {
-                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
-                        this.hasError = true;
-                    }
-                } else {
-                    this.message = 'Creatable creation failed.';
-                    this.hasError = true;
-                }
             ```
         })
     ]

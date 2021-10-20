@@ -12,7 +12,10 @@ client class EqualsUtil {
         if (one.name != two.name) {
             return false;
         }
-        if (!checkCreatable(one.ref, two.ref)) {
+        if (one.isBasic != two.isBasic) {
+            return false;
+        }
+        if (one.ref != two.ref) {
             return false;
         }
         if (!CollectionUtils.isEquals(one.refColl, two.refColl)) {

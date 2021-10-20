@@ -23,7 +23,11 @@ class EqualsUtil {
       return false;
     }
 
-    if (!EqualsUtil.checkCreatable(one.ref, two.ref)) {
+    if (one.isBasic != two.isBasic) {
+      return false;
+    }
+
+    if (one.ref != two.ref) {
       return false;
     }
 

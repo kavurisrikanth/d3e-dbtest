@@ -1,0 +1,352 @@
+client class ActionUtil {
+
+    static Creatable ref1;
+    static Creatable ref2;
+    static Creatable ref3;
+    static Creatable ref4;
+    static Creatable ref5;
+    static Creatable ref6;
+    static Creatable ref7;
+    
+    static Future<List<DBAction>> createActions() async {
+        return [
+            createBasic().await,
+            createRef().await,
+            createRefColl().await,
+            createChild().await,
+            createChildColl().await,
+            createEmb().await,
+            createFile().await,
+        ];
+    }
+
+    static Future<List<DBAction>> updateActions() async {
+        return [
+            updateBasic().await,
+            updateRef().await,
+            updateRefColl().await,
+            updateChild().await,
+            updateChildColl().await,
+            updateEmb().await,
+            updateFile().await,
+        ];
+    }
+
+    static Future<List<DBAction>> deleteActions() async {
+        return [
+            deleteBasic().await,
+            deleteRefColl().await,
+            deleteChild().await,
+            deleteChildColl().await,
+            deleteEmb().await,
+            deleteFile().await,
+            deleteAll().await,
+        ];
+    }
+
+    static void checkCreatable(DBAction action, Creatable c) async {
+        DBResult r = c.save().await;
+        action.actionRun = true;
+        if (r.status == DBResultStatus.Success) {
+            Creatable fromDb = Query.loadCreatable(c).await;
+            if (EqualsUtil.checkCreatable(c, fromDb)) {
+                action.success = true;
+            } else {
+                action.error = DisplayUtil.displayCreatable(c) + ' <=> ' + DisplayUtil.displayCreatable(fromDb);
+                action.success = false;
+            }
+        } else {
+            action.success = false;
+            action.error = r.errors.toString();
+        }
+    }
+
+    static void checkDelete(DBAction action, Creatable c) async {
+        DBResult r = c.delete().await;
+        action.actionRun = true;
+        if (r.status == DBResultStatus.Success) {
+            Creatable fromDb = Query.loadCreatable(c).await;
+            if(fromDb == null) {
+                action.success = true;
+            } else {
+                action.error = DisplayUtil.displayCreatable(fromDb);
+                action.success = true;
+            }
+        } else {
+            action.success = false;
+            action.error = r.errors.toString();
+        }
+    }
+
+    static Future<DBAction> createBasic() async {
+        return DBAction(
+            title: 'Create Basic',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = Creatable(name: NameUtil.getName());
+                checkCreatable(action, c);
+                ref1 = c;
+            }
+        );
+    }
+
+    static Future<DBAction> createRef() async {
+        return DBAction(
+            title: 'Create Ref',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = Creatable(name: NameUtil.getName(), ref: ref1);
+                checkCreatable(action, c);
+                ref2 = c;
+            }
+        );
+    }
+
+    static Future<DBAction> createRefColl() async {
+        return DBAction(
+            title: 'Create Ref Coll',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = Creatable(name: NameUtil.getName(), refColl: [ref1, ref2]);
+                checkCreatable(action, c);
+                ref3 = c;
+            }
+        );
+    }
+
+    static Future<DBAction> createChild() async {
+        return DBAction(
+            title: 'Create Child',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = Creatable(
+                    name: NameUtil.getName(), 
+                    child: NonCreatable(name: NameUtil.getName()),
+                );
+                checkCreatable(action, c);
+                ref4 = c;
+            }
+        );
+    }
+
+    static Future<DBAction> createChildColl() async {
+        return DBAction(
+            title: 'Create Child Coll',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = Creatable(
+                    name: NameUtil.getName(), 
+                    childColl: [
+                        NonCreatable(name: NameUtil.getName()),
+                        NonCreatable(name: NameUtil.getName()),
+                        NonCreatable(name: NameUtil.getName()),
+                    ]
+                );
+                checkCreatable(action, c);
+                ref5 = c;
+            }
+        );
+    }
+
+    static Future<DBAction> createEmb() async {
+        return DBAction(
+            title: 'Create Emb',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = Creatable(
+                    name: NameUtil.getName(), 
+                    emb: Embedded(embName: NameUtil.getName())
+                );
+                checkCreatable(action, c);
+                ref6 = c;
+            }
+        );
+    }
+
+    static Future<DBAction> createFile() async {
+        return DBAction(
+            title: 'Create File',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                DFile file = DFile();
+                file.name = NameUtil.getFileName();
+                file.size = 123;
+                Creatable c = Creatable(
+                    name: NameUtil.getName(), 
+                    file: file
+                );
+                checkCreatable(action, c);
+                ref7 = c;
+            }
+        );
+    }
+
+    static Future<DBAction> updateBasic() async {
+        return DBAction(
+            title: 'Update Basic',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = ref1;
+                c.name = NameUtil.getName();
+                checkCreatable(action, c);
+            }
+        );
+    }
+
+    static Future<DBAction> updateRef() async {
+        return DBAction(
+            title: 'Update Ref',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = ref2;
+                c.ref = ref4;
+                checkCreatable(action, c);
+            }
+        );
+    }
+
+    static Future<DBAction> updateRefColl() async {
+        return DBAction(
+            title: 'Update Ref Coll',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = ref3;
+                c.refColl = [ref2, ref4];
+                checkCreatable(action, c);
+            }
+        );
+    }
+
+    static Future<DBAction> updateChild() async {
+        return DBAction(
+            title: 'Update Child',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = ref4;
+                c.child = NonCreatable(name: NameUtil.getName());
+                checkCreatable(action, c);
+            }
+        );
+    }
+
+    static Future<DBAction> updateChildColl() async {
+        return DBAction(
+            title: 'Update Child Coll',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = ref5;
+                c.childColl.removeLast();
+                c.addToChildColl(NonCreatable(name: NameUtil.getName()));
+                checkCreatable(action, c);
+            }
+        );
+    }
+
+    static Future<DBAction> updateEmb() async {
+        return DBAction(
+            title: 'Update Emb',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                Creatable c = ref6;
+                c.emb = Embedded(embName: NameUtil.getName());
+                checkCreatable(action, c);
+            }
+        );
+    }
+
+    static Future<DBAction> updateFile() async {
+        return DBAction(
+            title: 'Update File',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                DFile newFile = DFile();
+                newFile.name = NameUtil.getFileName();
+                newFile.size = 234;
+                Creatable c = ref7;
+                c.file = newFile;
+                checkCreatable(action, c);
+            }
+        );
+    }
+
+    static Future<DBAction> deleteBasic() async {
+        return DBAction(
+            title: 'Delete Basic',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                checkDelete(action, ref1);
+            }
+        );
+    }
+
+    static Future<DBAction> deleteRef() async {
+        return DBAction(
+            title: 'Delete Ref',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                action.success = true;
+            }
+        );
+    }
+
+    static Future<DBAction> deleteRefColl() async {
+        return DBAction(
+            title: 'Delete Ref Coll',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                checkDelete(action, ref3);
+                checkDelete(action, ref2);
+            }
+        );
+    }
+
+    static Future<DBAction> deleteChild() async {
+        return DBAction(
+            title: 'Delete Child',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                checkDelete(action, ref4);
+            }
+        );
+    }
+
+    static Future<DBAction> deleteChildColl() async {
+        return DBAction(
+            title: 'Delete Child Coll',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                checkDelete(action, ref5);
+            }
+        );
+    }
+
+    static Future<DBAction> deleteEmb() async {
+        return DBAction(
+            title: 'Delete Emb',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                checkDelete(action, ref6);
+            }
+        );
+    }
+
+    static Future<DBAction> deleteFile() async {
+        return DBAction(
+            title: 'Delete File',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                checkDelete(action, ref7);
+            }
+        );
+    }
+
+    static Future<DBAction> deleteAll() async {
+        return DBAction(
+            title: 'Delete All',
+            exe: (a) {
+                DBAction action = a as DBAction;
+                action.success = true;
+            }
+        );
+    }
+}

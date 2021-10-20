@@ -16,8 +16,4 @@ class NameUtil {
 
     return name;
   }
-
-  static void setIndex(int idx) {
-    NameUtil._idx = idx;
-  }
 }

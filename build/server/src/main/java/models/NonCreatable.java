@@ -82,8 +82,10 @@ public class NonCreatable extends DatabaseObject {
       emb = new Embedded();
     }
     this.emb = emb;
-    this.emb.setMasterNonCreatable(this);
-    this.emb._setChildIdx(_EMB);
+    if (this.emb != null) {
+      this.emb.setMasterNonCreatable(this);
+      this.emb._setChildIdx(_EMB);
+    }
   }
 
   public Creatable getMasterCreatable() {

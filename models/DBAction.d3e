@@ -1,0 +1,29 @@
+(Struct DBAction{
+    properties [
+        (title {
+            type ({
+                primitive String
+            })
+        })
+        (actionRun {
+            type ({
+                primitive Boolean
+            })
+        })
+        (success {
+            type ({
+                primitive Boolean
+            })
+        })
+        (error {
+            type ({
+                primitive String
+            })
+        })
+        (exe {
+            type ({
+                cls #Consumer
+            })
+        })
+    ]
+})

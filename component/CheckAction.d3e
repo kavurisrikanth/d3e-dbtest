@@ -1,0 +1,121 @@
+(Component CheckAction{
+    properties [
+        (action {
+            type ({
+                struct #DBAction
+            })
+        })
+    ]
+    build (CRef col {
+        component #Column
+        data [
+            ({
+                prop #mainAxisAlignment
+                value 'center'
+            })
+            ({
+                prop #vscroll
+                value 'true'
+            })
+        ]
+        children [
+            (CRef row {
+                component #Column
+                data [
+                    ({
+                        prop #mainAxisAlignment
+                        value 'center'
+                    })
+                    ({
+                        prop #vscroll
+                        value 'true'
+                    })
+                ]
+                children [
+                    (CRef title {
+                        component #Button
+                        child (CRef id {
+                            component #TextView
+                            data [
+                                ({
+                                    prop #data
+                                    bind true
+                                    bindTo `action.title`
+                                })
+                            ]
+                            style #label
+                        })
+                    })
+                    (CIf id {
+                        condition `action.actionRun && !action.success`
+                        then (CRef row {
+                            component #Row
+                            data [
+                                ({
+                                    prop #mainAxisAlignment
+                                    value 'center'
+                                })
+                                ({
+                                    prop #hscroll
+                                    value 'true'
+                                })
+                            ]
+                            children [
+                                (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            bind true
+                                            bindTo `action.error`
+                                        })
+                                    ]
+                                    style #errorMessage
+                                })
+                            ]
+                        })
+                    })
+                    (CIf id {
+                        condition `action.actionRun && action.success`
+                        then (CRef row {
+                            component #Row
+                            data [
+                                ({
+                                    prop #mainAxisAlignment
+                                    value 'center'
+                                })
+                                ({
+                                    prop #hscroll
+                                    value 'true'
+                                })
+                            ]
+                            children [
+                                (CRef id {
+                                    component #TextView
+                                    data [
+                                        ({
+                                            prop #data
+                                            value 'Success'
+                                        })
+                                    ]
+                                    style #successMessage
+                                })
+                            ]
+                        })
+                    })
+                ]
+            })
+        ]
+    })
+    
+    eventHandlers [
+        (runAction {
+            type OnEvent
+            on #title
+            event #onPressed
+            block ```
+               action.exe(action);
+            ```
+        })
+    ]
+})

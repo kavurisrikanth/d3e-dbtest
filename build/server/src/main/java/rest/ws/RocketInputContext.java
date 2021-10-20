@@ -69,10 +69,14 @@ public class RocketInputContext {
 		DField<?, ?>[] fields = tt.getFields();
 		int i = tt.getParentClientCount();
 		for (DField df : fields) {
-			// D3ELogger.info("w field: " + i + " " + df.getName());
-			msg.writeInt(i++);
 			FieldType ft = df.getType();
 			Object val = df.getValue(obj);
+			if(df.getReference() != null && df.getReference().isEmbedded() && val == null) {
+				i++;
+				continue;
+			}
+			// D3ELogger.info("w field: " + i + " " + df.getName());
+			msg.writeInt(i++);
 			if (val == null) {
 				// D3ELogger.info("w null: ");
 				msg.writeInt(-1);

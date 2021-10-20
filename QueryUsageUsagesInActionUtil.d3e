@@ -1,0 +1,25 @@
+(QueryUsage ActionUtil_checkCreatable_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'ActionUtil'
+        'checkCreatable'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})
+
+(QueryUsage ActionUtil_checkDelete_Query_loadCreatable {
+    query [
+        'Query'
+        'loadCreatable'
+        'ActionUtil'
+        'checkDelete'
+    ]
+    model #Creatable
+    usage [
+        '*'
+    ]
+})

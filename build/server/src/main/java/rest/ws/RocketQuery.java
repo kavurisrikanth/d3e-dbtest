@@ -83,11 +83,6 @@ public class RocketQuery extends AbstractRocketQuery {
         }
       case "getCreatableById":
         {
-          if (currentUser instanceof AnonymousUser) {
-            throw new ValidationFailedException(
-                MutateResultStatus.AuthFail,
-                ListExt.asList("Current user does not have read permissions for this model."));
-          }
           OutObject one = gqlToSql.execute("Creatable", field, ctx.readLong());
           if (subscribed) {
             OutObjectTracker tracker = new OutObjectTracker(dataChangeTracker, session, field);

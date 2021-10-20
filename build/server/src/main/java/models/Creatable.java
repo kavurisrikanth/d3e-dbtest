@@ -177,8 +177,10 @@ public class Creatable extends CreatableObject {
     }
     fieldChanged(_CHILD, this.child);
     this.child = child;
-    this.child.setMasterCreatable(this);
-    this.child._setChildIdx(_CHILD);
+    if (this.child != null) {
+      this.child.setMasterCreatable(this);
+      this.child._setChildIdx(_CHILD);
+    }
   }
 
   public List<NonCreatable> getChildColl() {
@@ -224,8 +226,10 @@ public class Creatable extends CreatableObject {
       emb = new Embedded();
     }
     this.emb = emb;
-    this.emb.setMasterCreatable(this);
-    this.emb._setChildIdx(_EMB);
+    if (this.emb != null) {
+      this.emb.setMasterCreatable(this);
+      this.emb._setChildIdx(_EMB);
+    }
   }
 
   public boolean isIsBasic() {

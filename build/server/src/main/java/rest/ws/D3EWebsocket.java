@@ -531,8 +531,13 @@ public class D3EWebsocket extends BinaryWebSocketHandler implements WebSocketCon
 				writeCompleteList(msg, template, (List) val, f);
 //				}
 			} else {
-				msg.writeInt(cidx);
 				Object val = f.getValue(object);
+				if(f.getReference() != null && f.getReference().isEmbedded()) {
+					if(val == null) {
+						return;
+					}
+				}
+				msg.writeInt(cidx);
 				writeChangeVal(msg, template, f, val);
 			}
 		});

@@ -56,8 +56,10 @@ public class Avatar extends DatabaseObject {
       image = new D3EImage();
     }
     this.image = image;
-    this.image.setMasterAvatar(this);
-    this.image._setChildIdx(_IMAGE);
+    if (this.image != null) {
+      this.image.setMasterAvatar(this);
+      this.image._setChildIdx(_IMAGE);
+    }
   }
 
   public String getCreateFrom() {
