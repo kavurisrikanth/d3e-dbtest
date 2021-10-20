@@ -16,6 +16,7 @@ import rest.JSONInputContext;
 import store.DatabaseObject;
 import store.EntityHelper;
 import store.EntityHelperService;
+import store.IEntityManager;
 
 public class DocumentFlatSqlColumn implements ISqlColumn {
 
@@ -57,7 +58,7 @@ public class DocumentFlatSqlColumn implements ISqlColumn {
 	}
 
 	@Override
-	public void extractDeepFields(EntityManager em, IModelSchema schema, int type, List<OutObject> rows)
+	public void extractDeepFields(IEntityManager em, IModelSchema schema, int type, List<OutObject> rows)
 			throws Exception {
 		EntityHelperService instance = EntityHelperService.getInstance();
 		DModel<?> dm = schema.getType(type);

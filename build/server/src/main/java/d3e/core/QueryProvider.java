@@ -2,7 +2,6 @@ package d3e.core;
 
 import classes.Creatables;
 import classes.LoginResult;
-import java.util.Optional;
 import javax.annotation.PostConstruct;
 import lists.CreatablesImpl;
 import models.AnonymousUser;
@@ -50,18 +49,15 @@ public class QueryProvider {
   }
 
   public AnonymousUser getAnonymousUserById(long id) {
-    Optional<AnonymousUser> findById = anonymousUserRepository.findById(id);
-    return findById.orElse(null);
+    return anonymousUserRepository.findById(id);
   }
 
   public Creatable getCreatableById(long id) {
-    Optional<Creatable> findById = creatableRepository.findById(id);
-    return findById.orElse(null);
+    return creatableRepository.findById(id);
   }
 
   public OneTimePassword getOneTimePasswordById(long id) {
-    Optional<OneTimePassword> findById = oneTimePasswordRepository.findById(id);
-    return findById.orElse(null);
+    return oneTimePasswordRepository.findById(id);
   }
 
   public boolean checkTokenUniqueInOneTimePassword(long oneTimePasswordId, String token) {

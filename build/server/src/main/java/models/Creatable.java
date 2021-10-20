@@ -17,7 +17,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import org.apache.solr.client.solrj.beans.Field;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.solr.core.mapping.ChildDocument;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import store.Database;
@@ -59,11 +58,7 @@ public class Creatable extends CreatableObject {
   private DFile file;
 
   @Field @ChildDocument @javax.persistence.Embedded private Embedded emb = new Embedded();
-
-  @Field
-  @ColumnDefault("false")
-  private boolean isBasic = false;
-
+  @Field private boolean isBasic = false;
   private transient Creatable old;
 
   @Override
@@ -131,6 +126,7 @@ public class Creatable extends CreatableObject {
   }
 
   public String getName() {
+    _checkProxy();
     return this.name;
   }
 
@@ -143,6 +139,7 @@ public class Creatable extends CreatableObject {
   }
 
   public Creatable getRef() {
+    _checkProxy();
     return this.ref;
   }
 
@@ -155,6 +152,7 @@ public class Creatable extends CreatableObject {
   }
 
   public List<Creatable> getRefColl() {
+    _checkProxy();
     return this.refColl;
   }
 
@@ -168,6 +166,7 @@ public class Creatable extends CreatableObject {
   }
 
   public NonCreatable getChild() {
+    _checkProxy();
     return this.child;
   }
 
@@ -184,6 +183,7 @@ public class Creatable extends CreatableObject {
   }
 
   public List<NonCreatable> getChildColl() {
+    _checkProxy();
     return this.childColl;
   }
 
@@ -202,6 +202,7 @@ public class Creatable extends CreatableObject {
   }
 
   public DFile getFile() {
+    _checkProxy();
     return this.file;
   }
 
@@ -214,6 +215,7 @@ public class Creatable extends CreatableObject {
   }
 
   public Embedded getEmb() {
+    _checkProxy();
     return this.emb;
   }
 
@@ -233,6 +235,7 @@ public class Creatable extends CreatableObject {
   }
 
   public boolean isIsBasic() {
+    _checkProxy();
     return this.isBasic;
   }
 

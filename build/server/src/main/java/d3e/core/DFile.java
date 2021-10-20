@@ -10,6 +10,8 @@ public class DFile {
     @Id
     private String id;
     private long size;
+    private transient boolean notSaved = true;
+
     private String mimeType;
     
     public String getId() {
@@ -34,6 +36,14 @@ public class DFile {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public void _markSaved() {
+    	this.notSaved = false;
+    }
+    
+    public boolean _isNotSaved() {
+    	return notSaved;
     }
     
     public String getMimeType() {

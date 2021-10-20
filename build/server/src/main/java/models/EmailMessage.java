@@ -101,6 +101,7 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<String> getBcc() {
+    _checkProxy();
     return this.bcc;
   }
 
@@ -114,6 +115,7 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<String> getCc() {
+    _checkProxy();
     return this.cc;
   }
 
@@ -127,6 +129,7 @@ public class EmailMessage extends D3EMessage {
   }
 
   public String getSubject() {
+    _checkProxy();
     return this.subject;
   }
 
@@ -139,6 +142,7 @@ public class EmailMessage extends D3EMessage {
   }
 
   public boolean isHtml() {
+    _checkProxy();
     return this.html;
   }
 
@@ -151,6 +155,7 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<DFile> getInlineAttachments() {
+    _checkProxy();
     return this.inlineAttachments;
   }
 
@@ -164,6 +169,7 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<DFile> getAttachments() {
+    _checkProxy();
     return this.attachments;
   }
 

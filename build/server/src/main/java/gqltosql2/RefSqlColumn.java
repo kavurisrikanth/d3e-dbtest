@@ -5,11 +5,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
 import org.json.JSONException;
 
 import gqltosql.schema.IModelSchema;
+import store.IEntityManager;
 
 public class RefSqlColumn implements ISqlColumn {
 
@@ -64,7 +63,7 @@ public class RefSqlColumn implements ISqlColumn {
 	}
 
 	@Override
-	public void extractDeepFields(EntityManager em, IModelSchema schema, int type, List<OutObject> rows)
+	public void extractDeepFields(IEntityManager em, IModelSchema schema, int type, List<OutObject> rows)
 			throws Exception {
 		sub.executeSubQuery(em, (t) -> rows.stream().map(o -> {
 			try {

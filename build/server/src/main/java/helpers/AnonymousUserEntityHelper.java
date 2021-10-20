@@ -48,7 +48,7 @@ public class AnonymousUserEntityHelper<T extends AnonymousUser> extends UserEnti
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) anonymousUserRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) anonymousUserRepository.findById(id));
   }
 
   @Override

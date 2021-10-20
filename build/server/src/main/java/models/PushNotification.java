@@ -54,6 +54,7 @@ public class PushNotification extends CreatableObject {
   }
 
   public List<String> getDeviceTokens() {
+    _checkProxy();
     return this.deviceTokens;
   }
 
@@ -67,6 +68,7 @@ public class PushNotification extends CreatableObject {
   }
 
   public String getTitle() {
+    _checkProxy();
     return this.title;
   }
 
@@ -79,6 +81,7 @@ public class PushNotification extends CreatableObject {
   }
 
   public String getBody() {
+    _checkProxy();
     return this.body;
   }
 
@@ -91,6 +94,7 @@ public class PushNotification extends CreatableObject {
   }
 
   public String getPath() {
+    _checkProxy();
     return this.path;
   }
 

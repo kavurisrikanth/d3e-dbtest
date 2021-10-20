@@ -83,4 +83,12 @@ public class Database {
 	public static void collectCollctionCreatableReferences(List<Object> _refs, List<? extends DatabaseObject> coll) {
 		coll.forEach(o -> collectCreatableReferences(_refs, o));
 	}
+
+	public void unproxy(DatabaseObject obj) {
+		mutator.unproxy(obj);
+	}
+
+	public void unproxyCollection(D3EPersistanceList<?> list) {
+		mutator.unproxyCollection(list);
+	}
 }

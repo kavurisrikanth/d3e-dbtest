@@ -115,7 +115,7 @@ public class OneTimePasswordEntityHelper<T extends OneTimePassword> implements E
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) oneTimePasswordRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) oneTimePasswordRepository.findById(id));
   }
 
   @Override

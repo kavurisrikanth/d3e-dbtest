@@ -54,6 +54,7 @@ public class ReportConfigOption extends DatabaseObject {
   }
 
   public String getIdentity() {
+    _checkProxy();
     return this.identity;
   }
 
@@ -66,6 +67,7 @@ public class ReportConfigOption extends DatabaseObject {
   }
 
   public String getValue() {
+    _checkProxy();
     return this.value;
   }
 

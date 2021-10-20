@@ -43,6 +43,17 @@ public abstract class DBObject {
 	public Map<Integer, Object> _oldValues() {
 		return _oldValues;
 	}
+	
+	public DatabaseObject _masterObject() {
+		return null;
+	}
+	
+	protected void _checkProxy() {
+		DatabaseObject master = _masterObject();
+		if(master != null) {
+			master._checkProxy();
+		}
+	}
 
 	public void fieldChanged(int field, Object oldValue) {
 		this._changes.set(field);

@@ -57,7 +57,7 @@ public class UserSessionEntityHelper<T extends UserSession> implements EntityHel
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) userSessionRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) userSessionRepository.findById(id));
   }
 
   @Override

@@ -45,6 +45,7 @@ public class Embedded extends DBObject implements ICloneable {
   public void updateMasters(Consumer<DatabaseObject> visitor) {}
 
   public String getEmbName() {
+    _checkProxy();
     return this.embName;
   }
 

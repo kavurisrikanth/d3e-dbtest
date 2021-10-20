@@ -4,6 +4,5 @@
     package 'D3EDBTest'
     targets [
         JavaBackEnd
-        FlutterFrontEnd
     ]
 })

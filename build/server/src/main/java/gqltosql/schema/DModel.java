@@ -113,6 +113,11 @@ public class DModel<T> {
 	public boolean isTransient() {
 		return checkFlag(TRANSIENT);
 	}
+	
+	public boolean isNormal() {
+		return checkFlag(NORMAL);
+	}
+
 
 	public String getTableName() {
 		return table;
@@ -173,21 +178,31 @@ public class DModel<T> {
 		return ins.get();
 	}
 
-	public <R> void addEnum(String name, int index, String column, int enumClss, Function<T, R> getter,
+	public <R> DField<T,R> addEnum(String name, int index, String column, int enumClss, Function<T, R> getter,
 			BiConsumer<T, R> setter) {
-		DPrimField<T, R> df = new DPrimField<T, R>(this, index, name, column, FieldPrimitiveType.Enum, getter, setter);
+		DPrimField<T, R> df = new DPrimField<T, R>(this, index, name, column, FieldPrimitiveType.Enum, getter, setter, null);
 		df.setEnumType(enumClss);
 		addField(df);
+		return df;
 	}
 
-	public <R> void addPrimitive(String name, int index, String column, FieldPrimitiveType primType,
-			Function<T, R> getter, BiConsumer<T, R> setter) {
-		addField(new DPrimField<T, R>(this, index, name, column, primType, getter, setter));
+	public <R> DField<T, R> addPrimitive(String name, int index, String column, FieldPrimitiveType primType,
+	    Function<T, R> getter, BiConsumer<T, R> setter) {
+	  	return addPrimitive(name, index, column, primType, getter, setter, null);
+	}
+	
+	public <R> DField<T, R> addPrimitive(String name, int index, String column, FieldPrimitiveType primType,
+			Function<T, R> getter, BiConsumer<T, R> setter, Function<T, R> def) {
+		DPrimField<T, R> field = new DPrimField<T, R>(this, index, name, column, primType, getter, setter, def);
+		addField(field);
+		return field;
 	}
 
-	public <R> void addReference(String name, int index, String column, boolean child, DModel<?> ref,
+	public <R> DField<T, R> addReference(String name, int index, String column, boolean child, DModel<?> ref,
 			Function<T, R> getter, BiConsumer<T, R> setter) {
-		addField(new DRefField<T, R>(this, index, name, column, child, ref, getter, setter));
+		DRefField<T, R> field = new DRefField<T, R>(this, index, name, column, child, ref, getter, setter);
+		addField(field);
+		return field;
 	}
 
 	public <R> void addReference(String name, int index, String column, boolean child, DModel<?> ref,

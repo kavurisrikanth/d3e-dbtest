@@ -3,13 +3,12 @@ package gqltosql2;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import org.json.JSONException;
 
 import gqltosql.schema.DField;
 import gqltosql.schema.IModelSchema;
 import rest.JSONInputContext;
+import store.IEntityManager;
 
 public class DocumentSqlColumn implements ISqlColumn {
 
@@ -38,7 +37,7 @@ public class DocumentSqlColumn implements ISqlColumn {
 	}
 
 	@Override
-	public void extractDeepFields(EntityManager em, IModelSchema schema, int type, List<OutObject> rows)
+	public void extractDeepFields(IEntityManager em, IModelSchema schema, int type, List<OutObject> rows)
 			throws Exception {
 		if (doNotRead) {
 			return;

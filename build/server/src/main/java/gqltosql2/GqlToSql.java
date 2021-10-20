@@ -6,21 +6,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-
 import d3e.core.SetExt;
 import gqltosql.schema.DField;
 import gqltosql.schema.DFlatField;
 import gqltosql.schema.DModel;
 import gqltosql.schema.DModelType;
 import gqltosql.schema.IModelSchema;
+import store.D3EEntityManagerProvider;
 
 public class GqlToSql {
 
 	private IModelSchema schema;
-	private EntityManager em;
+	private D3EEntityManagerProvider em;
 
-	public GqlToSql(EntityManager em, IModelSchema schema) {
+	public GqlToSql(D3EEntityManagerProvider em, IModelSchema schema) {
 		this.em = em;
 		this.schema = schema;
 	}
@@ -38,7 +37,7 @@ public class GqlToSql {
 			ids.add(id);
 			byId.put(id, obj);
 		}
-		OutObjectList result = sqlNode.executeQuery(em, ids, byId);
+		OutObjectList result = sqlNode.executeQuery(em.get(), ids, byId);
 		return result;
 	}
 
@@ -54,7 +53,7 @@ public class GqlToSql {
 	public OutObjectList execute(DModel<?> type, Field field, Set<Long> ids) {
 		try {
 			SqlAstNode sqlNode = prepareSqlNode(field.getSelections(), type);
-			OutObjectList result = sqlNode.executeQuery(em, ids, new HashMap<>());
+			OutObjectList result = sqlNode.executeQuery(em.get(), ids, new HashMap<>());
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();

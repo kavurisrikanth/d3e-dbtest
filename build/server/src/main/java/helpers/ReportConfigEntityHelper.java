@@ -75,7 +75,7 @@ public class ReportConfigEntityHelper<T extends ReportConfig> implements EntityH
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) reportConfigRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) reportConfigRepository.findById(id));
   }
 
   @Override

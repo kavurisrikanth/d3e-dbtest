@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import org.apache.solr.client.solrj.beans.Field;
-import org.hibernate.annotations.Type;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import store.DatabaseObject;
 import store.ICloneable;
@@ -16,11 +15,7 @@ import store.ICloneable;
 @Entity
 public abstract class UserSession extends CreatableObject {
   public static final int _USERSESSIONID = 0;
-
-  @Field
-  @NotNull
-  @Type(type = "text")
-  private String userSessionId;
+  @Field @NotNull private String userSessionId;
 
   @Override
   public int _typeIdx() {
@@ -42,6 +37,7 @@ public abstract class UserSession extends CreatableObject {
   }
 
   public String getUserSessionId() {
+    _checkProxy();
     return this.userSessionId;
   }
 

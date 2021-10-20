@@ -8,16 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import d3e.core.CloneContext;
-import d3e.core.D3ELogger;
 import d3e.core.DFile;
 import d3e.core.TransactionManager;
 import models.CreatableObject;
@@ -32,37 +26,37 @@ public class DBEntityMutator implements EntityMutator {
 		private final Map<DatabaseObject, DatabaseObject> clones = new HashMap<>();
 		private ValidationContextImpl context;
 		private Set<DatabaseObject> externalObjects = new HashSet<>();
-		private List<Object> persistObjects = new ArrayList<>();
-		private List<Object> removeObjects = new ArrayList<>();
+		private List<DatabaseObject> persistObjects = new ArrayList<>();
+		private List<DatabaseObject> removeObjects = new ArrayList<>();
 		private List<Object> actionsDone = new ArrayList<>();
 		private List<DFile> persistFiles = new ArrayList<>();
 	}
 
-	private final EntityManager manager;
+	private final D3EEntityManagerProvider manager;
 
 	private ObjectFactory<EntityHelperService> helperService;
 
 	static ThreadLocal<Context> threadLocalMutator = new ThreadLocal<>();
 
 	@Autowired
-	public DBEntityMutator(EntityManager manager, ObjectFactory<EntityHelperService> helperService) {
+	public DBEntityMutator(D3EEntityManagerProvider manager, ObjectFactory<EntityHelperService> helperService) {
 		this.manager = manager;
 		this.helperService = helperService;
 	}
 
 	@Override
 	public void markDirty(DatabaseObject obj) {
-		if(!obj._isEntity()) {
-			if(obj.getId() == 0l || obj.isOld) {
+		if (!obj._isEntity()) {
+			if (obj.getId() == 0l || obj.isOld) {
 				return;
 			}
 			TransactionManager tm = TransactionManager.get();
-			if(tm != null && !obj.transientModel()) {
-				tm.update(obj);				
+			if (tm != null && !obj.transientModel()) {
+				tm.update(obj);
 			}
 			return;
 		}
-		if(obj.isNew()) {
+		if (obj.isNew()) {
 			return;
 		}
 		Context ctx = threadLocalMutator.get();
@@ -87,20 +81,27 @@ public class DBEntityMutator implements EntityMutator {
 		return findMaster((DatabaseObject) _masterObject);
 	}
 
-	@Transactional
+	@Override
+	public void unproxy(DatabaseObject obj) {
+		manager.get().unproxy(obj);
+	}
+	
+
+	@Override
+	public void unproxyCollection(D3EPersistanceList<?> list) {
+		manager.get().unproxyCollection(list);
+	}
+
 	public void save(DatabaseObject obj, boolean internal) {
 		saveOrUpdate(obj, internal);
 	}
 
-	@Transactional
 	public void update(DatabaseObject obj, boolean internal) {
 		saveOrUpdate(obj, internal);
 	}
 
-	@Transactional
 	public void saveOrUpdate(DatabaseObject obj, boolean internal) {
 		boolean created = createContextIfNotExist();
-		D3ELogger.info("Create/Update: " + Hibernate.getClass(obj).getSimpleName() + " : " + obj.getId());
 		Context ctx = getContext();
 		if (ctx.deleteQueue.contains(obj)) {
 			return;
@@ -127,8 +128,6 @@ public class DBEntityMutator implements EntityMutator {
 			}
 			List<Object> refs = new ArrayList<>();
 			obj.collectCreatableReferences(refs);
-			refs.stream().filter(o -> o instanceof DFile).map(o -> (DFile) o).filter(o -> !ctx.persistFiles.contains(o))
-					.forEach(o -> ctx.persistFiles.add(o));
 			refs.stream().filter(o -> o instanceof DatabaseObject).filter(o -> !ctx.saveQueue.contains(o))
 					.map(o -> (DatabaseObject) o).filter(o -> isActionDone(ctx, o)).forEach(o -> ctx.dirtyQueue.add(o));
 			ctx.saveQueue.remove(obj);
@@ -149,7 +148,7 @@ public class DBEntityMutator implements EntityMutator {
 	@Override
 	public void preUpdate(DatabaseObject entity) {
 		EntityHelper<DatabaseObject> helper = (EntityHelper<DatabaseObject>) getHelper(
-				Hibernate.getClass(entity).getSimpleName());
+				entity.getClass().getSimpleName());
 		if (helper != null) {
 			Context ctx = getContext();
 			helper.setDefaults(entity);
@@ -189,10 +188,10 @@ public class DBEntityMutator implements EntityMutator {
 	public void preDelete(DatabaseObject entity) {
 		entity.setDeleted(true);
 		EntityHelper<DatabaseObject> helper = (EntityHelper<DatabaseObject>) getHelper(
-				Hibernate.getClass(entity).getSimpleName());
+				entity.getClass().getSimpleName());
 		Context ctx = getContext();
 		if (helper != null) {
-		  	helper.validateOnDelete(entity, ctx.context);
+			helper.validateOnDelete(entity, ctx.context);
 		}
 		if (ctx.context.hasErrors()) {
 			throw ValidationFailedException.fromValidationContext(ctx.context);
@@ -243,9 +242,10 @@ public class DBEntityMutator implements EntityMutator {
 				DatabaseObject db = (DatabaseObject) o;
 				db.saveStatus = DBSaveStatus.Saved;
 			});
-			ctx.persistFiles.forEach(o -> manager.persist(o));
-			ctx.persistObjects.forEach(o -> manager.persist(o));
-			ctx.removeObjects.stream().forEach(o -> manager.remove(o));
+			IEntityManager em = manager.get();
+			ctx.persistFiles.forEach(o -> em.persistFile(o));
+			ctx.persistObjects.forEach(o -> em.persist(o));
+			ctx.removeObjects.stream().forEach(o -> em.delete(o));
 			return true;
 		}
 		Set<DatabaseObject> dirtySet = new HashSet<>(ctx.dirtyQueue);
@@ -281,7 +281,6 @@ public class DBEntityMutator implements EntityMutator {
 		if (entity.isDeleted()) {
 			return false;
 		}
-		D3ELogger.info("Create/Update: " + Hibernate.getClass(entity).getSimpleName() + " : " + entity.getId());
 		Context ctx = getContext();
 		if (!internal) {
 			ctx.externalObjects.add(entity);
@@ -307,19 +306,17 @@ public class DBEntityMutator implements EntityMutator {
 		}
 	}
 
-	public <T extends DatabaseObject, H extends EntityHelper<T>> H getHelper(
-			String fullType) {
+	public <T extends DatabaseObject, H extends EntityHelper<T>> H getHelper(String fullType) {
 		return (H) this.helperService.getObject().get(fullType);
 	}
 
-	public <T extends DatabaseObject, H extends EntityHelper<T>> H getHelperByInstance(
-			Object fullType) {
-		return (H) this.helperService.getObject().get(Hibernate.getClass(fullType).getSimpleName());
+	public <T extends DatabaseObject, H extends EntityHelper<T>> H getHelperByInstance(Object fullType) {
+		return (H) this.helperService.getObject().get(fullType.getClass().getSimpleName());
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void processOnLoad(Object entity) {
-		EntityHelper helper = getHelper(Hibernate.getClass(entity).getSimpleName());
+		EntityHelper helper = getHelper(entity.getClass().getSimpleName());
 		Context ctx = getContext();
 		if (helper != null) {
 			if (ctx.clones.containsKey(entity)) {

@@ -58,6 +58,7 @@ public class NonCreatable extends DatabaseObject {
   }
 
   public String getName() {
+    _checkProxy();
     return this.name;
   }
 
@@ -70,6 +71,7 @@ public class NonCreatable extends DatabaseObject {
   }
 
   public Embedded getEmb() {
+    _checkProxy();
     return this.emb;
   }
 

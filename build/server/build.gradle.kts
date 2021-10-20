@@ -11,7 +11,7 @@ group = "D3EDBTest"
 version = "1.0-SNAPSHOT"
 dependencies {
    implementation("com.google.guava:guava:26.0-jre")
-   implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.1.6.RELEASE")
+   implementation("org.springframework.boot:spring-boot-starter-jdbc:2.1.6.RELEASE")
    implementation("org.springframework.boot:spring-boot-starter-data-solr:2.1.6.RELEASE")
    implementation("org.postgresql:postgresql:42.2.5")
    implementation("org.flywaydb:flyway-core:5.2.4")

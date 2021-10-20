@@ -29,4 +29,8 @@ public interface EntityMutator {
 	public void markDirty(DatabaseObject obj);
 
 	public boolean isInDelete(Object obj);
+
+	public void unproxy(DatabaseObject obj);
+
+	public void unproxyCollection(D3EPersistanceList<?> list);
 }

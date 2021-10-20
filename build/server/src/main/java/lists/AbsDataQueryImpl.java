@@ -11,59 +11,35 @@ import javax.persistence.TemporalType;
 import d3e.core.D3ELogger;
 import d3e.core.MapExt;
 import store.DatabaseObject;
+import store.QueryImplUtil;
 
 public abstract class AbsDataQueryImpl {
 	protected void setParameter(Query query, String name, DatabaseObject value) {
-		if (value == null) {
-			query.setParameter(name, 0l);
-		} else {
-			query.setParameter(name, value.getId());
-		}
+		QueryImplUtil.setParameter(query, name, value);
 	}
 
 	protected void setParameter(Query query, String name, Enum<?> value) {
-		if (value == null) {
-			query.setParameter(name, "");
-		} else {
-			query.setParameter(name, value.name());
-		}
+		QueryImplUtil.setParameter(query, name, value);
 	}
 
 	protected void setParameter(Query query, String name, Object value) {
-		query.setParameter(name, value);
+		QueryImplUtil.setParameter(query, name, value);
 	}
 
 	protected void setParameter(Query query, String name, LocalDate value) {
-		if(value == null) {
-			query.setParameter(name, (Date)null, TemporalType.DATE);
-		} else {
-			query.setParameter(name, value);
-			
-		}
+		QueryImplUtil.setParameter(query, name, value);
 	}
 	
 	protected void setParameter(Query query, String name, LocalDateTime value) {
-		if(value == null) {
-			query.setParameter(name, (Date)null, TemporalType.TIMESTAMP);
-		} else {
-			query.setParameter(name, value);
-		}
+		QueryImplUtil.setParameter(query, name, value);
 	}
 		
 	protected void setParameter(Query query, String name, LocalTime value) {
-		if(value == null) {
-			query.setParameter(name, (Date)null, TemporalType.TIME);
-		} else {
-			query.setParameter(name, value);
-		}
+		QueryImplUtil.setParameter(query, name, value);
 	}
 	
 	protected void setParameter(Query query, String name, String value) {
-		if (value == null) {
-			query.setParameter(name, "");
-			return;
-		}
-		query.setParameter(name, value);
+		QueryImplUtil.setParameter(query, name, value);
 	}
 	
 	protected void assertLimitNotNegative(long limit) {

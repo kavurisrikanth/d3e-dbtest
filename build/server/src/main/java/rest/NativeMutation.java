@@ -166,8 +166,7 @@ public class NativeMutation extends AbstractQueryService {
           ListExt.asList("Current user type does not have update permissions for this model."));
     }
     CreatableEntityHelper creatableHelper = this.mutator.getHelper("Creatable");
-    Creatable currentCreatable =
-        creatableRepository.findById(ctx.readLong("input", "id")).orElse(null);
+    Creatable currentCreatable = creatableRepository.findById(ctx.readLong("input", "id"));
     if (currentCreatable == null) {
       throw new ValidationFailedException(
           MutateResultStatus.BadRequest, ListExt.asList("Invalid ID."));
@@ -187,7 +186,7 @@ public class NativeMutation extends AbstractQueryService {
     }
     long gqlInputId = ctx.readLong("input");
     CreatableEntityHelper creatableHelper = this.mutator.getHelper("Creatable");
-    Creatable currentCreatable = creatableRepository.findById(gqlInputId).orElse(null);
+    Creatable currentCreatable = creatableRepository.findById(gqlInputId);
     if (currentCreatable == null) {
       throw new ValidationFailedException(
           MutateResultStatus.BadRequest, ListExt.asList("Invalid ID"));

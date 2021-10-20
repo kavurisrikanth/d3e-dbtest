@@ -44,6 +44,7 @@ public class Avatar extends DatabaseObject {
   }
 
   public D3EImage getImage() {
+    _checkProxy();
     return this.image;
   }
 
@@ -63,6 +64,7 @@ public class Avatar extends DatabaseObject {
   }
 
   public String getCreateFrom() {
+    _checkProxy();
     return this.createFrom;
   }
 

@@ -65,7 +65,7 @@ public class AvatarEntityHelper<T extends Avatar> implements EntityHelper<T> {
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) avatarRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) avatarRepository.findById(id));
   }
 
   @Override

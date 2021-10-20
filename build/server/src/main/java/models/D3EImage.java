@@ -9,7 +9,6 @@ import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import org.apache.solr.client.solrj.beans.Field;
-import org.hibernate.annotations.ColumnDefault;
 import store.DBObject;
 import store.DatabaseObject;
 import store.ICloneable;
@@ -20,18 +19,9 @@ public class D3EImage extends DBObject implements ICloneable {
   public static final int _WIDTH = 1;
   public static final int _HEIGHT = 2;
   public static final int _FILE = 3;
-
-  @Field
-  @ColumnDefault("0")
-  private long size = 0l;
-
-  @Field
-  @ColumnDefault("0")
-  private long width = 0l;
-
-  @Field
-  @ColumnDefault("0")
-  private long height = 0l;
+  @Field private long size = 0l;
+  @Field private long width = 0l;
+  @Field private long height = 0l;
 
   @Field
   @ManyToOne(fetch = FetchType.LAZY)
@@ -64,6 +54,7 @@ public class D3EImage extends DBObject implements ICloneable {
   public void updateMasters(Consumer<DatabaseObject> visitor) {}
 
   public long getSize() {
+    _checkProxy();
     return this.size;
   }
 
@@ -76,6 +67,7 @@ public class D3EImage extends DBObject implements ICloneable {
   }
 
   public long getWidth() {
+    _checkProxy();
     return this.width;
   }
 
@@ -88,6 +80,7 @@ public class D3EImage extends DBObject implements ICloneable {
   }
 
   public long getHeight() {
+    _checkProxy();
     return this.height;
   }
 
@@ -100,6 +93,7 @@ public class D3EImage extends DBObject implements ICloneable {
   }
 
   public DFile getFile() {
+    _checkProxy();
     return this.file;
   }
 

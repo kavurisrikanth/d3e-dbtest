@@ -76,7 +76,7 @@ public class ReportConfigOptionEntityHelper<T extends ReportConfigOption>
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) reportConfigOptionRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) reportConfigOptionRepository.findById(id));
   }
 
   @Override

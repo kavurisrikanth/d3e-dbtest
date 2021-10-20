@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import d3e.core.D3ELogger;
 import d3e.core.DFile;
 import d3e.core.SchemaConstants;
 import gqltosql.schema.DChannel;
@@ -33,7 +32,6 @@ public abstract class AbstractModelSchema implements IModelSchema{
 		addFields();
 		computeHierarchyTypes();
 		recordAllChannels();
-		D3ELogger.info("Schema Ready");
 	}
 	  
 	private void computeHierarchyTypes() {
@@ -106,7 +104,7 @@ public abstract class AbstractModelSchema implements IModelSchema{
 	        new DModel<>(enm.getSimpleName(), index, constants.length, 0, null, DModelType.ENUM);
 	    int idx = 0;
 	    for (Enum<?> e : constants) {
-	      dm.addPrimitive(e.name(), idx++, null, FieldPrimitiveType.Enum, (s) -> e, null);
+	      	dm.addPrimitive(e.name(), idx++, null, FieldPrimitiveType.Enum, (s) -> e, null, null);
 	    }
 	    addTable(dm);
 	}
@@ -124,13 +122,11 @@ public abstract class AbstractModelSchema implements IModelSchema{
 	protected void addDFileFields() {
 	    DModel<DFile> m = getType2("DFile");
 	    m.addPrimitive(
-	        "id", 0, "_id", FieldPrimitiveType.String, (s) -> s.getId(), (s, v) -> s.setId(v));
+	        "id", 0, "_id", FieldPrimitiveType.String, (s) -> s.getId(), (s, v) -> s.setId(v), null).notNull();
 	    m.addPrimitive(
-	        "name", 1, "_name", FieldPrimitiveType.String, (s) -> s.getName(), (s, v) -> s.setName(v));
+	        "name", 1, "_name", FieldPrimitiveType.String, (s) -> s.getName(), (s, v) -> s.setName(v), null);
 	    m.addPrimitive(
-	        "size", 2, "_size", FieldPrimitiveType.Integer, (s) -> s.getSize(), (s, v) -> s.setSize(v));
-	    m.addPrimitive(
-		        "mimeType", 2, "_mime_type", FieldPrimitiveType.String, (s) -> s.getSize(), (s, v) -> s.setSize(v));
+	        "size", 2, "_size", FieldPrimitiveType.Integer, (s) -> s.getSize(), (s, v) -> s.setSize(v), null).notNull();
 	}
 	  
 	protected void recordNumChannels(int num) {
@@ -157,5 +153,4 @@ public abstract class AbstractModelSchema implements IModelSchema{
 	public DChannel getChannel(String name) {
 	    return this.allChannels.get(name);
 	}
-	
 }

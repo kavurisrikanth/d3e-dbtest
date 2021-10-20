@@ -115,7 +115,7 @@ public class CreatableEntityHelper<T extends Creatable> implements EntityHelper<
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) creatableRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) creatableRepository.findById(id));
   }
 
   @Override

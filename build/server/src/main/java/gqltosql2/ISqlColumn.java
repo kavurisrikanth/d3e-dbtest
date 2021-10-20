@@ -3,9 +3,8 @@ package gqltosql2;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import gqltosql.schema.IModelSchema;
+import store.IEntityManager;
 
 public interface ISqlColumn {
 
@@ -17,5 +16,5 @@ public interface ISqlColumn {
 
 	void updateSubField(Map<Long, OutObject> parents, List<OutObject> all) throws Exception;
 
-	void extractDeepFields(EntityManager em, IModelSchema schema, int type, List<OutObject> rows) throws Exception;
+	void extractDeepFields(IEntityManager em, IModelSchema schema, int type, List<OutObject> rows) throws Exception;
 }

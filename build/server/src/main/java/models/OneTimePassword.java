@@ -11,7 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import org.apache.solr.client.solrj.beans.Field;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import store.DatabaseObject;
 import store.ICloneable;
@@ -31,11 +30,7 @@ public class OneTimePassword extends CreatableObject {
   @Field @NotNull private String input;
   @Field @NotNull private String inputType;
   @Field @NotNull private String userType;
-
-  @Field
-  @ColumnDefault("false")
-  private boolean success = false;
-
+  @Field private boolean success = false;
   @Field private String errorMsg;
   @Field private String token;
   @Field private String code;
@@ -66,6 +61,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public String getInput() {
+    _checkProxy();
     return this.input;
   }
 
@@ -78,6 +74,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public String getInputType() {
+    _checkProxy();
     return this.inputType;
   }
 
@@ -90,6 +87,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public String getUserType() {
+    _checkProxy();
     return this.userType;
   }
 
@@ -102,6 +100,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public boolean isSuccess() {
+    _checkProxy();
     return this.success;
   }
 
@@ -114,6 +113,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public String getErrorMsg() {
+    _checkProxy();
     return this.errorMsg;
   }
 
@@ -126,6 +126,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public String getToken() {
+    _checkProxy();
     return this.token;
   }
 
@@ -138,6 +139,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public String getCode() {
+    _checkProxy();
     return this.code;
   }
 
@@ -150,6 +152,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public User getUser() {
+    _checkProxy();
     return this.user;
   }
 
@@ -162,6 +165,7 @@ public class OneTimePassword extends CreatableObject {
   }
 
   public LocalDateTime getExpiry() {
+    _checkProxy();
     return this.expiry;
   }
 

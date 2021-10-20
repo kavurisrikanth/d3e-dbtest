@@ -3,9 +3,8 @@ package gqltosql2;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import gqltosql.schema.IModelSchema;
+import store.IEntityManager;
 
 public class SqlColumn implements ISqlColumn {
 
@@ -38,7 +37,7 @@ public class SqlColumn implements ISqlColumn {
 	}
 
 	@Override
-	public void extractDeepFields(EntityManager em, IModelSchema schema, int type, List<OutObject> rows)
+	public void extractDeepFields(IEntityManager em, IModelSchema schema, int type, List<OutObject> rows)
 			throws Exception {
 	}
 

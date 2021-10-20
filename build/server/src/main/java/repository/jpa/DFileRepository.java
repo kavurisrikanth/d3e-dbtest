@@ -1,10 +1,7 @@
 package repository.jpa;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
-import d3e.core.DFile;
-
-@Repository
-public interface DFileRepository extends JpaRepository<DFile, String> {
+@Service
+public class DFileRepository {
 }

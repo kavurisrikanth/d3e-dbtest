@@ -32,6 +32,7 @@ public class SMSMessage extends D3EMessage {
   }
 
   public String getDltTemplateId() {
+    _checkProxy();
     return this.dltTemplateId;
   }
 

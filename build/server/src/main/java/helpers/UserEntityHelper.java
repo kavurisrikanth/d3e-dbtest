@@ -52,7 +52,7 @@ public class UserEntityHelper<T extends User> implements EntityHelper<T> {
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) userRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) userRepository.findById(id));
   }
 
   @Override

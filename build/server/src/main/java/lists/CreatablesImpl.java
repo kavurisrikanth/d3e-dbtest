@@ -9,7 +9,6 @@ import gqltosql2.OutObjectList;
 import graphql.language.Field;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import models.Creatable;
 import org.json.JSONArray;
@@ -18,10 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rest.AbstractQueryService;
 import rest.ws.RocketQuery;
+import store.D3EEntityManagerProvider;
 
 @Service
 public class CreatablesImpl extends AbsDataQueryImpl {
-  @Autowired private EntityManager em;
+  @Autowired private D3EEntityManagerProvider em;
   @Autowired private GqlToSql gqlToSql;
   @Autowired private gqltosql2.GqlToSql gqlToSql2;
 
@@ -33,7 +33,7 @@ public class CreatablesImpl extends AbsDataQueryImpl {
   public Creatables getAsStruct(List<NativeObj> rows) {
     List<Creatable> result = new ArrayList<>();
     for (NativeObj _r1 : rows) {
-      result.add(NativeSqlUtil.get(em, _r1.getRef(0), Creatable.class));
+      result.add(NativeSqlUtil.get(em.get(), _r1.getRef(0), SchemaConstants.Creatable));
     }
     Creatables wrap = new Creatables();
     wrap.setItems(result);
@@ -77,7 +77,7 @@ public class CreatablesImpl extends AbsDataQueryImpl {
 
   public List<NativeObj> getNativeResult() {
     String sql = "select a._id a0 from _creatable a";
-    Query query = em.createNativeQuery(sql);
+    Query query = em.get().createNativeQuery(sql);
     this.logQuery(sql, query);
     List<NativeObj> result = NativeSqlUtil.createNativeObj(query.getResultList(), 0);
     return result;

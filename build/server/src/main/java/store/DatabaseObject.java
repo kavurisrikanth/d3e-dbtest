@@ -1,10 +1,7 @@
 package store;
 
-import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -16,8 +13,6 @@ import d3e.core.CloneContext;
 @MappedSuperclass
 public abstract class DatabaseObject extends DBObject implements ICloneable {
 
-	@javax.persistence.Id
-	@javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
 	protected long id;
 
 	public transient boolean isOld;
@@ -53,6 +48,8 @@ public abstract class DatabaseObject extends DBObject implements ICloneable {
 	protected DBSaveStatus saveStatus = DBSaveStatus.New;
 	private transient boolean isInConvert;
 	private transient boolean loaded;
+
+	private transient boolean proxy;
 
 	public DatabaseObject() {
 	}
@@ -142,9 +139,9 @@ public abstract class DatabaseObject extends DBObject implements ICloneable {
 
 	public boolean isNew() {
 		if(_isEntity()) {
-			return !loaded || id == 0;
+			return !loaded || id == 0 || saveStatus == DBSaveStatus.New;
 		}
-		return id == 0;
+		return id == 0 || saveStatus == DBSaveStatus.New;
 	}
 
 	public void setNew(boolean isNew) {
@@ -260,6 +257,14 @@ public abstract class DatabaseObject extends DBObject implements ICloneable {
 	public void collectCreatableReferences(List<Object> _refs) {
 	}
 
+	public DBSaveStatus getSaveStatus() {
+    return this.saveStatus;
+  }
+
+  public void setSaveStatus(DBSaveStatus ss) {
+    this.saveStatus = ss;
+  }
+	
 	public boolean _isEntity() {
 		return false;
 	}
@@ -274,5 +279,16 @@ public abstract class DatabaseObject extends DBObject implements ICloneable {
 	}
 	
 	protected void _handleChildChange(int _childIdx) {
+	}
+
+	protected void _checkProxy() {
+		if(this.proxy) {
+			Database.get().unproxy(this);
+			this.proxy = false;
+		}
+	}
+	
+	public void _markProxy() {
+		this.proxy = true;
 	}
 }

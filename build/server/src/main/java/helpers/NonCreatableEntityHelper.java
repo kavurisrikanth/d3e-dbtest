@@ -71,7 +71,7 @@ public class NonCreatableEntityHelper<T extends NonCreatable> implements EntityH
 
   @Override
   public T getById(long id) {
-    return id == 0l ? null : ((T) nonCreatableRepository.findById(id).orElse(null));
+    return id == 0l ? null : ((T) nonCreatableRepository.findById(id));
   }
 
   @Override

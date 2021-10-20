@@ -152,7 +152,7 @@ public class RocketQuery extends AbstractRocketQuery {
       loginResult.setFailureMessage("Invalid code.");
       return loginResult;
     }
-    User user = ((User) org.hibernate.Hibernate.unproxy(otp.getUser()));
+    User user = otp.getUser();
     if (user == null) {
       loginResult.setSuccess(false);
       loginResult.setFailureMessage("Invalid user.");

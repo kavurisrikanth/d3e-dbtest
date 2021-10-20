@@ -8,8 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import org.apache.solr.client.solrj.beans.Field;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.Type;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import store.DatabaseObject;
 import store.ICloneable;
@@ -20,14 +18,8 @@ import store.ICloneable;
 public abstract class User extends CreatableObject {
   public static final int _ISACTIVE = 0;
   public static final int _DEVICETOKEN = 1;
-
-  @Field
-  @ColumnDefault("false")
-  private boolean isActive = false;
-
-  @Field
-  @Type(type = "text")
-  private String deviceToken;
+  @Field private boolean isActive = false;
+  @Field private String deviceToken;
 
   @Override
   public int _typeIdx() {
@@ -49,6 +41,7 @@ public abstract class User extends CreatableObject {
   }
 
   public boolean isIsActive() {
+    _checkProxy();
     return this.isActive;
   }
 
@@ -61,6 +54,7 @@ public abstract class User extends CreatableObject {
   }
 
   public String getDeviceToken() {
+    _checkProxy();
     return this.deviceToken;
   }
 

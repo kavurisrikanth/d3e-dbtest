@@ -14,6 +14,7 @@ import org.json.JSONException;
 import d3e.core.D3ELogger;
 import gqltosql.schema.DModel;
 import gqltosql.schema.IModelSchema;
+import store.IEntityManager;
 
 public class SqlAstNode {
 
@@ -85,21 +86,22 @@ public class SqlAstNode {
 	public boolean isEmpty() {
 		return tables.values().stream().allMatch(t -> t.getColumns().isEmpty());
 	}
-	
+
 	public void selectColumns(SqlQueryContext ctx) {
-		if(isEmpty()) {
+		if (isEmpty()) {
 			ctx.subType(type);
 			return;
 		}
 		SqlQueryContext typeCtx = ctx.subType(getType());
 		DModel<?> dModel = schema.getType(type);
-		if(!dModel.isEmbedded() && dModel.getAllTypes().length > 1) {
+		if (!dModel.isEmbedded() && dModel.getAllTypes().length > 1) {
 			StringBuilder b = new StringBuilder();
 			b.append("(case");
 			int[] allTypes = findAllTypes(type);
 			for (int x = allTypes.length - 1; x >= 0; x--) {
 				int t = allTypes[x];
-				b.append(" when ").append(ctx.getTableAlias(String.valueOf(t))).append("._id is not null then ").append(t);
+				b.append(" when ").append(ctx.getTableAlias(String.valueOf(t))).append("._id is not null then ")
+						.append(t);
 			}
 			b.append(" else -1 end)");
 			typeCtx.addSelection(b.toString(), "__typeindex");
@@ -121,7 +123,7 @@ public class SqlAstNode {
 		return schema.getType(type).getAllTypes();
 	}
 
-	public OutObjectList executeQuery(EntityManager em, Set<Long> ids, Map<Long, OutObject> byId) throws Exception {
+	public OutObjectList executeQuery(IEntityManager em, Set<Long> ids, Map<Long, OutObject> byId) throws Exception {
 		if (ids.isEmpty()) {
 			return new OutObjectList();
 		}
@@ -145,7 +147,7 @@ public class SqlAstNode {
 		return result;
 	}
 
-	public void executeSubQuery(EntityManager em, Function<Integer, List<OutObject>> listSupplier) throws Exception {
+	public void executeSubQuery(IEntityManager em, Function<Integer, List<OutObject>> listSupplier) throws Exception {
 		for (Map.Entry<Integer, SqlTable> e : tables.entrySet()) {
 			Integer type = e.getKey();
 			SqlTable table = e.getValue();

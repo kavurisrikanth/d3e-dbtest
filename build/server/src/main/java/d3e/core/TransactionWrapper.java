@@ -2,16 +2,14 @@ package d3e.core;
 
 import java.io.IOException;
 
-import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.UnexpectedRollbackException;
 
-import classes.ClassUtils;
+import store.D3EEntityManagerProvider;
 import store.DataStoreEvent;
-import store.DatabaseObject;
 
 @Component
 public class TransactionWrapper {
@@ -23,12 +21,15 @@ public class TransactionWrapper {
 	private TransactionDeligate deligate;
 
 	@Autowired
-	private EntityManager entityManager;
+	private D3EEntityManagerProvider managerProvider;
 
 	public void doInTransaction(TransactionDeligate.ToRun run) throws ServletException, IOException {
 		boolean created = createTransactionManager();
 		boolean success = false;
 		try {
+			if (created) {
+				managerProvider.create();
+			}
 			deligate.run(run);
 			if (created) {
 				publishEvents();
@@ -50,6 +51,9 @@ public class TransactionWrapper {
 				TransactionManager.remove();
 			}
 		}
+		if (created) {
+			managerProvider.clear();
+		}
 	}
 
 	private void publishEvents() throws ServletException, IOException {
@@ -59,15 +63,6 @@ public class TransactionWrapper {
 			createTransactionManager();
 			manager.commit((type, entity) -> {
 				try {
-					if (entity instanceof DatabaseObject) {
-						DatabaseObject db = (DatabaseObject) entity;
-						if (db._isEntity()) {
-							entity = refresh(db);
-							db.updateMasters(o -> {
-								refresh(o);
-							});
-						}
-					}
 					DataStoreEvent event = new DataStoreEvent(entity);
 					event.setType(type);
 					subscription.handleContextStart(event);
@@ -80,19 +75,6 @@ public class TransactionWrapper {
 		if (!TransactionManager.get().isEmpty()) {
 			publishEvents();
 		}
-	}
-
-	private DatabaseObject refresh(DatabaseObject obj) {
-		if(!obj._isEntity()) {
-			return obj;
-		}
-		DatabaseObject load = (DatabaseObject) entityManager.find(ClassUtils.getClass(obj), obj.getId());
-		if(load == null) {
-			return obj;
-		}
-		load.setOld(obj.getOld());
-		load._updateChanges(obj);
-		return load;
 	}
 
 	private boolean createTransactionManager() {

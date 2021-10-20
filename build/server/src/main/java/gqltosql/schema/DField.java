@@ -9,6 +9,7 @@ public abstract class DField<T, R> {
 	private String collTable;
 	private String mappedByColumn;
 	private DModel<T> decl;
+	private boolean notNull;
 
 	public DField(DModel<T> decl, int index, String name, String column) {
 		this.decl = decl;
@@ -68,6 +69,15 @@ public abstract class DField<T, R> {
 	@Override
 	public String toString() {
 		return name;
+	}
+	
+	public boolean isNotNull() {
+		return notNull;
+	}
+
+	public DField<?, ?> notNull() {
+		this.notNull = true;
+		return this;
 	}
 
 	public abstract Object getValue(T _this);

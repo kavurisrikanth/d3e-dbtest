@@ -184,7 +184,7 @@ public class NativeQuery extends AbstractQueryService {
       loginResult.put("loginResult", "Wrong password.");
       return loginResult;
     }
-    User user = ((User) org.hibernate.Hibernate.unproxy(otp.getUser()));
+    User user = otp.getUser();
     if (user == null) {
       loginResult.put("success", false);
       loginResult.put("loginResult", "Wrong password.");

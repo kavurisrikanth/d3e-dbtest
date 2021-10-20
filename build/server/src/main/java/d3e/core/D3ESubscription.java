@@ -12,7 +12,6 @@ import models.OneTimePassword;
 import models.User;
 import models.UserSession;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.transaction.event.TransactionalEventListener;
 import store.DataStoreEvent;
 
 @org.springframework.stereotype.Service
@@ -28,7 +27,6 @@ public class D3ESubscription implements FlowableOnSubscribe<DataStoreEvent> {
   }
 
   @Async
-  @TransactionalEventListener
   public void handleContextStart(DataStoreEvent event) {
     this.emitter.onNext(event);
   }

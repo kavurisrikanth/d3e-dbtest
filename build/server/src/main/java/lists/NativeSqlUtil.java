@@ -11,8 +11,6 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +19,7 @@ import gqltosql.SqlRow;
 import gqltosql2.OutObject;
 import gqltosql2.OutObjectList;
 import store.DatabaseObject;
+import store.IEntityManager;
 
 public class NativeSqlUtil {
 
@@ -99,17 +98,17 @@ public class NativeSqlUtil {
 		return list;
 	}
 
-	public static <T> List<T> getList(EntityManager em, List<NativeObj> listRef, Class<T> cls) {
+	public static <T> List<T> getList(IEntityManager em, List<NativeObj> listRef, int type) {
 		List<T> res = new ArrayList<T>();
-		listRef.forEach(r -> res.add(em.getReference(cls, r.getId())));
+		listRef.forEach(r -> res.add(em.find(type, r.getId())));
 		return res;
 	}
 
-	public static <T> T get(EntityManager em, NativeObj ref, Class<T> cls) {
+	public static <T> T get(IEntityManager em, NativeObj ref, int type) {
 		if (ref == null) {
 			return null;
 		}
-		return em.getReference(cls, ref.getId());
+		return em.find(type, ref.getId());
 	}
 
 	public static <R> List<NativeObj> groupBy(List<NativeObj> rows, Function<NativeObj, R> groupBy,

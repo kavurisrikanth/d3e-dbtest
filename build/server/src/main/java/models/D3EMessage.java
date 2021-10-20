@@ -55,6 +55,7 @@ public abstract class D3EMessage extends CreatableObject {
   }
 
   public String getFrom() {
+    _checkProxy();
     return this.from;
   }
 
@@ -67,6 +68,7 @@ public abstract class D3EMessage extends CreatableObject {
   }
 
   public List<String> getTo() {
+    _checkProxy();
     return this.to;
   }
 
@@ -80,6 +82,7 @@ public abstract class D3EMessage extends CreatableObject {
   }
 
   public String getBody() {
+    _checkProxy();
     return this.body;
   }
 
@@ -92,6 +95,7 @@ public abstract class D3EMessage extends CreatableObject {
   }
 
   public LocalDateTime getCreatedOn() {
+    _checkProxy();
     return this.createdOn;
   }
 
