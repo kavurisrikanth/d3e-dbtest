@@ -404,39 +404,47 @@ class _PopupOverlay extends StatelessWidget {
           return Container(
               color: Color(0xFFFFFFFF),
               height: query.size.height - query.padding.top,
-              child: Scrollbar(child: popUpchild));
+              child: Scrollbar(
+                  child: popUpchild, isAlwaysShown: false, thickness: 0.0));
         }
       case PopUpPosition.Right:
         {
           return Container(
               color: Color(0xFFFFFFFF),
               height: query.size.height - query.padding.top,
-              child: Scrollbar(child: popUpchild));
+              child: Scrollbar(
+                  child: popUpchild, isAlwaysShown: false, thickness: 0.0));
         }
       case PopUpPosition.Top:
         {
           return Container(
               color: Color(0xFFFFFFFF),
               width: query.size.width,
-              child: Scrollbar(child: popUpchild));
+              child: Scrollbar(
+                  child: popUpchild, isAlwaysShown: false, thickness: 0.0));
         }
       case PopUpPosition.Bottom:
         {
           return Container(
               color: Color(0xFFFFFFFF),
               width: query.size.width,
-              child: Scrollbar(child: popUpchild));
+              child: Scrollbar(
+                  child: popUpchild, isAlwaysShown: false, thickness: 0.0));
         }
       case PopUpPosition.Positioned:
         {
           return Container(
-              color: Color(0xFFFFFFFF), child: Scrollbar(child: popUpchild));
+              color: Color(0xFFFFFFFF),
+              child: Scrollbar(
+                  child: popUpchild, isAlwaysShown: false, thickness: 0.0));
         }
       default:
         {}
     }
     return Container(
-        color: Color(0xFFFFFFFF), child: Scrollbar(child: popUpchild));
+        color: Color(0xFFFFFFFF),
+        child:
+            Scrollbar(child: popUpchild, isAlwaysShown: false, thickness: 0.0));
   }
 }
 

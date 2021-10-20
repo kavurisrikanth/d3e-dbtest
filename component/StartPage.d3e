@@ -6,15 +6,9 @@
             })
             internal true
         })
-        (creatable {
+        (hasError {
             type ({
-                model #Creatable
-            })
-            internal true
-        })
-        (nonCreatable {
-            type ({
-                model #NonCreatable
+                primitive Boolean
             })
             internal true
         })
@@ -92,77 +86,80 @@
                     })
                 ]
             })
-            (CRef row {
-                component #Row
-                data [
-                    ({
-                        prop #mainAxisAlignment
-                        value 'center'
-                    })
-                    ({
-                        prop #hscroll
-                        value 'true'
-                    })
-                ]
-                children [
-                    (CRef id {
-                        component #TextView
-                        data [
-                            ({
-                                prop #data
-                                value 'Creatable: '
-                            })
-                        ]
-                        style #heading1
-                    })
-                    (CRef id {
-                        component #TextView
-                        data [
-                            ({
-                                prop #data
-                                bind true
-                                bindTo `DisplayUtil.displayCreatable(this.creatable)`
-                            })
-                        ]
-                        style #label
-                    })
-                ]
-            })
-            (CRef row {
-                component #Row
-                data [
-                    ({
-                        prop #mainAxisAlignment
-                        value 'center'
-                    })
-                    ({
-                        prop #hscroll
-                        value 'true'
-                    })
-                ]
-                children [
-                    (CRef id {
-                        component #TextView
-                        data [
-                            ({
-                                prop #data
-                                value 'Message: '
-                            })
-                        ]
-                        style #heading1
-                    })
-                    (CRef id {
-                        component #TextView
-                        data [
-                            ({
-                                prop #data
-                                bind true
-                                bindTo `(this.message == null || this.message.length == 0) ? 'No Message' : this.message`
-                            })
-                        ]
-                        style #label
-                    })
-                ]
+            (CIf id {
+                condition `this.hasError`
+                then (CRef row {
+                    component #Row
+                    data [
+                        ({
+                            prop #mainAxisAlignment
+                            value 'center'
+                        })
+                        ({
+                            prop #hscroll
+                            value 'true'
+                        })
+                    ]
+                    children [
+                        (CRef id {
+                            component #TextView
+                            data [
+                                ({
+                                    prop #data
+                                    value 'Message: '
+                                })
+                            ]
+                            style #errorMessage
+                        })
+                        (CRef id {
+                            component #TextView
+                            data [
+                                ({
+                                    prop #data
+                                    bind true
+                                    bindTo `(this.message == null || this.message.length == 0) ? 'No Message' : this.message`
+                                })
+                            ]
+                            style #errorMessage
+                        })
+                    ]
+                })
+                else (CRef row {
+                    component #Row
+                    data [
+                        ({
+                            prop #mainAxisAlignment
+                            value 'center'
+                        })
+                        ({
+                            prop #hscroll
+                            value 'true'
+                        })
+                    ]
+                    children [
+                        (CRef id {
+                            component #TextView
+                            data [
+                                ({
+                                    prop #data
+                                    value 'Message: '
+                                })
+                            ]
+                            style #successMessage
+                        })
+                        (CRef id {
+                            component #TextView
+                            data [
+                                ({
+                                    prop #data
+                                    bind true
+                                    bindTo `(this.message == null || this.message.length == 0) ? 'No Message' : this.message`
+                                })
+                            ]
+                            style #successMessage
+                        })
+                    ]
+                })
             })
             (CRef id {
                 component #Row
@@ -511,10 +508,17 @@
     eventHandlers [
         (onInit {
             block ```
+                ElementUtils.removeInitialLoader();
                 NameUtil.setIndex(this.allCreatables.length);
                 NameUtil.getName();
                 NameUtil.getFileName();
                 this.allCreatables.firstWhere((c) => c.isBasic);
+            ```
+        })
+        (reset {
+            block ```
+                this.message = null;
+                this.hasError = false;
             ```
         })
         (createBasic {
@@ -522,14 +526,19 @@
             on #basicC
             event #onPressed
             block ```
+                reset();
                 Creatable c = EventUtil.createBasic().await;
                 if (c != null) {
-                    String message = 'Creatable creation success';
                     Creatable fromDb = Query.loadCreatable(c).await;
-                    this.message = message;
-                    this.creatable = fromDb;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
                     this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -538,12 +547,19 @@
             on #cWithRef
             event #onPressed
             block ```
-                Creatable ref = EventUtil.createRef().await;
-                if (ref != null) {
-                    this.message = 'Reference creation success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.createRef().await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Reference creation failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -552,12 +568,19 @@
             on #cWithRefColl
             event #onPressed
             block ```
+                reset();
                 Creatable c = EventUtil.createRefColl().await;
                 if (c != null) {
-                    this.message = 'Reference creation success.';
-                    this.creatable = Query.loadCreatable(c).await;
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Reference creation failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -566,12 +589,19 @@
             on #cWithChild
             event #onPressed
             block ```
-                Creatable ref = EventUtil.createChild().await;
-                if (ref != null) {
-                    this.message = 'With Child creation success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.createChild().await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'With Child creation failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -580,12 +610,19 @@
             on #cWithChildColl
             event #onPressed
             block ```
+                reset();
                 Creatable c = EventUtil.createChildColl().await;
                 if (c != null) {
-                    this.message = 'With child collection creation success.';
-                    this.creatable = Query.loadCreatable(c).await;
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'With child collection creation failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -594,12 +631,19 @@
             on #cWithEmb
             event #onPressed
             block ```
-                Creatable ref = EventUtil.createEmb().await;
-                if (ref != null) {
-                    this.message = 'With Embedded creation success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.createEmb().await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'With Embedded creation failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -608,12 +652,19 @@
             on #cWithFile
             event #onPressed
             block ```
-                Creatable ref = EventUtil.createFile().await;
-                if (ref != null) {
-                    this.message = 'With File creation success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.createFile().await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'With File creation failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -623,14 +674,19 @@
             on #uBasic
             event #onPressed
             block ```
-                Creatable obj = EventUtil.updateBasic(this.allCreatables).await;
-                if (obj != null) {
-                    String message = 'Creatable update success';
-                    Creatable fromDb = Query.loadCreatable(obj).await;
-                    this.message = message;
-                    this.creatable = fromDb;
+                reset();
+                Creatable c = EventUtil.updateBasic(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable update failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -639,12 +695,19 @@
             on #uWithRef
             event #onPressed
             block ```
-                Creatable ref = EventUtil.updateRef(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable update with ref success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.updateRef(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable update with ref failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -653,12 +716,19 @@
             on #uWithRefColl
             event #onPressed
             block ```
-                Creatable ref = EventUtil.updateRefColl(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable update with ref collection success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.updateRefColl(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable update with ref collection failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -667,12 +737,19 @@
             on #uWithChild
             event #onPressed
             block ```
-                Creatable ref = EventUtil.updateChild(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable update with child success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.updateChild(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable update with child failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -681,12 +758,19 @@
             on #uWithChildColl
             event #onPressed
             block ```
-                Creatable ref = EventUtil.updateChildColl(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable update with child collection success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.updateChildColl(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable update with child collection failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -695,12 +779,19 @@
             on #uWithEmb
             event #onPressed
             block ```
-                Creatable ref = EventUtil.updateEmb(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable update with embedded success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.updateEmb(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable update with embedded failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -709,12 +800,19 @@
             on #uWithFile
             event #onPressed
             block ```
-                Creatable ref = EventUtil.updateFile(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable update with file success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.updateFile(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable update with file failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -724,14 +822,19 @@
             on #dBasic
             event #onPressed
             block ```
-                Creatable obj = EventUtil.deleteBasic(this.allCreatables).await;
-                if (obj != null) {
-                    String message = 'Creatable delete success';
-                    Creatable fromDb = Query.loadCreatable(obj).await;
-                    this.message = message;
-                    this.creatable = fromDb;
+                reset();
+                Creatable c = EventUtil.deleteBasic(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable delete failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -740,12 +843,19 @@
             on #dWithRef
             event #onPressed
             block ```
-                Creatable ref = EventUtil.deleteRef(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable delete with ref success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.deleteRef(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable delete with ref failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -754,12 +864,19 @@
             on #dWithRefColl
             event #onPressed
             block ```
-                Creatable ref = EventUtil.deleteRefColl(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable delete with ref collection success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.deleteRefColl(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable delete with ref collection failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -768,12 +885,19 @@
             on #dWithChild
             event #onPressed
             block ```
-                Creatable ref = EventUtil.deleteChild(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable delete with child success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.deleteChild(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable delete with child failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -782,12 +906,19 @@
             on #dWithChildColl
             event #onPressed
             block ```
-                Creatable ref = EventUtil.deleteChildColl(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable delete with child collection success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.deleteChildColl(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable delete with child collection failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -796,12 +927,19 @@
             on #dWithEmb
             event #onPressed
             block ```
-                Creatable ref = EventUtil.deleteEmb(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable delete with embedded success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.deleteEmb(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable delete with embedded failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })
@@ -810,12 +948,19 @@
             on #dWithFile
             event #onPressed
             block ```
-                Creatable ref = EventUtil.deleteFile(this.allCreatables).await;
-                if (ref != null) {
-                    this.message = 'Creatable delete with file success.';
-                    this.creatable = Query.loadCreatable(ref).await;
+                reset();
+                Creatable c = EventUtil.deleteFile(this.allCreatables).await;
+                if (c != null) {
+                    Creatable fromDb = Query.loadCreatable(c).await;
+                    if (EqualsUtil.checkCreatable(c, fromDb)) {
+                        this.message = 'Creatable creation success';
+                    } else {
+                        this.message = 'Equals check failed for ' + DisplayUtil.displayCreatable(c) + ' and ' + DisplayUtil.displayCreatable(fromDb);
+                        this.hasError = true;
+                    }
                 } else {
-                    this.message = 'Creatable delete with file failed.';
+                    this.message = 'Creatable creation failed.';
+                    this.hasError = true;
                 }
             ```
         })

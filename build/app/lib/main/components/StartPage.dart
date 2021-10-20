@@ -1,11 +1,12 @@
 import '../utils/ObservableState.dart';
 import '../classes/Creatables.dart';
 import '../classes/DisplayUtil.dart';
+import '../classes/ElementUtils.dart';
+import '../classes/EqualsUtil.dart';
 import '../classes/EventUtil.dart';
 import '../classes/NameUtil.dart';
 import '../classes/Query.dart';
 import '../models/Creatable.dart';
-import '../models/NonCreatable.dart';
 import '../rocket/MessageDispatch.dart';
 import '../rocket/Template.dart';
 import '../utils/CollectionUtils.dart';
@@ -22,8 +23,7 @@ class StartPage extends StatefulWidget {
 
 class _StartPageState extends ObservableState<StartPage> {
   String _message = '';
-  Creatable _creatable;
-  NonCreatable _nonCreatable;
+  bool _hasError = false;
   Creatables _creatables;
   List<Creatable> _allCreatables = [];
   @override
@@ -44,25 +44,7 @@ class _StartPageState extends ObservableState<StartPage> {
 
     computeAllCreatables();
 
-    this.on([
-      'allCreatables',
-      'creatable',
-      'creatable.child',
-      'creatable.child.emb',
-      'creatable.child.emb.embName',
-      'creatable.child.name',
-      'creatable.childColl',
-      'creatable.childColl.emb',
-      'creatable.childColl.emb.embName',
-      'creatable.childColl.name',
-      'creatable.emb',
-      'creatable.emb.embName',
-      'creatable.file',
-      'creatable.name',
-      'creatable.ref',
-      'creatable.refColl',
-      'message'
-    ], rebuild);
+    this.on(['allCreatables', 'hasError', 'message'], rebuild);
   }
 
   String get message {
@@ -81,40 +63,20 @@ class _StartPageState extends ObservableState<StartPage> {
     this.fire('message', this);
   }
 
-  Creatable get creatable {
-    return _creatable;
+  bool get hasError {
+    return _hasError;
   }
 
-  void setCreatable(Creatable val) {
-    bool isValChanged = _creatable != val;
+  void setHasError(bool val) {
+    bool isValChanged = _hasError != val;
 
     if (!isValChanged) {
       return;
     }
 
-    updateObservable('creatable', _creatable, val);
+    _hasError = val;
 
-    _creatable = val;
-
-    this.fire('creatable', this);
-  }
-
-  NonCreatable get nonCreatable {
-    return _nonCreatable;
-  }
-
-  void setNonCreatable(NonCreatable val) {
-    bool isValChanged = _nonCreatable != val;
-
-    if (!isValChanged) {
-      return;
-    }
-
-    updateObservable('nonCreatable', _nonCreatable, val);
-
-    _nonCreatable = val;
-
-    this.fire('nonCreatable', this);
+    this.fire('hasError', this);
   }
 
   Creatables get creatables {
@@ -226,45 +188,52 @@ class _StartPageState extends ObservableState<StartPage> {
                                   fontSize: cStyle.tTextViewLabelFontSizeOn)))
                   ]),
               scrollDirection: Axis.vertical),
-          ScrollView2(
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Container(
-                    padding: cStyle.tTextViewHeading1PaddingOn,
-                    child: Text('Creatable: ',
-                        style: TextStyle(
-                            color: cStyle.tTextViewHeading1ColorOn,
-                            fontSize: cStyle.tTextViewHeading1FontSizeOn))),
-                Container(
-                    padding: cStyle.tTextViewLabelPaddingOn,
-                    child: Text(DisplayUtil.displayCreatable(this.creatable),
-                        textAlign: cStyle.tTextViewLabelTextAlignOn,
-                        style: TextStyle(
-                            color: cStyle.tTextViewLabelColorOn,
-                            fontSize: cStyle.tTextViewLabelFontSizeOn)))
-              ]),
-              scrollDirection: Axis.horizontal),
-          ScrollView2(
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Container(
-                    padding: cStyle.tTextViewHeading1PaddingOn,
-                    child: Text('Message: ',
-                        style: TextStyle(
-                            color: cStyle.tTextViewHeading1ColorOn,
-                            fontSize: cStyle.tTextViewHeading1FontSizeOn))),
-                Container(
-                    padding: cStyle.tTextViewLabelPaddingOn,
-                    child: Text(
-                        (this.message == null || this.message.length == 0)
-                            ? 'No Message'
-                            : this.message,
-                        textAlign: cStyle.tTextViewLabelTextAlignOn,
-                        style: TextStyle(
-                            color: cStyle.tTextViewLabelColorOn,
-                            fontSize: cStyle.tTextViewLabelFontSizeOn)))
-              ]),
-              scrollDirection: Axis.horizontal),
+          if (this.hasError)
+            ScrollView2(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Container(
+                      padding: cStyle.tTextViewErrorMessagePaddingOn,
+                      child: Text('Message: ',
+                          textAlign: cStyle.tTextViewErrorMessageTextAlignOn,
+                          style: TextStyle(
+                              color: cStyle.tTextViewErrorMessageColorOn))),
+                  Container(
+                      padding: cStyle.tTextViewErrorMessagePaddingOn,
+                      child: Text(
+                          (this.message == null || this.message.length == 0)
+                              ? 'No Message'
+                              : this.message,
+                          textAlign: cStyle.tTextViewErrorMessageTextAlignOn,
+                          style: TextStyle(
+                              color: cStyle.tTextViewErrorMessageColorOn)))
+                ]),
+                scrollDirection: Axis.horizontal)
+          else
+            ScrollView2(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Container(
+                      padding: cStyle.tTextViewSuccessMessagePaddingOn,
+                      child: Text('Message: ',
+                          textAlign: cStyle.tTextViewSuccessMessageTextAlignOn,
+                          style: TextStyle(
+                              color: cStyle.tTextViewSuccessMessageColorOn,
+                              fontSize:
+                                  cStyle.tTextViewSuccessMessageFontSizeOn))),
+                  Container(
+                      padding: cStyle.tTextViewSuccessMessagePaddingOn,
+                      child: Text(
+                          (this.message == null || this.message.length == 0)
+                              ? 'No Message'
+                              : this.message,
+                          textAlign: cStyle.tTextViewSuccessMessageTextAlignOn,
+                          style: TextStyle(
+                              color: cStyle.tTextViewSuccessMessageColorOn,
+                              fontSize:
+                                  cStyle.tTextViewSuccessMessageFontSizeOn)))
+                ]),
+                scrollDirection: Axis.horizontal),
           ScrollView2(
               child:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -425,6 +394,8 @@ class _StartPageState extends ObservableState<StartPage> {
   }
 
   void onInit() {
+    ElementUtils.removeInitialLoader();
+
     NameUtil.setIndex(this.allCreatables.length);
 
     NameUtil.getName();
@@ -434,330 +405,597 @@ class _StartPageState extends ObservableState<StartPage> {
     this.allCreatables.firstWhere((c) => c.isBasic, orElse: () => null);
   }
 
+  void reset() {
+    this.setMessage(null);
+
+    this.setHasError(false);
+  }
+
   void createBasic() async {
+    reset();
+
     Creatable c = (await EventUtil.createBasic());
 
     if (c != null) {
-      String message = 'Creatable creation success';
-
       Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATEBASIC_BLOCK_QUERY_LOADCREATABLE,
           c.id));
 
-      this.setMessage(message);
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
 
-      this.setCreatable(fromDb);
+        this.setHasError(true);
+      }
     } else {
       this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void createRef() async {
-    Creatable ref = (await EventUtil.createRef());
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Reference creation success.');
+    Creatable c = (await EventUtil.createRef());
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATEREF_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Reference creation failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void createRefColl() async {
+    reset();
+
     Creatable c = (await EventUtil.createRefColl());
 
     if (c != null) {
-      this.setMessage('Reference creation success.');
-
-      this.setCreatable((await Query.get().getCreatableById(
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
-          c.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Reference creation failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void createChild() async {
-    Creatable ref = (await EventUtil.createChild());
+    reset();
 
-    if (ref != null) {
-      this.setMessage('With Child creation success.');
+    Creatable c = (await EventUtil.createChild());
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATECHILD_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('With Child creation failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void createChildColl() async {
+    reset();
+
     Creatable c = (await EventUtil.createChildColl());
 
     if (c != null) {
-      this.setMessage('With child collection creation success.');
-
-      this.setCreatable((await Query.get().getCreatableById(
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATECHILDCOLL_BLOCK_QUERY_LOADCREATABLE,
-          c.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('With child collection creation failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void createEmb() async {
-    Creatable ref = (await EventUtil.createEmb());
+    reset();
 
-    if (ref != null) {
-      this.setMessage('With Embedded creation success.');
+    Creatable c = (await EventUtil.createEmb());
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATEEMB_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('With Embedded creation failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void createFile() async {
-    Creatable ref = (await EventUtil.createFile());
+    reset();
 
-    if (ref != null) {
-      this.setMessage('With File creation success.');
+    Creatable c = (await EventUtil.createFile());
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_CREATEFILE_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('With File creation failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void updateBasic() async {
-    Creatable obj = (await EventUtil.updateBasic(this.allCreatables));
+    reset();
 
-    if (obj != null) {
-      String message = 'Creatable update success';
+    Creatable c = (await EventUtil.updateBasic(this.allCreatables));
 
+    if (c != null) {
       Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATEBASIC_BLOCK_QUERY_LOADCREATABLE,
-          obj.id));
+          c.id));
 
-      this.setMessage(message);
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
 
-      this.setCreatable(fromDb);
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable update failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void updateRef() async {
-    Creatable ref = (await EventUtil.updateRef(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable update with ref success.');
+    Creatable c = (await EventUtil.updateRef(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATEREF_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable update with ref failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void updateRefColl() async {
-    Creatable ref = (await EventUtil.updateRefColl(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable update with ref collection success.');
+    Creatable c = (await EventUtil.updateRefColl(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable update with ref collection failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void updateChild() async {
-    Creatable ref = (await EventUtil.updateChild(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable update with child success.');
+    Creatable c = (await EventUtil.updateChild(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATECHILD_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable update with child failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void updateChildColl() async {
-    Creatable ref = (await EventUtil.updateChildColl(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable update with child collection success.');
+    Creatable c = (await EventUtil.updateChildColl(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATECHILDCOLL_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable update with child collection failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void updateEmb() async {
-    Creatable ref = (await EventUtil.updateEmb(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable update with embedded success.');
+    Creatable c = (await EventUtil.updateEmb(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATEEMB_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable update with embedded failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void updateFile() async {
-    Creatable ref = (await EventUtil.updateFile(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable update with file success.');
+    Creatable c = (await EventUtil.updateFile(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_UPDATEFILE_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable update with file failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void deleteBasic() async {
-    Creatable obj = (await EventUtil.deleteBasic(this.allCreatables));
+    reset();
 
-    if (obj != null) {
-      String message = 'Creatable delete success';
+    Creatable c = (await EventUtil.deleteBasic(this.allCreatables));
 
+    if (c != null) {
       Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_DELETEBASIC_BLOCK_QUERY_LOADCREATABLE,
-          obj.id));
+          c.id));
 
-      this.setMessage(message);
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
 
-      this.setCreatable(fromDb);
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable delete failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void deleteRef() async {
-    Creatable ref = (await EventUtil.deleteRef(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable delete with ref success.');
+    Creatable c = (await EventUtil.deleteRef(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_DELETEREF_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable delete with ref failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void deleteRefColl() async {
-    Creatable ref = (await EventUtil.deleteRefColl(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable delete with ref collection success.');
+    Creatable c = (await EventUtil.deleteRefColl(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_DELETEREFCOLL_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable delete with ref collection failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void deleteChild() async {
-    Creatable ref = (await EventUtil.deleteChild(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable delete with child success.');
+    Creatable c = (await EventUtil.deleteChild(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_DELETECHILD_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable delete with child failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void deleteChildColl() async {
-    Creatable ref = (await EventUtil.deleteChildColl(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable delete with child collection success.');
+    Creatable c = (await EventUtil.deleteChildColl(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_DELETECHILDCOLL_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable delete with child collection failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void deleteEmb() async {
-    Creatable ref = (await EventUtil.deleteEmb(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable delete with embedded success.');
+    Creatable c = (await EventUtil.deleteEmb(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_DELETEEMB_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable delete with embedded failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 
   void deleteFile() async {
-    Creatable ref = (await EventUtil.deleteFile(this.allCreatables));
+    reset();
 
-    if (ref != null) {
-      this.setMessage('Creatable delete with file success.');
+    Creatable c = (await EventUtil.deleteFile(this.allCreatables));
 
-      this.setCreatable((await Query.get().getCreatableById(
+    if (c != null) {
+      Creatable fromDb = (await Query.get().getCreatableById(
           UsageConstants
               .STARTPAGE_EVENTHANDLERS_DELETEFILE_BLOCK_QUERY_LOADCREATABLE,
-          ref.id)));
+          c.id));
+
+      if (EqualsUtil.checkCreatable(c, fromDb)) {
+        this.setMessage('Creatable creation success');
+      } else {
+        this.setMessage('Equals check failed for ' +
+            DisplayUtil.displayCreatable(c) +
+            ' and ' +
+            DisplayUtil.displayCreatable(fromDb));
+
+        this.setHasError(true);
+      }
     } else {
-      this.setMessage('Creatable delete with file failed.');
+      this.setMessage('Creatable creation failed.');
+
+      this.setHasError(true);
     }
   }
 

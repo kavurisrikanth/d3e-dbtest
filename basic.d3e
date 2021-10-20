@@ -155,3 +155,69 @@
     ]
     theme #basic
 })
+
+(Style successMessage {
+    name 'SuccessMessage'
+    component #TextView
+    states [
+        ({
+            values [
+                ({
+                    prop #fontSize
+                    value '15.5'
+                })
+                ({
+                    prop #textAlign
+                    value 'center'
+                })
+                ({
+                    prop #color
+                    value '@c6'
+                })
+                ({
+                    prop #padding
+                    values [
+                        ({
+                            prop #bottom
+                            value '15.0'
+                        })
+                    ]
+                })
+            ]
+        })
+    ]
+    theme #basic
+})
+
+(Style errorMessage {
+    name 'ErrorMessage'
+    component #TextView
+    states [
+        ({
+            values [
+                ({
+                    prop #color
+                    value '@c7'
+                })
+                ({
+                    prop #textAlign
+                    value 'start'
+                })
+                ({
+                    prop #padding
+                    values [
+                        ({
+                            prop #top
+                            value '5.0'
+                        })
+                        ({
+                            prop #bottom
+                            value '5.0'
+                        })
+                    ]
+                })
+            ]
+        })
+    ]
+    theme #basic
+})

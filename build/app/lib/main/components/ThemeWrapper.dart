@@ -31,6 +31,13 @@ class StyleThemeData {
   final Color tTextViewLabelColorOn;
   final TextAlign tTextViewLabelTextAlignOn;
   final EdgeInsets tTextViewLabelPaddingOn;
+  final double tTextViewSuccessMessageFontSizeOn;
+  final TextAlign tTextViewSuccessMessageTextAlignOn;
+  final Color tTextViewSuccessMessageColorOn;
+  final EdgeInsets tTextViewSuccessMessagePaddingOn;
+  final Color tTextViewErrorMessageColorOn;
+  final TextAlign tTextViewErrorMessageTextAlignOn;
+  final EdgeInsets tTextViewErrorMessagePaddingOn;
   static StyleThemeData current;
   StyleThemeData(
       {this.themeName,
@@ -41,6 +48,13 @@ class StyleThemeData {
       this.tTextViewLabelColorOn,
       this.tTextViewLabelTextAlignOn,
       this.tTextViewLabelPaddingOn,
+      this.tTextViewSuccessMessageFontSizeOn,
+      this.tTextViewSuccessMessageTextAlignOn,
+      this.tTextViewSuccessMessageColorOn,
+      this.tTextViewSuccessMessagePaddingOn,
+      this.tTextViewErrorMessageColorOn,
+      this.tTextViewErrorMessageTextAlignOn,
+      this.tTextViewErrorMessagePaddingOn,
       this.c1,
       this.c2,
       this.c3,
@@ -71,6 +85,13 @@ class StyleThemeData {
         tTextViewLabelColorOn: Color(0xff2d2d50),
         tTextViewLabelTextAlignOn: TextAlign.start,
         tTextViewLabelPaddingOn: EdgeInsets.only(top: 5.0, bottom: 5.0),
+        tTextViewSuccessMessageFontSizeOn: 15.5,
+        tTextViewSuccessMessageTextAlignOn: TextAlign.center,
+        tTextViewSuccessMessageColorOn: Color(0xff00875a),
+        tTextViewSuccessMessagePaddingOn: EdgeInsets.only(bottom: 15.0),
+        tTextViewErrorMessageColorOn: Color(0xffc71306),
+        tTextViewErrorMessageTextAlignOn: TextAlign.start,
+        tTextViewErrorMessagePaddingOn: EdgeInsets.only(top: 5.0, bottom: 5.0),
         c1: Color(0xff16163a),
         c2: Color(0xfffe941e),
         c3: Color(0xffd7dde2),
