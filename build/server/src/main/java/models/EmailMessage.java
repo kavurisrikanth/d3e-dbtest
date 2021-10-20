@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.apache.solr.client.solrj.beans.Field;
+import store.D3EPersistanceList;
 import store.DatabaseObject;
 import store.ICloneable;
 
@@ -18,12 +19,12 @@ public class EmailMessage extends D3EMessage {
   public static final int _HTML = 7;
   public static final int _INLINEATTACHMENTS = 8;
   public static final int _ATTACHMENTS = 9;
-  @Field private List<String> bcc = new ArrayList<>();
-  @Field private List<String> cc = new ArrayList<>();
+  @Field private List<String> bcc = new D3EPersistanceList<>(this, _BCC);
+  @Field private List<String> cc = new D3EPersistanceList<>(this, _CC);
   @Field private String subject;
   @Field private boolean html = false;
-  @Field private List<DFile> inlineAttachments = new ArrayList<>();
-  @Field private List<DFile> attachments = new ArrayList<>();
+  @Field private List<DFile> inlineAttachments = new D3EPersistanceList<>(this, _INLINEATTACHMENTS);
+  @Field private List<DFile> attachments = new D3EPersistanceList<>(this, _ATTACHMENTS);
 
   @Override
   public int _typeIdx() {
@@ -101,7 +102,6 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<String> getBcc() {
-    _checkProxy();
     return this.bcc;
   }
 
@@ -115,7 +115,6 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<String> getCc() {
-    _checkProxy();
     return this.cc;
   }
 
@@ -155,7 +154,6 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<DFile> getInlineAttachments() {
-    _checkProxy();
     return this.inlineAttachments;
   }
 
@@ -169,7 +167,6 @@ public class EmailMessage extends D3EMessage {
   }
 
   public List<DFile> getAttachments() {
-    _checkProxy();
     return this.attachments;
   }
 

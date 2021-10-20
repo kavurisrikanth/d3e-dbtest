@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.apache.solr.client.solrj.beans.Field;
+import store.D3EPersistanceList;
 import store.DatabaseObject;
 import store.ICloneable;
 
@@ -15,7 +16,7 @@ public class PushNotification extends CreatableObject {
   public static final int _TITLE = 1;
   public static final int _BODY = 2;
   public static final int _PATH = 3;
-  @Field private List<String> deviceTokens = new ArrayList<>();
+  @Field private List<String> deviceTokens = new D3EPersistanceList<>(this, _DEVICETOKENS);
   @Field private String title;
   @Field private String body;
   @Field private String path;
@@ -54,7 +55,6 @@ public class PushNotification extends CreatableObject {
   }
 
   public List<String> getDeviceTokens() {
-    _checkProxy();
     return this.deviceTokens;
   }
 

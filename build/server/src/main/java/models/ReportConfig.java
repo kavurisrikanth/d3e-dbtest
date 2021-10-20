@@ -2,7 +2,6 @@ package models;
 
 import d3e.core.CloneContext;
 import d3e.core.SchemaConstants;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -14,6 +13,7 @@ import javax.persistence.OrderColumn;
 import javax.validation.constraints.NotNull;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.solr.core.mapping.ChildDocument;
+import store.D3EPersistanceList;
 import store.Database;
 import store.DatabaseObject;
 import store.ICloneable;
@@ -28,7 +28,7 @@ public class ReportConfig extends DatabaseObject {
   @ChildDocument
   @OrderColumn
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ReportConfigOption> values = new ArrayList<>();
+  private List<ReportConfigOption> values = new D3EPersistanceList<>(this, _VALUES);
 
   private transient ReportConfig old;
 
@@ -87,7 +87,6 @@ public class ReportConfig extends DatabaseObject {
   }
 
   public List<ReportConfigOption> getValues() {
-    _checkProxy();
     return this.values;
   }
 

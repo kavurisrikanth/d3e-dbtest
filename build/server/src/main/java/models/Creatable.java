@@ -19,6 +19,7 @@ import javax.persistence.OrderColumn;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.solr.core.mapping.ChildDocument;
 import org.springframework.data.solr.core.mapping.SolrDocument;
+import store.D3EPersistanceList;
 import store.Database;
 import store.DatabaseObject;
 import store.ICloneable;
@@ -40,7 +41,8 @@ public class Creatable extends CreatableObject {
   @ManyToOne(fetch = FetchType.LAZY)
   private Creatable ref;
 
-  @Field @OrderColumn @ManyToMany private List<Creatable> refColl = new ArrayList<>();
+  @Field @OrderColumn @ManyToMany
+  private List<Creatable> refColl = new D3EPersistanceList<>(this, _REFCOLL);
 
   @Field
   @ChildDocument
@@ -51,7 +53,7 @@ public class Creatable extends CreatableObject {
   @ChildDocument
   @OrderColumn
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<NonCreatable> childColl = new ArrayList<>();
+  private List<NonCreatable> childColl = new D3EPersistanceList<>(this, _CHILDCOLL);
 
   @Field
   @ManyToOne(fetch = FetchType.LAZY)
@@ -152,7 +154,6 @@ public class Creatable extends CreatableObject {
   }
 
   public List<Creatable> getRefColl() {
-    _checkProxy();
     return this.refColl;
   }
 
@@ -183,7 +184,6 @@ public class Creatable extends CreatableObject {
   }
 
   public List<NonCreatable> getChildColl() {
-    _checkProxy();
     return this.childColl;
   }
 

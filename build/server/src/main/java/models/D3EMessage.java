@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.apache.solr.client.solrj.beans.Field;
+import store.D3EPersistanceList;
 import store.DatabaseObject;
 import store.ICloneable;
 
@@ -17,7 +18,7 @@ public abstract class D3EMessage extends CreatableObject {
   public static final int _BODY = 2;
   public static final int _CREATEDON = 3;
   @Field private String from;
-  @Field private List<String> to = new ArrayList<>();
+  @Field private List<String> to = new D3EPersistanceList<>(this, _TO);
   @Field private String body;
   @Field private LocalDateTime createdOn;
 
@@ -68,7 +69,6 @@ public abstract class D3EMessage extends CreatableObject {
   }
 
   public List<String> getTo() {
-    _checkProxy();
     return this.to;
   }
 
