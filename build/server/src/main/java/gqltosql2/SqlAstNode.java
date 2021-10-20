@@ -37,7 +37,7 @@ public class SqlAstNode {
 	public SqlQueryContext createCtx() {
 		SqlQueryContext ctx = new SqlQueryContext(this, -1);
 		ctx.getQuery().setFrom(getTableName(), ctx.getFrom());
-		ctx.getQuery().addWhere(ctx.getFrom() + "._id in ?1");
+		ctx.getQuery().addWhere(ctx.getFrom() + "._id in (:ids)");
 		return ctx;
 	}
 
@@ -133,7 +133,7 @@ public class SqlAstNode {
 		String sql = query.createSQL();
 		D3ELogger.displaySql(getPath(), sql, ids);
 		Query q = em.createNativeQuery(sql);
-		q.setParameter(1, ids);
+		q.setParameter("ids", ids);
 		List<?> rows = q.getResultList();
 		QueryReader reader = query.getReader();
 		OutObjectList result = new OutObjectList();

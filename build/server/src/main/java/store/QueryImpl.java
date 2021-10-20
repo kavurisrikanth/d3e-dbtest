@@ -36,7 +36,12 @@ public class QueryImpl implements Query {
 
 		@Override
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-			throw new RuntimeException();
+			int cols = rs.getMetaData().getColumnCount();
+			Object[] arr = new Object[cols];
+			for (int i = 0; i < cols; i++) {
+				arr[i] = rs.getObject(i + 1);
+			}
+			return arr.length == 1 ? arr[0] : arr;
 		}
 
 	}
@@ -49,10 +54,10 @@ public class QueryImpl implements Query {
 	@Override
 	public Object getSingleResult() {
 		List list = getResultList();
-		if(list.isEmpty()) {
+		if (list.isEmpty()) {
 			throw new NoResultException();
 		}
-		if(list.size() > 1) {
+		if (list.size() > 1) {
 			throw new NonUniqueResultException();
 		}
 		return list.get(0);

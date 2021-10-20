@@ -39,13 +39,8 @@ public class D3EQueryBuilder {
 
 		if (index != SchemaConstants.DFile) {
 			// DFile has _id as part of its fields, so it will be covered in the below loop
-			// TODO: saveStatus
 			DatabaseObject asDbObj = (DatabaseObject) _this;
-
-			cols.add("_id");
-			params.add("?");
-			args.add(asDbObj.getId());
-
+			query.setObj(asDbObj);
 			cols.add("_save_status");
 			params.add("?");
 			args.add(asDbObj.getSaveStatus().ordinal());
@@ -64,6 +59,10 @@ public class D3EQueryBuilder {
 					DModel<?> ref = field.getReference();
 					if (ref.isEmbedded()) {
 						handleEmbedded(ref, cols, params, args, arg);
+						continue;
+					}
+					
+					if(arg == null) {
 						continue;
 					}
 

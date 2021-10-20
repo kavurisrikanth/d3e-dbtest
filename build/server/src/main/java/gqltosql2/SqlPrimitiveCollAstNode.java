@@ -23,7 +23,7 @@ public class SqlPrimitiveCollAstNode extends SqlAstNode {
 		String from = ctx.getFrom();
 		ctx.getQuery().setFrom(collTable, from);
 		ctx.addSelection(from + "." + idColumn, "_parent");
-		ctx.getQuery().addWhere(from + "." + idColumn + " in ?1");
+		ctx.getQuery().addWhere(from + "." + idColumn + " in (:ids)");
 		return ctx;
 	}
 

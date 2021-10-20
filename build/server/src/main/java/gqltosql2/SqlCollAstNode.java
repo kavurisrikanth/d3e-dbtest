@@ -22,7 +22,7 @@ public class SqlCollAstNode extends SqlAstNode {
 		String from = ctx.nextAlias();
 		ctx.getQuery().setFrom(collTable, from);
 		ctx.addSelection(from + "." + idColumn, "_parent");
-		ctx.getQuery().addWhere(from + "." + idColumn + " in ?1");
+		ctx.getQuery().addWhere(from + "." + idColumn + " in (:ids)");
 		if (isEmpty()) {
 			ctx.addSelection(from + "." + column, "id");
 			ctx.subType(getType());

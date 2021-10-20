@@ -18,7 +18,7 @@ public class SqlInverseCollAstNode extends SqlAstNode {
 		String from = sub.getFrom();
 		sub.getQuery().setFrom(getTableName(), from);
 		sub.addSelection(from + "." + column, "_parent");
-		sub.getQuery().addWhere(from + "." + column + " in ?1");
+		sub.getQuery().addWhere(from + "." + column + " in (:ids)");
 		return ctx;
 	}
 }

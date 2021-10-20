@@ -3,6 +3,7 @@ package store;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.BitSet;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import d3e.core.D3ELogger;
@@ -58,7 +61,7 @@ public class D3EEntityManagerProvider {
 
 		@Override
 		public void persist(DatabaseObject entity) {
-			if (entity.getSaveStatus() == DBSaveStatus.New) {
+			if (entity.getId() == 0l) {
 				entity.setSaveStatus(DBSaveStatus.Saved);
 				D3EQuery query = queryBuilder.generateCreateQuery(entity._typeIdx(), entity);
 				execute(query);
@@ -139,26 +142,27 @@ public class D3EEntityManagerProvider {
 		}
 
 		private void execute(D3EQuery query) {
-			PreparedStatement stmt = null;
-			try {
-				if (query.pre != null) {
-					execute(query.pre);
-				}
-				String q = query.query;
-				List<Object> args = query.args;
-				D3ELogger.info("Executing query: " + q);
-				stmt = null;
-				// TODO set args
-				stmt.executeUpdate();
-			} catch (SQLException e) {
-				// TODO: handle exception
-				e.printStackTrace();
-			} finally {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+			if (query.pre != null) {
+				execute(query.pre);
+			}
+			String q = query.query;
+			List<Object> args = query.args;
+			D3ELogger.info("Executing query: " + q);
+
+			DatabaseObject obj = query.getObj();
+			if (obj instanceof DatabaseObject) {
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+				jdbcTemplate.getJdbcTemplate().update(conn -> {
+					PreparedStatement ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
+					for (int i = 0; i < args.size(); i++) {
+						ps.setObject(i + 1, args.get(i));
+					}
+					return ps;
+				}, keyHolder);
+				long id = (long) keyHolder.getKeys().get("_id");
+				query.getObj().setId(id);
+			} else {
+				jdbcTemplate.getJdbcTemplate().update(q, args.toArray());
 			}
 		}
 
@@ -195,7 +199,7 @@ public class D3EEntityManagerProvider {
 			// TODO Auto-generated method stub
 			throw new RuntimeException();
 		}
-		
+
 		private void readObject(DModel<?> type, DatabaseObject obj, ResultSet rs) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException();
