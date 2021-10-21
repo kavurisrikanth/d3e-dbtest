@@ -88,7 +88,7 @@ public class D3EEntityManagerProvider {
 		@Override
 		public DatabaseObject mapRow(ResultSet rs, int rowNum) throws SQLException {
 			int i = 1;
-			rs.getObject(i); // Just read id;
+			rs.getObject(i++); // Just read id;
 			readObject(rs, i, obj, selectedFields);
 			return obj;
 		}
@@ -195,12 +195,12 @@ public class D3EEntityManagerProvider {
 				D3EQuery query = queryBuilder.generateCreateQuery(schema.getType(entity._typeIdx()), entity);
 				execute(query);
 			} else {
-//				BitSet _changes = entity._changes();
-//				if (_changes.isEmpty()) {
-//					return;
-//				}
-//				D3EQuery query = queryBuilder.generateUpdateQuery(entity._typeIdx(), _changes, entity);
-//				execute(query);
+				BitSet _changes = entity._changes();
+				if (_changes.isEmpty()) {
+					return;
+				}
+				D3EQuery query = queryBuilder.generateUpdateQuery(schema.getType(entity._typeIdx()), entity);
+				execute(query);
 			}
 		}
 
@@ -209,7 +209,7 @@ public class D3EEntityManagerProvider {
 			if (entity.saveStatus != DBSaveStatus.Saved) {
 				return;
 			}
-			D3EQuery query = queryBuilder.generateDeleteQuery(entity._typeIdx(), entity);
+			D3EQuery query = queryBuilder.generateDeleteQuery(schema.getType(entity._typeIdx()), entity);
 			execute(query);
 		}
 
@@ -227,8 +227,9 @@ public class D3EEntityManagerProvider {
 		public <T> T getById(int type, long id) {
 			DModel<?> dm = schema.getType(type);
 			StringBuilder sb = new StringBuilder();
-			sb.append("SELECT _id FROM ").append(dm.getTableName()).append(" WHERE _id = ").append(id);
+			sb.append("select _id from ").append(dm.getTableName()).append(" where _id = ").append(id);
 			String query = sb.toString();
+			D3ELogger.info("By Id: type: " + type + ", id: " + id + " , " + query);
 			List<Map<String, Object>> list = jdbcTemplate.getJdbcTemplate().queryForList(query);
 			if (list.isEmpty()) {
 				return null;
@@ -243,39 +244,44 @@ public class D3EEntityManagerProvider {
 		}
 
 		private void execute(D3EQuery query) {
+			if (query == null) {
+				return;
+			}
 			if (query.pre != null) {
 				execute(query.pre);
 			}
-			String q = query.query;
-			List<Object> args = query.args;
-			D3ELogger.info("Executing query: " + q);
+			if (query.query != null) {
+				String q = query.query;
+				List<Object> args = query.args;
+				D3ELogger.info("Insert/Update: " + q);
 
-			DatabaseObject obj = query.getObj();
-			if (obj instanceof DatabaseObject) {
-				KeyHolder keyHolder = new GeneratedKeyHolder();
-				jdbcTemplate.getJdbcTemplate().update(conn -> {
-					PreparedStatement ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
+				DatabaseObject obj = query.getObj();
+				if (obj instanceof DatabaseObject) {
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					jdbcTemplate.getJdbcTemplate().update(conn -> {
+						PreparedStatement ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
+						for (int i = 0; i < args.size(); i++) {
+							Object arg = args.get(i);
+							if (arg instanceof DatabaseObject) {
+								arg = ((DatabaseObject) arg).getId();
+							}
+							ps.setObject(i + 1, arg);
+						}
+						return ps;
+					}, keyHolder);
+					long id = (long) keyHolder.getKeys().get("_id");
+					query.getObj().setId(id);
+				} else {
+					Object[] argsArray = new Object[args.size()];
 					for (int i = 0; i < args.size(); i++) {
 						Object arg = args.get(i);
 						if (arg instanceof DatabaseObject) {
 							arg = ((DatabaseObject) arg).getId();
 						}
-						ps.setObject(i + 1, arg);
+						argsArray[i] = arg;
 					}
-					return ps;
-				}, keyHolder);
-				long id = (long) keyHolder.getKeys().get("_id");
-				query.getObj().setId(id);
-			} else {
-				Object[] argsArray = new Object[args.size()];
-				for (int i = 0; i < args.size(); i++) {
-					Object arg = args.get(i);
-					if (arg instanceof DatabaseObject) {
-						arg = ((DatabaseObject) arg).getId();
-					}
-					argsArray[i] = arg;
+					jdbcTemplate.getJdbcTemplate().update(q, argsArray);
 				}
-				jdbcTemplate.getJdbcTemplate().update(q, argsArray);
 			}
 			if (query.next != null) {
 				execute(query.next);
@@ -292,6 +298,7 @@ public class D3EEntityManagerProvider {
 			DModel<?> type = schema.getType(obj._typeIdx());
 			List<RowField> selectedFields = new ArrayList<>();
 			String query = queryBuilder.generateSelectAllQuery(type, selectedFields, obj.getId());
+			D3ELogger.info("Unproxy Object: " + obj.getId() + " , " + query);
 			jdbcTemplate.getJdbcTemplate().query(query, new SingleObjectMapper(cache, obj, type, selectedFields));
 		}
 
@@ -301,6 +308,7 @@ public class D3EEntityManagerProvider {
 			DModel<?> type = schema.getType(master._typeIdx());
 			DField<?, ?> field = type.getField(list.getField());
 			String query = queryBuilder.generateSelectCollectionQuery(type, field, master.getId());
+			D3ELogger.info("Unproxy Collection: " + master.getId() + ", " + field.getName() + " , " + query);
 			List<Object> result = jdbcTemplate.getJdbcTemplate().query(query, new CollectionMapper(cache, field));
 			list._unproxy(result);
 		}

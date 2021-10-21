@@ -37,6 +37,8 @@ public class D3EPrimaryCache {
 			DatabaseObject ins = (DatabaseObject) dm.newInstance();
 			ins.setId(id);
 			ins._markProxy();
+			ins.postLoad();
+			ins.setSaveStatus(DBSaveStatus.Saved);
 			markCollectionsAsProxy(dm, ins);
 			add(ins, dm.getIndex());
 			return ins;

@@ -2,17 +2,15 @@ package store;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import d3e.core.DFile;
 import d3e.core.ListExt;
-import d3e.core.MapExt;
 import d3e.core.SchemaConstants;
 import gqltosql.schema.DField;
 import gqltosql.schema.DModel;
@@ -23,12 +21,12 @@ import gqltosql2.AliasGenerator;
 import store.D3EEntityManagerProvider.RowField;
 
 @Service
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class D3EQueryBuilder {
 
 	@Autowired
 	private IModelSchema schema;
 
-	@SuppressWarnings("rawtypes")
 	public D3EQuery generateCreateQuery(DModel type, DatabaseObject _this) {
 		List<String> cols = ListExt.List();
 		List<String> params = ListExt.List();
@@ -46,14 +44,16 @@ public class D3EQueryBuilder {
 				.append(") values (").append(ListExt.join(params, ", ")).append(")");
 		query.setQuery(sb.toString());
 		query.setArgs(args);
+
+		if (type.getParent() != null) {
+			query.addPreQuery(generateCreateQuery(type.getParent(), _this));
+		}
 		return query;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addInsertColumns(D3EQuery query, DModel type, Object _this, List<String> cols, List<String> params,
 			List<Object> args) {
 		for (DField field : type.getFields()) {
-			// TODO transient We should skip those fields
 			if (field.getType() == FieldType.InverseCollection) {
 				continue;
 			}
@@ -83,11 +83,10 @@ public class D3EQueryBuilder {
 							D3EQuery chq = generateCreateQuery(ref, (DatabaseObject) value);
 							query.addPreQuery(chq);
 						}
-					} else {
-						cols.add(field.getColumnName());
-						params.add("?");
-						args.add(field.getValue(_this));
 					}
+					cols.add(field.getColumnName());
+					params.add("?");
+					args.add(field.getValue(_this));
 				}
 				break;
 			case PrimitiveCollection:
@@ -165,290 +164,209 @@ public class D3EQueryBuilder {
 		return query;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Object getValue(DField field, Object _this) {
-		Object value = field.getValue(_this);
-		if (value instanceof DatabaseObject) {
-			return ((DatabaseObject) value).getId();
+	public D3EQuery generateUpdateQuery(DModel type, DatabaseObject _this) {
+		List<String> updates = ListExt.List();
+		List<Object> args = ListExt.List();
+		D3EQuery query = new D3EQuery();
+
+		addUpdateColumns(query, type, _this, updates, args);
+
+		if (!updates.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("update ").append(type.getTableName()).append(" set ").append(ListExt.join(updates, ", "))
+					.append(" where _id = ").append(_this.getId());
+			query.setQuery(sb.toString());
+			query.setArgs(args);
 		}
-		return value;
+
+		if (type.getParent() != null) {
+			D3EQuery parent = generateCreateQuery(type.getParent(), _this);
+			if (parent != null) {
+				query.addPreQuery(parent);
+			}
+		}
+		return query;
 	}
 
-	private D3EQuery mergeQueries(D3EQuery old, D3EQuery _new) {
-		if (old == null && _new == null) {
+	private void addUpdateColumns(D3EQuery query, DModel type, DBObject _this, List<String> updates,
+			List<Object> args) {
+		BitSet changes = _this._changes();
+		for (DField field : type.getFields()) {
+			if (field.getType() == FieldType.InverseCollection || !changes.get(field.getIndex())) {
+				continue;
+			}
+			switch (field.getType()) {
+			case Primitive:
+				updates.add(field.getColumnName() + " = ?");
+				addPrimitiveArg(args, field, field.getValue(_this));
+				break;
+			case Reference:
+				DModel ref = field.getReference();
+				if (ref.getIndex() == SchemaConstants.DFile) {
+					Object value = field.getValue(_this);
+					if (value != null) {
+						updates.add(field.getColumnName() + " = ?");
+						args.add(((DFile) value).getId());
+					}
+				} else if (ref.isDocument()) {
+					// TODO Unable to get the document Doc
+				} else if (ref.isEmbedded()) {
+					addUpdateColumns(query, ref, (DBObject) field.getValue(_this), updates, args);
+				} else {
+					if (field.isChild()) {
+						DatabaseObject obj = (DatabaseObject) _this;
+						DatabaseObject old = obj.getOld();
+						Object oldChild = field.getValue(old);
+						Object newChild = field.getValue(_this);
+						if (oldChild == newChild) {
+							continue;
+						}
+						if (newChild != null) {
+							D3EQuery chq = generateCreateQuery(ref, (DatabaseObject) newChild);
+							query.addPreQuery(chq);
+						}
+						if (oldChild != null) {
+							D3EQuery chq = generateDeleteQuery(ref, (DatabaseObject) oldChild);
+							query.addPreQuery(chq);
+						}
+					}
+					updates.add(field.getColumnName() + " = ?");
+					args.add(field.getValue(_this));
+				}
+				break;
+			case PrimitiveCollection:
+				D3EQuery priDel = generatePrimitiveCollectionDeleteQuery(field, ListExt.asList(_this));
+				query.addPreQuery(priDel);
+				D3EQuery priColl = generatePrimitiveCollectionCreateQuery(field, (List) field.getValue(_this), _this);
+				query.addNextQuery(priColl);
+				break;
+			case ReferenceCollection:
+				D3EQuery refDel = generateReferenceCollectionDeleteQuery(field, ListExt.asList(_this));
+				query.addPreQuery(refDel);
+				List values = (List) field.getValue(_this);
+				if (field.isChild()) {
+					for (Object v : values) {
+						D3EQuery chq = generateCreateQuery(field.getReference(), (DatabaseObject) v);
+						query.addPreQuery(chq);
+					}
+					ListChanges old = (ListChanges) _this._oldValue(field.getIndex());
+					D3EQuery chq = generateMultiDeleteQuery(old.getOld());
+					query.addPreQuery(chq);
+				}
+				D3EQuery refColl = generateReferenceCollectionCreateQuery(field, values, _this);
+				query.addNextQuery(refColl);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	private D3EQuery generateReferenceCollectionDeleteQuery(DField<?, ?> field, List masterList) {
+		return generatePrimitiveCollectionDeleteQuery(field, masterList);
+	}
+
+	private D3EQuery generatePrimitiveCollectionDeleteQuery(DField<?, ?> field, List masterList) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("delete from ").append(field.getCollTableName(null));
+		sb.append(" where ");
+		sb.append(field.declType().toColumnName()).append(" in (");
+		sb.append(ListExt.join(ListExt.map(masterList, v -> ((DBObject) v).getId()), ", "));
+		sb.append(")");
+		D3EQuery query = new D3EQuery();
+		query.setArgs(new ArrayList<>());
+		query.setQuery(sb.toString());
+		return query;
+	}
+
+	public D3EQuery generateDeleteQuery(DModel<?> type, DatabaseObject _this) {
+		D3EQuery query = new D3EQuery();
+		addDeleteColumns(query, type, ListExt.asList(_this));
+		StringBuilder sb = new StringBuilder();
+		sb.append("delete from ").append(type.getTableName()).append(" where _id = ").append(_this.getId());
+		query.setQuery(sb.toString());
+		if (type.getParent() != null) {
+			query.addNextQuery(generateDeleteQuery(type.getParent(), _this));
+		}
+		return query;
+	}
+
+	public D3EQuery generateMultiDeleteQuery(List<DatabaseObject> values) {
+		if (values.isEmpty()) {
 			return null;
 		}
-		if (old == null) {
-			old = _new;
-		} else {
-			old.addPreQuery(_new);
+		// Group by types and it's parents;
+		Map<Integer, List<DatabaseObject>> groupByTypes = new HashMap<>();
+		for (DatabaseObject v : values) {
+			DModel<?> type = schema.getType(v._typeIdx());
+			while (type != null) {
+				List<DatabaseObject> list = groupByTypes.get(type.getIndex());
+				if (list == null) {
+					list = new ArrayList<>();
+					groupByTypes.put(type.getIndex(), list);
+				}
+				list.add(v);
+				type = type.getParent();
+			}
 		}
-		return old;
-	}
-
-	@SuppressWarnings("rawtypes")
-	private void handleEmbedded(DModel emb, List<String> defs, List<String> params, List<Object> args, Object _this) {
-		// TODO: Collection fields?
-		for (DField field : emb.getFields()) {
-			String columnName = field.getColumnName();
-
-			defs.add(columnName);
-			params.add("?");
-
-			Object fieldValue = getValue(field, _this);
-			args.add(fieldValue);
-		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public D3EQuery generateUpdateQuery(int _typeIdx, BitSet _changes, DatabaseObject _this) {
-		// Assume that _changes is not empty.
-		/*
-		 * query: update <TABLE> set (X1 = ?, X2 = ?...) where _a._id = <ID> args: x1,
-		 * x2...
-		 */
-		DModel type = schema.getType(_typeIdx);
-		StringBuilder sb = new StringBuilder();
-
-		List<String> assigns = ListExt.List();
-		List<Object> args = ListExt.List();
-
 		D3EQuery query = new D3EQuery();
-		String tableName = type.getTableName();
-		sb.append("UPDATE ").append(tableName).append(" SET ");
-
-		for (int one : _changes.stream().toArray()) {
-			DField field = type.getField(one);
-
-			FieldType fieldType = field.getType();
-			if (fieldType == FieldType.InverseCollection) {
-				continue;
-			}
-			boolean isRef = fieldType == FieldType.Reference;
-			if (fieldType == FieldType.Primitive || isRef) {
-				if (isRef) {
-					DModel ref = field.getReference();
-					if (ref.isEmbedded()) {
-						// Embedded - Individual field assigns
-						List<String> defs = ListExt.List();
-						List<String> params = ListExt.List(); // Maybe unnecessary, since it's just a list of ?s, but
-																// need it to reuse handleEmbedded
-						handleEmbedded(ref, defs, params, args, field.getValue(_this));
-						for (int i = 0; i < defs.size(); i++) {
-							String def = defs.get(i);
-							String param = params.get(i);
-
-							assigns.add(def + " = " + param);
-						}
-						continue;
-					}
-					if (field.isChild()) {
-						/*
-						 * Child - Check if the child is a new object. If new, Insert query and assign
-						 * Else, just assign
-						 */
-						DatabaseObject _child = (DatabaseObject) field.getValue(_this);
-						if (_child.getSaveStatus() == DBSaveStatus.New) {
-							// Insert query
-							D3EQuery childQuery = null;// generateCreateQuery(_child._typeIdx(), _child);
-							query = mergeQueries(query, childQuery);
-						}
-					}
-				}
-				String columnName = field.getColumnName();
-				assigns.add(columnName + " = ?");
-				args.add(getValue(field, _this));
-			} else {
-				// Collection
-				ListChanges _oldValue = (ListChanges) _this._oldValue(field.getIndex());
-				D3EQuery q = generateCollectionUpdateQuery(type, _this, field, (List) getValue(field, _this),
-						_oldValue.getOld(), fieldType);
-
-				query = mergeQueries(query, q);
-			}
-		}
-
-		sb.append(ListExt.join(assigns, ", "));
-		sb.append(" WHERE _id = ?");
-		args.add(_this.getId());
-
-		query.setQuery(sb.toString());
-		query.setArgs(args);
-
-		return query;
+		groupByTypes.forEach((t, list) -> {
+			DModel<?> type = schema.getType(t);
+			addDeleteColumns(query, type, list);
+			StringBuilder sb = new StringBuilder();
+			sb.append("delete from ").append(type.getTableName()).append(" where _id in (");
+			sb.append(ListExt.join(ListExt.map(list, v -> v.getId()), ", "));
+			sb.append(")");
+			D3EQuery q = new D3EQuery();
+			q.setQuery(sb.toString());
+			query.addPreQuery(q);
+		});
+		return query.pre;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private D3EQuery generateCollectionUpdateQuery(DModel masterModel, Object master, DField collField, List value,
-			List oldValue, FieldType fieldType) {
-		String tableName = masterModel.getTableName();
-		String masterColumn = tableName + (masterModel.getParent() != null ? "_" : "") + "_id";
-		String collTableName = collField.getCollTableName(tableName);
-		String collColumnName = collField.getColumnName();
-
-		D3EQuery query = null;
-		List<String> cols = ListExt.asList(masterColumn, collColumnName);
-		List<String> params = ListExt.asList("?", "?");
-
-		boolean isRC = fieldType == FieldType.ReferenceCollection;
-		String orderColumnName = null;
-		if (isRC) {
-			orderColumnName = collColumnName + "_order";
-			cols.add(orderColumnName); // Order column name
-			params.add("?");
-		}
-
-		// Insert queries for these
-		List inserted = ListExt.List();
-		Map<Integer, Object> updated = MapExt.Map();
-		int oldSize = oldValue.size();
-		for (int i = 0; i < value.size(); i++) {
-			Object one = value.get(i);
-			if (i < oldSize) {
-				// Counts as value being updated at this index
-				Object oldOne = oldValue.get(i);
-				if (!Objects.equals(one, oldOne)) {
-					// Update at this index
-					updated.put(i, one);
-				}
-			} else {
-				// Counts as new value
-				inserted.add(one);
-			}
-		}
-
-		if (!inserted.isEmpty()) {
-			D3EQuery createQuery = null;// generateCollectionCreateQueryInternal(masterModel, master, collField,
-										// inserted,
-//					fieldType, oldSize);
-			query = mergeQueries(query, createQuery);
-		}
-
-		// Query for updates
-		long masterId = ((DatabaseObject) master).getId();
-		if (!updated.isEmpty()) {
-			// update <CollTable> set <CollColumn> = <value> where <MasterColumn> =
-			// <masterId> and <OrderColumn> = <index>
-			Set<Integer> keySet = updated.keySet();
-			StringBuilder sb = new StringBuilder();
-			sb.append("UPDATE ").append(collTableName).append(" SET ").append(collColumnName).append(" = ? WHERE ")
-					.append(masterColumn).append(" = ?");
-			if (isRC) {
-				sb.append(" and ").append(orderColumnName).append(" = ?");
-			}
-			String queryStr = sb.toString();
-			for (Integer idx : keySet) {
-				Object update = updated.get(idx);
-				List<Object> args = ListExt.asList(getValue(collField, update), masterId);
-				if (isRC) {
-					args.add(idx);
-				}
-
-				D3EQuery q = new D3EQuery();
-				q.setQuery(queryStr);
-				q.setArgs(args);
-
-				query = mergeQueries(query, q);
-			}
-		}
-
-		Map<Integer, Object> removed = MapExt.Map();
-		for (int i = 0; i < oldValue.size(); i++) {
-			Object one = oldValue.get(i);
-			if (!value.contains(one)) {
-				removed.put(i, one);
-			}
-		}
-
-		if (!removed.isEmpty()) {
-			Set<Integer> keySet = removed.keySet();
-			StringBuilder sb = new StringBuilder();
-			sb.append("DELETE FROM ").append(collTableName).append(" WHERE ").append(masterColumn).append(" = ?");
-			if (isRC) {
-				sb.append(" AND ").append(orderColumnName).append(" = ?");
-			}
-			String queryStr = sb.toString();
-			for (int idx : keySet) {
-				// delete from <CollTable> where <MasterColumn> = <masterId> and <OrderColumn> =
-				// <index>
-				D3EQuery q = new D3EQuery();
-				List<Object> args = ListExt.asList(masterId);
-				if (isRC) {
-					args.add(idx);
-				}
-
-				q.setQuery(queryStr);
-				q.setArgs(args);
-				query = mergeQueries(query, q);
-			}
-		}
-
-		return query;
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public D3EQuery generateDeleteQuery(int index, DatabaseObject _this) {
-		// TODO Auto-generated method stub
-		// delete from <tableName> where _id = ?
-		// If any of the props are childs or collections (primitive & child only), then
-		// need query for those also
-		DModel type = schema.getType(index);
-		String tableName = type.getTableName();
-
-		D3EQuery query = new D3EQuery();
-		StringBuilder sb = new StringBuilder();
-		sb.append("DELETE FROM ").append(tableName).append(" WHERE _id = ?");
-		query.setQuery(sb.toString());
-		query.setArgs(ListExt.asList(_this.getId()));
-
+	private void addDeleteColumns(D3EQuery query, DModel<?> type, List multiValues) {
 		for (DField field : type.getFields()) {
-			FieldType fieldType = field.getType();
-			if (fieldType == FieldType.InverseCollection || fieldType == FieldType.Primitive) {
-				// Nothing to do
+			if (field.getType() == FieldType.InverseCollection) {
 				continue;
 			}
-			if (fieldType == FieldType.Reference) {
-				if (field.isChild()) {
-					// Single query
-					DModel child = field.getReference();
-					DatabaseObject childValue = (DatabaseObject) field.getValue(_this);
-					D3EQuery childQuery = generateDeleteQuery(child.getIndex(), childValue);
-
-					query = mergeQueries(query, childQuery);
+			switch (field.getType()) {
+			case Reference:
+				if (!field.getReference().isEmbedded() && field.isChild()) {
+					List childs = new ArrayList<>();
+					for (Object o : multiValues) {
+						Object value = field.getValue(o);
+						if (value != null) {
+							childs.add(value);
+						}
+					}
+					D3EQuery chq = generateMultiDeleteQuery(childs);
+					query.addPreQuery(chq);
 				}
-			} else {
-				// Collection query
-				D3EQuery collectionQuery = generateCollectionDeleteQuery(type, _this, field,
-						(List) field.getValue(_this));
-				query = mergeQueries(query, collectionQuery);
+				break;
+			case PrimitiveCollection:
+				D3EQuery priDel = generatePrimitiveCollectionDeleteQuery(field, multiValues);
+				query.addPreQuery(priDel);
+				break;
+			case ReferenceCollection:
+				D3EQuery refDel = generateReferenceCollectionDeleteQuery(field, multiValues);
+				query.addPreQuery(refDel);
+				if (field.isChild()) {
+					List childs = new ArrayList<>();
+					for (Object o : multiValues) {
+						Object value = field.getValue(o);
+						if (value != null) {
+							childs.addAll((List<DatabaseObject>) value);
+						}
+					}
+					D3EQuery chq = generateMultiDeleteQuery(childs);
+					query.addPreQuery(chq);
+				}
+				break;
+			default:
+				break;
 			}
 		}
 
-		return query;
-	}
-
-	@SuppressWarnings("rawtypes")
-	private D3EQuery generateCollectionDeleteQuery(DModel masterModel, DatabaseObject master, DField collField,
-			List value) {
-		// delete from <collTableName> where <masterId> = ? and <order> = ?
-		String tableName = masterModel.getTableName();
-		String masterColumn = tableName + (masterModel.getParent() != null ? "_" : "") + "_id";
-		String collTableName = collField.getCollTableName(tableName);
-
-		D3EQuery query = new D3EQuery();
-		StringBuilder sb = new StringBuilder();
-		sb.append("DELETE FROM ").append(collTableName).append(" WHERE ").append(masterColumn).append(" = ?");
-		query.setQuery(sb.toString());
-		query.setArgs(ListExt.asList(master.getId()));
-		return query;
-	}
-
-	public D3EQuery generateDeleteQuery(DFile obj) {
-		// delete from <tableName> where _id = ?
-		D3EQuery query = new D3EQuery();
-		query.setQuery("DELETE FROM _dfile WHERE _id = ?");
-		query.setArgs(ListExt.asList(obj.getId()));
-		return query;
 	}
 
 	public String generateSelectAllQuery(DModel type, List<RowField> selectedFields, long id) {
@@ -478,19 +396,16 @@ public class D3EQueryBuilder {
 				break;
 			case Reference:
 				DModel ref = df.getReference();
-				DModelType mt = ref.getModelType();
-				if (mt == DModelType.MODEL) {
-					if (ref.isDocument()) {
-						sb.append(", ").append(alias).append(".").append(df.getColumnName());
-						selectedFields.add(new RowField(df));
-					} else if (ref.isEmbedded()) {
-						List<RowField> subFields = new ArrayList<>();
-						appendAllColumns(sb, ref, subFields, joins, ag, alias);
-						selectedFields.add(new RowField(df, subFields));
-					} else if (ref.isNormal()) {
-						sb.append(", ").append(alias).append(".").append(df.getColumnName());
-						selectedFields.add(new RowField(df));
-					}
+				if (ref.isDocument()) {
+					sb.append(", ").append(alias).append(".").append(df.getColumnName());
+					selectedFields.add(new RowField(df));
+				} else if (ref.isEmbedded()) {
+					List<RowField> subFields = new ArrayList<>();
+					appendAllColumns(sb, ref, subFields, joins, ag, alias);
+					selectedFields.add(new RowField(df, subFields));
+				} else {
+					sb.append(", ").append(alias).append(".").append(df.getColumnName());
+					selectedFields.add(new RowField(df));
 				}
 				break;
 			case PrimitiveCollection:

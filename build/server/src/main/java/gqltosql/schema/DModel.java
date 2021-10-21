@@ -119,10 +119,6 @@ public class DModel<T> {
 		return checkFlag(TRANSIENT);
 	}
 
-	public boolean isNormal() {
-		return checkFlag(NORMAL);
-	}
-
 	public String getTableName() {
 		return table;
 	}

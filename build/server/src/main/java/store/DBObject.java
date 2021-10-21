@@ -12,6 +12,7 @@ public abstract class DBObject {
 	private transient BitSet _changes;
 	private transient Map<Integer, Object> _oldValues = new HashMap<>();
 	protected transient int _childIdx = -1;
+	protected transient boolean inProxy;
 
 	public DBObject() {
 		this._changes = new BitSet(_fieldsCount());
@@ -56,11 +57,17 @@ public abstract class DBObject {
 	}
 
 	public void fieldChanged(int field, Object oldValue) {
+		if(inProxy) {
+			return;
+		}
 		this._changes.set(field);
 		onPropertySet();
 	}
 	
 	public void collFieldChanged(int field, Object oldValue) {
+		if(inProxy) {
+			return;
+		}
 		this._changes.set(field);
 		ListChanges lc = (ListChanges) _oldValues.get(field);
 		if (lc == null) {

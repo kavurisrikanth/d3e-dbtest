@@ -14,14 +14,14 @@ public class CreatableRepository extends AbstractD3ERepository<Creatable> {
   }
 
   public List<Creatable> getByRef(Creatable ref) {
-    String queryStr = "SELECT _id from _creatable where _ref_id = :ref";
+    String queryStr = "select _id from _creatable where _ref_id = :ref";
     Query query = em().createNativeQuery(queryStr);
     QueryImplUtil.setParameter(query, "ref", ref);
     return getAllXsByY(query);
   }
 
   public List<Creatable> findByRefColl(Creatable refColl) {
-    String queryStr = "SELECT _id from _creatable where _ref_coll_id = :refColl";
+    String queryStr = "select _creatable_id from _creatable_ref_coll where _ref_coll_id = :refColl";
     Query query = em().createNativeQuery(queryStr);
     QueryImplUtil.setParameter(query, "refColl", refColl);
     return getAllXsByY(query);

@@ -20,6 +20,8 @@ import javax.persistence.TemporalType;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import d3e.core.D3ELogger;
+
 public class QueryImpl implements Query {
 
 	private NamedParameterJdbcTemplate template;
@@ -48,6 +50,7 @@ public class QueryImpl implements Query {
 
 	@Override
 	public List getResultList() {
+		D3ELogger.info("Query: " + sql);
 		return template.query(sql, values, new ObjectArrayRowMapper());
 	}
 

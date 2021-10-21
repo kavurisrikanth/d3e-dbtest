@@ -184,11 +184,12 @@ public abstract class DatabaseObject extends DBObject implements ICloneable {
 	}
 
 	protected boolean needOldObject() {
-		return false;
+		return true;
 	}
 	
 	public void createOldObject() {
 	  CloneContext ctx = new CloneContext(false, true);
+	  _checkProxy();
 	  ctx.startClone(this);
 	  recordOld(ctx);
 	}
@@ -284,7 +285,9 @@ public abstract class DatabaseObject extends DBObject implements ICloneable {
 	protected void _checkProxy() {
 		if(this.proxy) {
 			this.proxy = false;
+			this.inProxy = true;
 			Database.get().unproxy(this);
+			this.inProxy = false;
 		}
 	}
 	

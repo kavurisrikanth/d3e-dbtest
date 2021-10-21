@@ -65,6 +65,7 @@ public class RocketQuery extends AbstractRocketQuery {
       throws Exception {
     D3ELogger.displayGraphQL(query, query, null);
     User currentUser = CurrentUser.get();
+    long id = 0;
     switch (query) {
       case "getAnonymousUserById":
         {
@@ -83,7 +84,13 @@ public class RocketQuery extends AbstractRocketQuery {
         }
       case "getCreatableById":
         {
-          OutObject one = gqlToSql.execute("Creatable", field, ctx.readLong());
+        	if(id == 0) {
+        		id = ctx.readLong();
+        	}
+          OutObject one = gqlToSql.execute("Creatable", field, id);
+          if(one != null && one.isOfType(17)) {
+        	  System.out.println();
+          }
           if (subscribed) {
             OutObjectTracker tracker = new OutObjectTracker(dataChangeTracker, session, field);
             tracker.init(one);
