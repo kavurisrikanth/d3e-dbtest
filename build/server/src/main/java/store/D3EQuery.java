@@ -9,6 +9,7 @@ public class D3EQuery {
 	String query;
 	List<Object> args = ListExt.List();
 	D3EQuery pre;
+	D3EQuery next;
 	private DatabaseObject obj;
 
 	public D3EQuery() {
@@ -28,6 +29,14 @@ public class D3EQuery {
 			return;
 		}
 		this.pre = q;
+	}
+	
+	public void addNextQuery(D3EQuery q) {
+		if (this.next != null) {
+			this.next.addNextQuery(q);
+			return;
+		}
+		this.next = q;
 	}
 
 	public void setQuery(String q) {

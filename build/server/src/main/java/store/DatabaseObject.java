@@ -283,8 +283,8 @@ public abstract class DatabaseObject extends DBObject implements ICloneable {
 
 	protected void _checkProxy() {
 		if(this.proxy) {
-			Database.get().unproxy(this);
 			this.proxy = false;
+			Database.get().unproxy(this);
 		}
 	}
 	

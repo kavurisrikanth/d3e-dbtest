@@ -17,7 +17,7 @@ public class DModel<T> {
 	public static final byte EXTERNAL = 0x02;
 	public static final byte TRANSIENT = 0x04;
 	public static final byte DOCUMENT = 0x08;
-	
+
 	private int index;
 	private String type;
 	private String table;
@@ -44,6 +44,7 @@ public class DModel<T> {
 		this.modelType = modelType;
 		this.ins = ins;
 	}
+
 	public DModel(String type, int index, int count, int parentCount, String table, DModelType modelType,
 			Supplier<T> ins) {
 		this(type, index, count, parentCount, table, modelType, NORMAL, ins);
@@ -52,27 +53,31 @@ public class DModel<T> {
 	public DModel(String type, int index, int count, int parentCount, String table, DModelType modelType, byte flags) {
 		this(type, index, count, parentCount, table, modelType, flags, null);
 	}
-	
+
 	public DModel(String type, int index, int count, int parentCount, String table, DModelType modelType) {
 		this(type, index, count, parentCount, table, modelType, NORMAL, null);
 	}
-	
+
+	public String toColumnName() {
+		return table + (parent == null ? "_id" : "__id");
+	}
+
 	public DModel<T> trans() {
 		this.flags |= TRANSIENT;
 		return this;
 	}
-	
+
 	public DModel<T> external(String name) {
 		this.flags |= EXTERNAL;
 		this.external = name;
 		return this;
 	}
-	
+
 	public DModel<T> emb() {
 		this.flags |= EMBEDDED;
 		return this;
 	}
-	
+
 	public DModel<T> document() {
 		this.flags |= DOCUMENT;
 		return this;
@@ -97,7 +102,7 @@ public class DModel<T> {
 	public boolean checkFlag(byte val) {
 		return (flags & val) != 0;
 	}
-	
+
 	public boolean isEmbedded() {
 		return checkFlag(EMBEDDED);
 	}
@@ -113,11 +118,10 @@ public class DModel<T> {
 	public boolean isTransient() {
 		return checkFlag(TRANSIENT);
 	}
-	
+
 	public boolean isNormal() {
 		return checkFlag(NORMAL);
 	}
-
 
 	public String getTableName() {
 		return table;
@@ -178,19 +182,20 @@ public class DModel<T> {
 		return ins.get();
 	}
 
-	public <R> DField<T,R> addEnum(String name, int index, String column, int enumClss, Function<T, R> getter,
+	public <R> DField<T, R> addEnum(String name, int index, String column, int enumClss, Function<T, R> getter,
 			BiConsumer<T, R> setter) {
-		DPrimField<T, R> df = new DPrimField<T, R>(this, index, name, column, FieldPrimitiveType.Enum, getter, setter, null);
+		DPrimField<T, R> df = new DPrimField<T, R>(this, index, name, column, FieldPrimitiveType.Enum, getter, setter,
+				null);
 		df.setEnumType(enumClss);
 		addField(df);
 		return df;
 	}
 
 	public <R> DField<T, R> addPrimitive(String name, int index, String column, FieldPrimitiveType primType,
-	    Function<T, R> getter, BiConsumer<T, R> setter) {
-	  	return addPrimitive(name, index, column, primType, getter, setter, null);
+			Function<T, R> getter, BiConsumer<T, R> setter) {
+		return addPrimitive(name, index, column, primType, getter, setter, null);
 	}
-	
+
 	public <R> DField<T, R> addPrimitive(String name, int index, String column, FieldPrimitiveType primType,
 			Function<T, R> getter, BiConsumer<T, R> setter, Function<T, R> def) {
 		DPrimField<T, R> field = new DPrimField<T, R>(this, index, name, column, primType, getter, setter, def);
@@ -259,15 +264,16 @@ public class DModel<T> {
 	public String getExternal() {
 		return this.external;
 	}
-	
+
 	@Override
 	public String toString() {
 		return type;
 	}
+
 	public void addAllParents(List<Integer> allParents) {
-		if(parent != null) {
+		if (parent != null) {
 			allParents.add(parent.index);
 			parent.addAllParents(allParents);
-		}		
+		}
 	}
 }

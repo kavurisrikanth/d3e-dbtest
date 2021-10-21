@@ -103,37 +103,9 @@ public class D3EEntityManagerProvider {
 				FieldType type = df.getType();
 				switch (type) {
 				case Primitive:
-					FieldPrimitiveType pt = df.getPrimitiveType();
-					switch (pt) {
-					case Boolean:
-						df.setValue(obj, rs.getBoolean(i++));
-						break;
-					case Date:
-						throw new UnsupportedOperationException();
-					case DateTime:
-						throw new UnsupportedOperationException();
-					case Double:
-						df.setValue(obj, rs.getDouble(i++));
-						break;
-					case Duration:
-						throw new UnsupportedOperationException();
-					case Enum:
-						String str = rs.getString(i++);
-						DModel<?> enmType = schema.getType(df.getEnumType());
-						Object val = enmType.getField(str).getValue(null);
-						df.setValue(obj, val);
-						break;
-					case Integer:
-						df.setValue(obj, rs.getLong(i++));
-						break;
-					case String:
-						df.setValue(obj, rs.getString(i++));
-						break;
-					case Time:
-						throw new UnsupportedOperationException();
-					default:
-						break;
-					}
+					Object pri = readPrimitive(df, rs, i);
+					df.setValue(obj, pri);
+					i++;
 					break;
 				case Reference:
 					DModel ref = df.getReference();
@@ -154,6 +126,60 @@ public class D3EEntityManagerProvider {
 		}
 	}
 
+	private class CollectionMapper implements RowMapper<Object> {
+
+		private D3EPrimaryCache cache;
+		private DField field;
+
+		public CollectionMapper(D3EPrimaryCache cache, DField field) {
+			this.cache = cache;
+			this.field = field;
+		}
+
+		@Override
+		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+			switch (field.getType()) {
+			case PrimitiveCollection:
+				return readPrimitive(field, rs, 1);
+			case InverseCollection:
+			case ReferenceCollection:
+				DModel ref = field.getReference();
+				long id = rs.getLong(1);
+				return cache.getOrCreate(ref, id);
+			}
+			return null;
+		}
+	}
+
+	private Object readPrimitive(DField df, ResultSet rs, int i) throws SQLException {
+		FieldPrimitiveType pt = df.getPrimitiveType();
+		switch (pt) {
+		case Boolean:
+			return rs.getBoolean(i);
+		case Date:
+			throw new UnsupportedOperationException();
+		case DateTime:
+			throw new UnsupportedOperationException();
+		case Double:
+			return rs.getDouble(i);
+		case Duration:
+			throw new UnsupportedOperationException();
+		case Enum:
+			String str = rs.getString(i);
+			DModel<?> enmType = schema.getType(df.getEnumType());
+			Object val = enmType.getField(str).getValue(null);
+			return val;
+		case Integer:
+			return rs.getLong(i);
+		case String:
+			return rs.getString(i);
+		case Time:
+			throw new UnsupportedOperationException();
+		default:
+			throw new UnsupportedOperationException();
+		}
+	}
+
 	private class EntityManagerImpl implements IEntityManager {
 
 		private D3EPrimaryCache cache;
@@ -166,15 +192,15 @@ public class D3EEntityManagerProvider {
 		public void persist(DatabaseObject entity) {
 			if (entity.getId() == 0l) {
 				entity.setSaveStatus(DBSaveStatus.Saved);
-				D3EQuery query = queryBuilder.generateCreateQuery(entity._typeIdx(), entity);
+				D3EQuery query = queryBuilder.generateCreateQuery(schema.getType(entity._typeIdx()), entity);
 				execute(query);
 			} else {
-				BitSet _changes = entity._changes();
-				if (_changes.isEmpty()) {
-					return;
-				}
-				D3EQuery query = queryBuilder.generateUpdateQuery(entity._typeIdx(), _changes, entity);
-				execute(query);
+//				BitSet _changes = entity._changes();
+//				if (_changes.isEmpty()) {
+//					return;
+//				}
+//				D3EQuery query = queryBuilder.generateUpdateQuery(entity._typeIdx(), _changes, entity);
+//				execute(query);
 			}
 		}
 
@@ -230,14 +256,29 @@ public class D3EEntityManagerProvider {
 				jdbcTemplate.getJdbcTemplate().update(conn -> {
 					PreparedStatement ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
 					for (int i = 0; i < args.size(); i++) {
-						ps.setObject(i + 1, args.get(i));
+						Object arg = args.get(i);
+						if (arg instanceof DatabaseObject) {
+							arg = ((DatabaseObject) arg).getId();
+						}
+						ps.setObject(i + 1, arg);
 					}
 					return ps;
 				}, keyHolder);
 				long id = (long) keyHolder.getKeys().get("_id");
 				query.getObj().setId(id);
 			} else {
-				jdbcTemplate.getJdbcTemplate().update(q, args.toArray());
+				Object[] argsArray = new Object[args.size()];
+				for (int i = 0; i < args.size(); i++) {
+					Object arg = args.get(i);
+					if (arg instanceof DatabaseObject) {
+						arg = ((DatabaseObject) arg).getId();
+					}
+					argsArray[i] = arg;
+				}
+				jdbcTemplate.getJdbcTemplate().update(q, argsArray);
+			}
+			if (query.next != null) {
+				execute(query.next);
 			}
 		}
 
@@ -256,8 +297,12 @@ public class D3EEntityManagerProvider {
 
 		@Override
 		public void unproxyCollection(D3EPersistanceList<?> list) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException();
+			DatabaseObject master = list.getMaster();
+			DModel<?> type = schema.getType(master._typeIdx());
+			DField<?, ?> field = type.getField(list.getField());
+			String query = queryBuilder.generateSelectCollectionQuery(type, field, master.getId());
+			List<Object> result = jdbcTemplate.getJdbcTemplate().query(query, new CollectionMapper(cache, field));
+			list._unproxy(result);
 		}
 
 		@Override

@@ -1,6 +1,5 @@
 package gqltosql2;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,14 +81,10 @@ public class QueryReader {
 		if (id == -1) {
 			return null;
 		}
-		if (!(row[id] instanceof BigInteger)) {
+		if (!(row[id] instanceof Long)) {
 			return null;
 		}
-		BigInteger bid = ((BigInteger) row[id]);
-		if (bid == null) {
-			return null;
-		}
-		return ((BigInteger) row[id]).longValue();
+		return ((Long) row[id]);
 	}
 
 	public QueryTypeReader getTypeReader(int type) {

@@ -24,140 +24,144 @@ import store.D3EEntityManagerProvider.RowField;
 
 @Service
 public class D3EQueryBuilder {
+
 	@Autowired
 	private IModelSchema schema;
 
 	@SuppressWarnings("rawtypes")
-	public D3EQuery generateCreateQuery(int index, Object _this) {
-		DModel type = schema.getType(index);
-		StringBuilder sb = new StringBuilder();
-
+	public D3EQuery generateCreateQuery(DModel type, DatabaseObject _this) {
+		List<String> cols = ListExt.List();
+		List<String> params = ListExt.List();
+		List<Object> args = ListExt.List();
 		D3EQuery query = new D3EQuery();
-		List<Object> args = ListExt.List(); // The actual values to be passed to the SQL query
+		query.setObj(_this);
+		cols.add("_save_status");
+		params.add("?");
+		args.add(DBSaveStatus.Saved.ordinal());
 
-		List<String> cols = ListExt.List(); // The column names
-		List<String> params = ListExt.List(); // Just a list of ?s
+		addInsertColumns(query, type, _this, cols, params, args);
 
-		if (index != SchemaConstants.DFile) {
-			// DFile has _id as part of its fields, so it will be covered in the below loop
-			DatabaseObject asDbObj = (DatabaseObject) _this;
-			query.setObj(asDbObj);
-			cols.add("_save_status");
-			params.add("?");
-			args.add(asDbObj.getSaveStatus().ordinal());
-		}
-
-		for (DField field : type.getFields()) {
-			Object arg = getValue(field, _this);
-			FieldType fieldType = field.getType();
-			if (fieldType == FieldType.InverseCollection) {
-				continue;
-			}
-
-			boolean isRef = fieldType == FieldType.Reference;
-			if (fieldType == FieldType.Primitive || isRef) {
-				if (isRef) {
-					DModel<?> ref = field.getReference();
-					if (ref.isEmbedded()) {
-						handleEmbedded(ref, cols, params, args, arg);
-						continue;
-					}
-
-					if (arg == null) {
-						continue;
-					}
-
-					if (field.isChild()) {
-						// Add the value in the table; need query for that.
-						int idx = field.getIndex();
-						D3EQuery pre = generateCreateQuery(idx, arg);
-						query.addPreQuery(pre);
-					}
-
-					// Value should already be there for references because we will collect
-					// creatable references and call persist on all of them
-					args.add(((DatabaseObject) arg).getId());
-				} else {
-					// Add normally
-					args.add(arg);
-				}
-
-				cols.add(field.getColumnName());
-				params.add("?");
-			} else {
-				// For collections
-				D3EQuery pre = generateCollectionCreateQuery(type, _this, field, (List) arg, fieldType);
-				query.addPreQuery(pre);
-			}
-		}
-
-		sb.append("INSERT INTO ").append(type.getTableName()).append(" (").append(ListExt.join(cols, ", "))
-				.append(") VALUES (").append(ListExt.join(params, ", ")).append(")");
-
+		StringBuilder sb = new StringBuilder();
+		sb.append("insert into ").append(type.getTableName()).append(" (").append(ListExt.join(cols, ", "))
+				.append(") values (").append(ListExt.join(params, ", ")).append(")");
 		query.setQuery(sb.toString());
 		query.setArgs(args);
-
 		return query;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public D3EQuery generateCollectionCreateQuery(DModel masterModel, Object master, DField collField, List value,
-			FieldType fieldType) {
-		// Exactly the same as generateCreateQuery, except that the table to insert in
-		// is different
-		return generateCollectionCreateQueryInternal(masterModel, master, collField, value, fieldType, 0);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void addInsertColumns(D3EQuery query, DModel type, Object _this, List<String> cols, List<String> params,
+			List<Object> args) {
+		for (DField field : type.getFields()) {
+			// TODO transient We should skip those fields
+			if (field.getType() == FieldType.InverseCollection) {
+				continue;
+			}
+			switch (field.getType()) {
+			case Primitive:
+				cols.add(field.getColumnName());
+				params.add("?");
+				addPrimitiveArg(args, field, field.getValue(_this));
+				break;
+			case Reference:
+				DModel ref = field.getReference();
+				if (ref.getIndex() == SchemaConstants.DFile) {
+					Object value = field.getValue(_this);
+					if (value != null) {
+						cols.add(field.getColumnName());
+						params.add("?");
+						args.add(((DFile) value).getId());
+					}
+				} else if (ref.isDocument()) {
+					// TODO Unable to get the document Doc
+				} else if (ref.isEmbedded()) {
+					addInsertColumns(query, ref, field.getValue(_this), cols, params, args);
+				} else {
+					if (field.isChild()) {
+						Object value = field.getValue(_this);
+						if (value != null) {
+							D3EQuery chq = generateCreateQuery(ref, (DatabaseObject) value);
+							query.addPreQuery(chq);
+						}
+					} else {
+						cols.add(field.getColumnName());
+						params.add("?");
+						args.add(field.getValue(_this));
+					}
+				}
+				break;
+			case PrimitiveCollection:
+				D3EQuery priColl = generatePrimitiveCollectionCreateQuery(field, (List) field.getValue(_this), _this);
+				query.addNextQuery(priColl);
+				break;
+			case ReferenceCollection:
+				List values = (List) field.getValue(_this);
+				if (field.isChild()) {
+					for (Object v : values) {
+						D3EQuery chq = generateCreateQuery(field.getReference(), (DatabaseObject) v);
+						query.addPreQuery(chq);
+					}
+				}
+				D3EQuery refColl = generateReferenceCollectionCreateQuery(field, values, _this);
+				query.addNextQuery(refColl);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private D3EQuery generateCollectionCreateQueryInternal(DModel masterModel, Object master, DField collField,
-			List value, FieldType fieldType, int startIdx) {
-		String tableName = masterModel.getTableName();
-		String masterColumn = tableName + (masterModel.getParent() != null ? "_" : "") + "_id";
-		String collTableName = collField.getCollTableName(tableName);
-		String collColumnName = collField.getColumnName();
+	private void addPrimitiveArg(List<Object> args, DField<?, ?> field, Object value) {
+		args.add(value);
+	}
 
-		D3EQuery query = null;
-		List<String> cols = ListExt.asList(masterColumn, collColumnName);
-		List<String> params = ListExt.asList("?", "?");
-
-		boolean isRC = fieldType == FieldType.ReferenceCollection;
-		DModel<?> ref = null;
-		if (isRC) {
-			ref = collField.getReference();
-			cols.add(collColumnName + "_order"); // Order column name
-			params.add("?");
+	private D3EQuery generateReferenceCollectionCreateQuery(DField<?, ?> field, List<?> value, Object master) {
+		if (value.isEmpty()) {
+			return null;
 		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("insert into ").append(field.getCollTableName(null));
+		sb.append(" (").append(field.declType().toColumnName()).append(", ").append(field.getColumnName()).append(", ")
+				.append(field.getColumnName().replaceAll("_id$", "_order")).append(") values ");
 
-		int _collIdx = startIdx;
+		List<Object> args = ListExt.List();
 		for (int i = 0; i < value.size(); i++) {
-			Object one = value.get(i);
-			StringBuilder sb2 = new StringBuilder();
-			sb2.append("INSERT INTO ").append(collTableName).append(" (").append(ListExt.join(cols, ", "))
-					.append(") VALUES (").append(ListExt.join(params, ", ")).append(")");
-
-			List<Object> args = ListExt.asList(((DatabaseObject) master).getId(), getValue(collField, one));
-			if (isRC) {
-				args.add(_collIdx++);
+			if (i != 0) {
+				sb.append(", ");
 			}
-
-			D3EQuery oneQuery = new D3EQuery();
-			oneQuery.setQuery(sb2.toString());
-			oneQuery.setArgs(args);
-
-			if (isRC) {
-				// Add id
-				// create insert query for that table ONLY if child
-				args.add(((DatabaseObject) one).getId());
-				if (collField.isChild()) {
-					int idx = ref.getIndex();
-					D3EQuery pre = generateCreateQuery(idx, one);
-					oneQuery.addPreQuery(pre);
-				}
-			}
-
-			query = mergeQueries(query, oneQuery);
+			args.add(master);
+			args.add(value.get(i));
+			sb.append("( ?, ?, ").append(i).append(")");
 		}
+		sb.append(";");
+		D3EQuery query = new D3EQuery();
+		query.setArgs(args);
+		query.setQuery(sb.toString());
+		return query;
+	}
 
+	private D3EQuery generatePrimitiveCollectionCreateQuery(DField<?, ?> field, List<?> value, Object master) {
+		if (value.isEmpty()) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("insert into ").append(field.getCollTableName(null));
+		sb.append(" (").append(field.declType().toColumnName()).append(", ").append(field.getColumnName())
+				.append(") values ");
+
+		List<Object> args = ListExt.List();
+		for (int i = 0; i < value.size(); i++) {
+			if (i != 0) {
+				sb.append(", ");
+			}
+			args.add(master);
+			addPrimitiveArg(args, field, value.get(i));
+			sb.append("(?, ?)");
+		}
+		sb.append(";");
+		D3EQuery query = new D3EQuery();
+		query.setArgs(args);
+		query.setQuery(sb.toString());
 		return query;
 	}
 
@@ -246,7 +250,7 @@ public class D3EQueryBuilder {
 						DatabaseObject _child = (DatabaseObject) field.getValue(_this);
 						if (_child.getSaveStatus() == DBSaveStatus.New) {
 							// Insert query
-							D3EQuery childQuery = generateCreateQuery(_child._typeIdx(), _child);
+							D3EQuery childQuery = null;// generateCreateQuery(_child._typeIdx(), _child);
 							query = mergeQueries(query, childQuery);
 						}
 					}
@@ -314,8 +318,9 @@ public class D3EQueryBuilder {
 		}
 
 		if (!inserted.isEmpty()) {
-			D3EQuery createQuery = generateCollectionCreateQueryInternal(masterModel, master, collField, inserted,
-					fieldType, oldSize);
+			D3EQuery createQuery = null;// generateCollectionCreateQueryInternal(masterModel, master, collField,
+										// inserted,
+//					fieldType, oldSize);
 			query = mergeQueries(query, createQuery);
 		}
 
@@ -502,5 +507,56 @@ public class D3EQueryBuilder {
 			joins.add(parent.getTableName() + " " + ja);
 			appendAllColumns(sb, parent, selectedFields, joins, ag, ja);
 		}
+	}
+
+	public String generateSelectCollectionQuery(DModel<?> type, DField<?, ?> field, long id) {
+		StringBuilder b = new StringBuilder();
+		b.append("select ");
+		switch (field.getType()) {
+		case InverseCollection:
+			b.append("_id");
+			break;
+		case PrimitiveCollection:
+		case ReferenceCollection:
+			b.append(field.getColumnName());
+			break;
+		default:
+			break;
+		}
+
+		b.append(" from ");
+
+		switch (field.getType()) {
+		case InverseCollection:
+			b.append(field.getReference().getTableName());
+			break;
+		case PrimitiveCollection:
+		case ReferenceCollection:
+			b.append(field.getCollTableName(null));
+			break;
+		default:
+			break;
+		}
+
+		b.append(" where ");
+
+		switch (field.getType()) {
+		case InverseCollection:
+			b.append(field.getColumnName());
+			break;
+		case PrimitiveCollection:
+		case ReferenceCollection:
+			b.append(type.getTableName() + (type.getParent() == null ? "_id" : "__id"));
+			break;
+		default:
+			break;
+		}
+
+		b.append(" = ").append(id);
+		if (field.getType() == FieldType.ReferenceCollection) {
+			b.append(" order by ");
+			b.append(field.getColumnName().replaceAll("_id$", "_order"));
+		}
+		return b.toString();
 	}
 }

@@ -21,21 +21,25 @@ public class D3EPersistanceList<E> extends ArrayList<E> {
 		this.master = master;
 		this.field = field;
 	}
-	
+
 	public DatabaseObject getMaster() {
 		return master;
 	}
-	
+
 	public int getField() {
 		return field;
 	}
-	
+
+	public void _unproxy(List result) {
+		super.addAll(result);
+	}
+
 	public void _markProxy() {
 		this.proxy = true;
 	}
-	
+
 	private void _checkProxy() {
-		if(this.proxy) {
+		if (this.proxy) {
 			Database.get().unproxyCollection(this);
 			this.proxy = false;
 		}
@@ -213,5 +217,4 @@ public class D3EPersistanceList<E> extends ArrayList<E> {
 		_checkProxy();
 		return super.subList(fromIndex, toIndex);
 	}
-
 }
